@@ -1,4 +1,4 @@
-package main
+package billing
 
 type AWSService int64
 
@@ -44,6 +44,7 @@ const (
 type billable interface {
 	print(Service)
 	billingDetails(string) Service
+	total() float64
 }
 
 type Billable struct {
