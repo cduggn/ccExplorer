@@ -8,7 +8,7 @@ The SDK uses the AWS credential chain to find AWS credentials. The SDK looks for
 
 ## Installation
 
-Get the latest version of go-coin library:
+Get the latest version of cloudcost library:
 ``` 
 (In progress, not yet available)
 go get github.com/cduggn/cloudcost
@@ -16,4 +16,8 @@ go get github.com/cduggn/cloudcost
 
 ## Usage
 
-... will update shortly
+The quickest way to get started is to run the following command:
+
+```shell
+$ cloudcost billing get "Amazon Route 53"
+```
