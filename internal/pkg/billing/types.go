@@ -41,11 +41,11 @@ const (
 	Tax
 )
 
-type billable interface {
-	print(Service)
-	billingDetails(string) Service
-	total() float64
-}
+//type billable interface {
+//	print(Service)
+//	billingDetails(string) Service
+//	total() float64
+//}
 
 type Billable struct {
 	Services map[string]Service

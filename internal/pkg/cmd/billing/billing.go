@@ -41,7 +41,10 @@ func GetBill() *cobra.Command {
 
 	service := ""
 	getCommand.Flags().StringVarP(&service, "service", "s", "", "AWS Service to get billing information for")
-	getCommand.MarkFlagRequired("service")
+	err := getCommand.MarkFlagRequired("service")
+	if err != nil {
+		panic(err)
+	}
 
 	return getCommand
 }

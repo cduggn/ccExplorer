@@ -8,7 +8,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
 	"log"
-	"strconv"
 )
 
 func FetchCloudCost() *Billable {
@@ -77,22 +76,22 @@ func (b Billable) Print(s Service) {
 	}
 }
 
-func (b Billable) total() float64 {
-	var total float64
-	for _, v := range b.Services {
-		for _, m := range v.Metrics {
-			if m.Name == "UnblendedCost" {
-				total += toFloatingPoint(m.Amount)
-			}
-		}
-	}
-	return total
-}
-
-func toFloatingPoint(amount string) float64 {
-	floatNumAmount, _ := strconv.ParseFloat(amount, 64)
-	return floatNumAmount
-}
+//func (b Billable) total() float64 {
+//	var total float64
+//	for _, v := range b.Services {
+//		for _, m := range v.Metrics {
+//			if m.Name == "UnblendedCost" {
+//				total += toFloatingPoint(m.Amount)
+//			}
+//		}
+//	}
+//	return total
+//}
+//
+//func toFloatingPoint(amount string) float64 {
+//	floatNumAmount, _ := strconv.ParseFloat(amount, 64)
+//	return floatNumAmount
+//}
 
 func (b Billable) ForService(s string) Service {
 	return b.Services[s]

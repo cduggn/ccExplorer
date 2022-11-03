@@ -1,22 +1,39 @@
 
 .DEFAULT_GOAL := build
-.PHONY: build
+.PHONY: build checks build imports
 
+GO ?= go
 GOBIN ?= $(shell go env GOPATH)/bin
 GOIMPORTS ?= $(GOBIN)/goimports
-GOLANGCI_LINT ?= $(GOBIN)/golangci-lint
+STATICCHECK ?= $(GOBIN)/staticcheck
 GORELEASER ?= $(GOBIN)/goreleaser
+GOLANGCI_LINT ?= $(GOBIN)/golangci-lint
 
 $(GOIMPORTS):
-	go get golang.org/x/tools/cmd/goimports@latest
+	$(GO) install golang.org/x/tools/cmd/goimports@latest
 
 $(GORELEASER):
-	go install github.com/goreleaser/goreleaser@latest
+	$(GO) install github.com/goreleaser/goreleaser@latest
+
+$(STATICCHECK):
+	$(GO) install honnef.co/go/tools/cmd/staticcheck@latest
 
 $(GOLANGCI_LINT):
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+	$(GO) install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
-build: $(GOIMPORTS) $(GOLANGCI_LINT)
+lint: $(GOLANGCI_LINT)
+	$(GOLANGCI_LINT) run ./...
+
+imports: $(GOIMPORTS)
+	$(GOIMPORTS) -l cmd/ internal/ && echo "OK"
+
+checks: $(STATICCHECK) lint imports
+	$(GO) vet ./...
+	$(STATICCHECK) ./...
+	$(GOLANGCI_LINT) run ./...
+
+build: checks
+	$(GO) build -o bin/ ./...
 
 release: $(GORELEASER)
 	$(GORELEASER) release --rm-dist
