@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# redirect to stderr
+exec 1>&2
+
+if [ -z "$(git diff --cached --name-only)" ]; then
+    echo "----------------------------------------------"
+        echo "Pre-commit: No files to check"
+    echo "----------------------------------------------"
+        exit 0
+fi
+
+echo "------------------------------------------------"
+    echo "Pre-commit: Clean build of project"
+echo "------------------------------------------------"
+
+if (make checks); then
+    echo "------------------------------------------------"
+        echo "Pre-commit: All checks passed"
+    echo "------------------------------------------------"
+        exit 0
+else
+    echo "------------------------------------------------"
+        echo "Pre-commit: Some checks failed"
+    echo "------------------------------------------------"
+        exit 1
+fi

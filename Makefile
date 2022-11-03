@@ -1,13 +1,17 @@
 
 .DEFAULT_GOAL := build
-.PHONY: build checks build imports
+.PHONY: build checks imports release lint setup
 
 GO ?= go
-GOBIN ?= $(shell go env GOPATH)/bin
+GOPATH ?= $(shell $(GO) env GOPATH)
+GOBIN ?= $(GOPATH)/bin
 GOIMPORTS ?= $(GOBIN)/goimports
 STATICCHECK ?= $(GOBIN)/staticcheck
 GORELEASER ?= $(GOBIN)/goreleaser
 GOLANGCI_LINT ?= $(GOBIN)/golangci-lint
+
+setup:
+	git config --local core.hooksPath .githooks/
 
 $(GOIMPORTS):
 	$(GO) install golang.org/x/tools/cmd/goimports@latest
