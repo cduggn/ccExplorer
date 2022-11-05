@@ -7,15 +7,19 @@ import (
 	"os"
 )
 
+var rootCmd = &cobra.Command{
+	Use:   "cloudcost",
+	Short: "A CLI tool to get AWS Costs, Usage and Forecasts",
+	Long:  paintHeader(),
+}
+
 func paintHeader() string {
 	myFigure := figure.NewFigure("CloudCost", "thin", true)
 	return myFigure.String()
 }
 
-var rootCmd = &cobra.Command{
-	Use:   "cloudcost",
-	Short: "A CLI tool to get AWS billing information",
-	Long:  paintHeader(),
+func init() {
+	rootCmd.AddCommand(billing.CostAndUsageCommand())
 }
 
 func Execute() {
@@ -23,8 +27,4 @@ func Execute() {
 	if err != nil {
 		os.Exit(126)
 	}
-}
-
-func init() {
-	rootCmd.AddCommand(billing.BillingCmd())
 }

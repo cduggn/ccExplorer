@@ -1,59 +1,19 @@
 package billing
 
-type AWSService int64
+type CostAndUsageRequest struct {
+	Granularity string
+	GroupBy     []string
+	Tag         string
+}
 
-const (
-	AWSServiceEC2 AWSService = iota
-	AWSServiceECS
-	AWSServiceEKS
-	AWSServiceElasticBeanstalk
-	AWSServiceElasticLoadBalancing
-	AWSServiceElasticMapReduce
-	AWSServiceElasticache
-	AWSServiceGlacier
-	AWSServiceKinesis
-	AWSServiceLambda
-	AWSServiceRDS
-	AWSServiceRedshift
-	AWSServiceS3
-	AWSServiceSES
-	AWSServiceSNS
-	AWSServiceSQS
-	AWSServiceStorageGateway
-	AWSServiceVPC
-	AWSAmplify
-	AWSAppSync
-	AWSAppStream
-	AWSAConfig
-	AWSDataTransfer
-	AWSKeyManagementService
-	AWSLambda
-	AWSSecretsManager
-	AWSStepFunctions
-	AWSAPIGateway
-	AWSCloudFront
-	AWSCognito
-	AWSDynamoDB
-	AWSElasticFileSystem
-	AWSRegistrar
-	AWSRoute53
-	Refund
-	Tax
-)
-
-//type billable interface {
-//	print(Service)
-//	billingDetails(string) Service
-//	total() float64
-//}
-
-type Billable struct {
-	Services map[string]Service
+type CostAndUsageReport struct {
+	Services map[int]Service
 	Start    string
 	End      string
 }
 
 type Service struct {
+	Keys    []string
 	Name    string
 	Metrics []Metrics
 }
