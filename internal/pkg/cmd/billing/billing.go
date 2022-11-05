@@ -3,6 +3,7 @@ package billing
 import (
 	"github.com/common-nighthawk/go-figure"
 	"github.com/spf13/cobra"
+	"time"
 )
 
 var (
@@ -27,6 +28,8 @@ var (
 		- Cost Allocation Tags if you want to filter by tag ( Note cost allocation tags can take up to 24 hours to be applied )`,
 		Run: GetBillingSummary,
 	}
+	startDate string
+	endDate   string
 )
 
 func paintHeader() string {
@@ -40,12 +43,16 @@ func CostAndUsageCommand() *cobra.Command {
 }
 
 func GetCommand() *cobra.Command {
-	getCmd.Flags().StringSliceVarP(&groupBy, "groupByDimension", "d", []string{"SERVICE", "USAGE_TYPE"}, "Group by at most 2 dimension tags [ Dimensions: AZ, SERVICE, USAGE_TYPE ]")
-	getCmd.Flags().StringVarP(&groupByTag, "groupByTag", "t", "", "Group by cost allocation tag")
+	getCmd.Flags().StringSliceVarP(&groupBy, "group-by-dimension", "d", []string{"SERVICE", "USAGE_TYPE"}, "Group by at most 2 dimension tags [ Dimensions: AZ, SERVICE, USAGE_TYPE ]")
+	getCmd.Flags().StringVarP(&groupByTag, "group-by-tag", "t", "", "Group by cost allocation tag")
 	getCmd.Flags().StringVarP(&granularity, "granularity", "g", "DAILY", "Granularity of billing information to fetch")
 	ok := getCmd.MarkFlagRequired("granularity")
 	if ok != nil {
 		panic(ok)
 	}
+
+	getCmd.Flags().StringVarP(&startDate, "start-date", "s", "", "Start date for billing information")
+	getCmd.Flags().StringVarP(&endDate, "end-date", "e", time.Now().Format("2006-01-02"), "End date for billing information")
+
 	return getCmd
 }

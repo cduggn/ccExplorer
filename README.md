@@ -8,16 +8,11 @@ The SDK uses the AWS credential chain to find AWS credentials. The SDK looks for
 
 ## Installation
 
-Get the latest version of cloudcost library:
-``` 
-(In progress, not yet available)
-go get github.com/cduggn/cloudcost
-```
+See the releases page for the latest version.
 
-## Usage
+## Commands
 
-The quickest way to get started is to run the following command:
+### `cost`
+Specify granularity, and 'group by' parameters to get cost data. For example:
 
-```shell
-$ cloudcost billing get "Amazon Route 53"
-```
+    $ cloudcost cost --granularity MONTHLY --group-by-dimension SERVICE --group-by-dimension AZ 

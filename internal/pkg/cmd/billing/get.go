@@ -14,7 +14,7 @@ func GetBillingSummary(cmd *cobra.Command, args []string) {
 
 func NewCostAndUsageRequest(cmd *cobra.Command) billing.CostAndUsageRequest {
 
-	dimensions, err := cmd.Flags().GetStringSlice("groupByDimension")
+	dimensions, err := cmd.Flags().GetStringSlice("group-by-dimension")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -22,7 +22,11 @@ func NewCostAndUsageRequest(cmd *cobra.Command) billing.CostAndUsageRequest {
 	return billing.CostAndUsageRequest{
 		Granularity: cmd.Flags().Lookup("granularity").Value.String(),
 		GroupBy:     dimensions,
-		Tag:         cmd.Flags().Lookup("groupByTag").Value.String(),
+		Tag:         cmd.Flags().Lookup("group-by-tag").Value.String(),
+		Time: billing.Time{
+			Start: cmd.Flags().Lookup("start-date").Value.String(),
+			End:   cmd.Flags().Lookup("end-date").Value.String(),
+		},
 	}
 
 }

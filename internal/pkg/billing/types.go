@@ -1,9 +1,15 @@
 package billing
 
+type Time struct {
+	Start string
+	End   string
+}
+
 type CostAndUsageRequest struct {
 	Granularity string
 	GroupBy     []string
 	Tag         string
+	Time        Time
 }
 
 type CostAndUsageReport struct {

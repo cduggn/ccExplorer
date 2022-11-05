@@ -48,8 +48,8 @@ func GetAWSCostAndUsage(req CostAndUsageRequest) *CostAndUsageReport {
 		Granularity: types.Granularity(req.Granularity),
 		Metrics:     metrics,
 		TimePeriod: &types.DateInterval{
-			Start: aws.String("2022-11-01"),
-			End:   aws.String("2022-11-06"),
+			Start: aws.String(req.Time.Start), //aws.String("2022-11-01"),
+			End:   aws.String(req.Time.End),   //aws.String("2022-11-30"),
 		},
 		GroupBy: groupBy(req),
 	})
