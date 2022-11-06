@@ -12,13 +12,13 @@ var (
 	granularity string
 	filterBy    string
 	billingCmd  = &cobra.Command{
-		Use:   "cost",
+		Use:   "aws",
 		Short: "Fetch Cost and Usage information for default account and region",
 		Long:  paintHeader(),
 	}
 	getCmd = &cobra.Command{
-		Use:   "get",
-		Short: "Bill information",
+		Use:   "get-cost-and-usage",
+		Short: "Cost and Usage information",
 		Long: `
 		GetBill = DESCRIPTION
 		Fetches billing information for the time interval provided using the AWS Cost Explorer API

@@ -3,12 +3,13 @@ package billing
 import "C"
 import (
 	"context"
-	"fmt"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
+	"github.com/jedib0t/go-pretty/v6/table"
 	"log"
+	"os"
 )
 
 var (
@@ -129,17 +130,14 @@ func (c *CostAndUsageReport) CurateReport(output *costexplorer.GetCostAndUsageOu
 }
 
 func (c *CostAndUsageReport) Print() {
-	count := 0
+	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
+	t.AppendHeader(table.Row{"Dimension/Tag", "Dimension/Tag", "Metric Name", "Amount", "Unit"})
 	for _, m := range c.Services {
-		count++
-		fmt.Printf(" \n| %d | GroupedBy", count)
-		for _, k := range m.Keys {
-			fmt.Print(" | ", k, " ")
-		}
-		fmt.Print("\nCost And Usage Report\n")
 		for _, v := range m.Metrics {
-			fmt.Printf("Name: %s: \n", v.Name)
-			fmt.Printf("Amount: %s Unit: %s\n", v.Amount, v.Unit)
+			tempRow := table.Row{m.Keys[0], m.Keys[1], v.Name, v.Amount, v.Unit}
+			t.AppendRow(tempRow)
 		}
 	}
+	t.Render()
 }
