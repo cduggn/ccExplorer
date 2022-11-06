@@ -35,6 +35,20 @@ var (
 			},
 		}
 	}
+	groupByTagAndDimension = func(tag string, dimensions []string) []types.GroupDefinition {
+		var groups []types.GroupDefinition
+		for _, d := range dimensions {
+			groups = append(groups, types.GroupDefinition{
+				Type: types.GroupDefinitionTypeDimension,
+				Key:  aws.String(d),
+			})
+		}
+		groups = append(groups, types.GroupDefinition{
+			Type: types.GroupDefinitionTypeTag,
+			Key:  aws.String(tag),
+		})
+		return groups
+	}
 )
 
 func GetAWSCostAndUsage(req CostAndUsageRequest) *CostAndUsageReport {
@@ -52,6 +66,7 @@ func GetAWSCostAndUsage(req CostAndUsageRequest) *CostAndUsageReport {
 			End:   aws.String(req.Time.End),   //aws.String("2022-11-30"),
 		},
 		GroupBy: groupBy(req),
+		Filter:  filter(req),
 	})
 
 	if err != nil {
@@ -64,12 +79,28 @@ func GetAWSCostAndUsage(req CostAndUsageRequest) *CostAndUsageReport {
 	return c
 }
 
+func filter(req CostAndUsageRequest) *types.Expression {
+	if req.IsFilterEnabled {
+		return &types.Expression{
+			Tags: &types.TagValues{
+				Key:    aws.String(req.Tag),
+				Values: []string{req.TagFilterValue},
+			},
+		}
+	} else {
+		return nil
+	}
+}
+
 func groupBy(req CostAndUsageRequest) []types.GroupDefinition {
-	if req.Tag != "" {
+	if req.Tag != "" && len(req.GroupBy) == 1 {
+		return groupByTagAndDimension(req.Tag, req.GroupBy)
+	} else if req.Tag != "" {
 		return groupByTag(req.Tag)
 	} else {
 		return groupByDimension(req.GroupBy)
 	}
+
 }
 
 func (c *CostAndUsageReport) CurateReport(output *costexplorer.GetCostAndUsageOutput) {

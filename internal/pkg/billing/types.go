@@ -6,10 +6,12 @@ type Time struct {
 }
 
 type CostAndUsageRequest struct {
-	Granularity string
-	GroupBy     []string
-	Tag         string
-	Time        Time
+	Granularity     string
+	GroupBy         []string
+	Tag             string
+	Time            Time
+	IsFilterEnabled bool
+	TagFilterValue  string
 }
 
 type CostAndUsageReport struct {

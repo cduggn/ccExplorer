@@ -19,6 +19,8 @@ func NewCostAndUsageRequest(cmd *cobra.Command) billing.CostAndUsageRequest {
 		fmt.Println(err)
 	}
 
+	filterBy, _ := cmd.Flags().GetString("filter-by")
+
 	return billing.CostAndUsageRequest{
 		Granularity: cmd.Flags().Lookup("granularity").Value.String(),
 		GroupBy:     dimensions,
@@ -27,6 +29,16 @@ func NewCostAndUsageRequest(cmd *cobra.Command) billing.CostAndUsageRequest {
 			Start: cmd.Flags().Lookup("start-date").Value.String(),
 			End:   cmd.Flags().Lookup("end-date").Value.String(),
 		},
+		IsFilterEnabled: isFilterEnabled(filterBy),
+		TagFilterValue:  filterBy,
 	}
 
+}
+
+func isFilterEnabled(filterBy string) bool {
+	if filterBy != "" {
+		return true
+	} else {
+		return false
+	}
 }

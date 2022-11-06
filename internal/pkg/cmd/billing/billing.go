@@ -10,6 +10,7 @@ var (
 	groupBy     []string
 	groupByTag  string
 	granularity string
+	filterBy    string
 	billingCmd  = &cobra.Command{
 		Use:   "cost",
 		Short: "Fetch Cost and Usage information for default account and region",
@@ -52,7 +53,11 @@ func GetCommand() *cobra.Command {
 	}
 
 	getCmd.Flags().StringVarP(&startDate, "start-date", "s", "", "Start date for billing information")
+	ok = getCmd.MarkFlagRequired("start-date")
+	if ok != nil {
+		panic(ok)
+	}
 	getCmd.Flags().StringVarP(&endDate, "end-date", "e", time.Now().Format("2006-01-02"), "End date for billing information")
-
+	getCmd.Flags().StringVarP(&filterBy, "filter-by", "f", "", "When grouping by tag, filter by tag value")
 	return getCmd
 }

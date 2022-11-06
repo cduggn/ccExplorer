@@ -3,7 +3,7 @@
 .PHONY: build checks imports release lint setup
 
 GO ?= go
-GOPATH ?= $(shell $(GO) env GOPATH)
+GOPATH ?= $(shell go env GOPATH)
 GOBIN ?= $(GOPATH)/bin
 GOIMPORTS ?= $(GOBIN)/goimports
 STATICCHECK ?= $(GOBIN)/staticcheck
