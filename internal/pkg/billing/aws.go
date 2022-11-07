@@ -135,9 +135,18 @@ func (c *CostAndUsageReport) Print() {
 	t.AppendHeader(table.Row{"Dimension/Tag", "Dimension/Tag", "Metric Name", "Amount", "Unit"})
 	for _, m := range c.Services {
 		for _, v := range m.Metrics {
-			tempRow := table.Row{m.Keys[0], m.Keys[1], v.Name, v.Amount, v.Unit}
+			tempRow := table.Row{m.Keys[0], isEmpty(m.Keys), v.Name, v.Amount, v.Unit}
 			t.AppendRow(tempRow)
 		}
 	}
 	t.Render()
+}
+
+func isEmpty(s []string) string {
+	if len(s) == 1 {
+		return ""
+	} else {
+		return s[1]
+	}
+
 }
