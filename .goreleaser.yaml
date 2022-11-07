@@ -34,7 +34,7 @@ builds:
       - goarm: mips64
       - gomips: hardfloat
       - goamd64: v4
-    gobinary: "go1.18"
+    gobinary: "go"
     main: ./cmd/cloudcost
 checksum:
   name_template: 'checksums.txt'
