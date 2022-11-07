@@ -28,7 +28,7 @@ lint: $(GOLANGCI_LINT)
 	$(GOLANGCI_LINT) run ./...
 
 imports: $(GOIMPORTS)
-#	$(GOIMPORTS) -l cmd/ internal/ && echo "OK"
+	$(GOIMPORTS) -l ./... && echo "OK"
 
 checks: $(STATICCHECK) lint #imports
 	go vet ./...
