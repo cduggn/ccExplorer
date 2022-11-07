@@ -1,6 +1,6 @@
 
 .DEFAULT_GOAL := build
-.PHONY: build checks imports release lint setup
+.PHONY: build checks goimports release lint setup
 
 GOPATH ?= $(shell go env GOPATH)
 GOBIN ?= $(GOPATH)/bin
@@ -27,10 +27,10 @@ $(GOLANGCI_LINT):
 lint: $(GOLANGCI_LINT)
 	$(GOLANGCI_LINT) run ./...
 
-imports: $(GOIMPORTS)
-	$(GOIMPORTS) -l ./... && echo "OK"
+goimports: $(GOIMPORTS)
+	$(GOIMPORTS) -l cmd/ internal/ && echo "OK"
 
-checks: $(STATICCHECK) lint #imports
+checks: $(STATICCHECK) lint goimports
 	go vet ./...
 	$(STATICCHECK) ./...
 	$(GOLANGCI_LINT) run ./...
