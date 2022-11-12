@@ -59,5 +59,6 @@ func GetCommand() *cobra.Command {
 	}
 	getCmd.Flags().StringVarP(&endDate, "end-date", "e", time.Now().Format("2006-01-02"), "End date for billing information")
 	getCmd.Flags().StringVarP(&filterBy, "filter-by", "f", "", "When grouping by tag, filter by tag value")
+
 	return getCmd
 }

@@ -11,6 +11,7 @@ type CostAndUsageRequest struct {
 	Tag             string
 	Time            Time
 	IsFilterEnabled bool
+	FilterType      string
 	TagFilterValue  string
 }
 
