@@ -6,9 +6,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var report *billing.CostAndUsageReport
+
 func GetBillingSummary(cmd *cobra.Command, args []string) {
 	req := NewCostAndUsageRequest(cmd)
-	report := billing.GetAWSCostAndUsage(req)
+	report = billing.GetAWSCostAndUsage(req)
 	report.Print()
 }
 

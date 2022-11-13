@@ -7,6 +7,8 @@ before:
 builds:
   - main: ./cmd/cloudcost
     binary: cloudcost
+    env:
+      - CGO_ENABLED=0
     goos:
       - linux
       - windows

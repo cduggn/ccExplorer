@@ -1,6 +1,5 @@
 package billing
 
-import "C"
 import (
 	"context"
 	"github.com/aws/aws-sdk-go-v2/aws"
