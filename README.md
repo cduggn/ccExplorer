@@ -21,9 +21,13 @@ AWS billing information is updated up to three times daily. Querying the Cost Ex
 
 Cost Explorer supports the following commands:
 
-### `cost`
+### `get`
 
-The `cost` command returns the total cost for the given time period. The time period can be specified using the `--start-date` and `--end-date` flags. The default time period is the current month.
+The `get` command returns the results of a Cost Explorer query. The `get` command supports the following sub flags:
+
+`aws` - The AWS service to query. This is currently the only cloud service provider that can be queried.
+
+The `aws` command provides the following sub flags:
 
 Arguments:
    - --start-date string   The start date of the time period. The default is the current month.
@@ -33,28 +37,16 @@ Arguments:
    - --group-by-dimension string   The dimension to group the cost by. The default is [ SERVICE,USAGE_TYPE].
    - --group-by-tag string         The tag to group the cost by. The default is no grouping.
 
+Basic usage:
 
-    $ cloudcost aws get-cost-and-usage -g DAILY -t <Cost-Allocation-Tag-Name> -d SERVICE -s 2022-10-01 -f "Some value to filter on"
+The minimum required command is `get aws`. This will return the cost for the past 30 days. The default granularity is DAILY. The default group by dimension is [ SERVICE,USAGE_TYPE]. The default group by tag is no grouping.
 
-Sample output when filtering on tag named ApplicationName
+    $ cloudcost get aws
 
-```bash
-+-------------------------------------+-------------------------+---------------+-------------------+------+
-| DIMENSION/TAG                       | DIMENSION/TAG           | METRIC NAME   | AMOUNT            | UNIT |
-+-------------------------------------+-------------------------+---------------+-------------------+------+
-| AWS Data Transfer                   | ApplicationName$        | BlendedCost   | 0.000000000       | USD  |
-| AWS Data Transfer                   | ApplicationName$        | UnblendedCost | 0.000000000       | USD  |
-| AWS Data Transfer                   | ApplicationName$        | UsageQuantity | 0                 | N/A  |
-| AWS Step Functions                  | ApplicationName$        | UnblendedCost | 0                 | USD  |
-| AWS Step Functions                  | ApplicationName$        | UsageQuantity | 0                 | N/A  |
-| AWS Step Functions                  | ApplicationName$        | BlendedCost   | 0                 | USD  |
-| Amazon API Gateway                  | ApplicationName$        | BlendedCost   | 0                 | USD  |
-| Amazon API Gateway                  | ApplicationName$        | UnblendedCost | 0                 | USD  |
-| Amazon API Gateway                  | ApplicationName$        | UsageQuantity | 0.0000000000      | N/A  |
-| Amazon CloudFront                   | ApplicationName$        | BlendedCost   | 0.0000000000      | USD  |
-| Amazon CloudFront                   | ApplicationName$        | UnblendedCost | 0.0000000000      | USD  |
-| Amazon CloudFront                   | ApplicationName$        | UsageQuantity | 0.0000000000      | N/A  |
-| Refund                              | ApplicationName$        | BlendedCost   | 0                 | USD  |
-| Refund                              | ApplicationName$        | UnblendedCost | 0                 | USD  |
+The following command will return the cost for the past 30 days grouped by the tag `ApplicationName` and the dimension `SERVICE`.
+    
+    $ cloudcost get aws --group-by-tag Environment --group-by-dimension SERVICE
 
-```
+The following command will return the cost for the past 30 days grouped by the tag `ApplicationName` and the dimension `SERVICE` and filter by the tag `ApplicationName` and the value `myApplication`.
+    
+    $ cloudcost get aws --group-by-tag ApplicationName --filter-by myapp --group-by-dimension SERVICE
