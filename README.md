@@ -45,8 +45,12 @@ The minimum required command is `get aws`. This will return the cost for the pas
 
 The following command will return the cost for the past 30 days grouped by the tag `ApplicationName` and the dimension `SERVICE`.
     
-    $ cloudcost get aws --group-by-tag Environment --group-by-dimension SERVICE
+    $ cloudcost get aws --group-by-tag ApplicationName --group-by-dimension SERVICE
 
-The following command will return the cost for the past 30 days grouped by the tag `ApplicationName` and the dimension `SERVICE` and filter by the tag `ApplicationName` and the value `myApplication`.
+The following command will return the cost for the past 30 days grouped by the tag `ApplicationName` and the dimension `SERVICE` and filter by the tag `ApplicationName` and the value `myapp`.
     
     $ cloudcost get aws --group-by-tag ApplicationName --filter-by myapp --group-by-dimension SERVICE
+
+The following command will group the cost by the dimension LINKED_ACCOUNT and filter by the tag `ApplicationName` and the value `myapp`.
+    
+    $ cloudcost get aws --group-by-dimension LINKED_ACCOUNT --group-by-tag ApplicationName--filter-by myapp
