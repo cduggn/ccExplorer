@@ -25,8 +25,8 @@ func NewCostAndUsageRequest(cmd *cobra.Command) billing.CostAndUsageRequest {
 	if err != nil {
 		fmt.Println(err)
 	}
-
 	filterBy, _ := cmd.Flags().GetString("filter-by")
+	excludeCredits, _ := cmd.Flags().GetBool("exclude-credit")
 
 	return billing.CostAndUsageRequest{
 		Granularity: cmd.Flags().Lookup("granularity").Value.String(),
@@ -39,6 +39,7 @@ func NewCostAndUsageRequest(cmd *cobra.Command) billing.CostAndUsageRequest {
 		IsFilterEnabled: isFilterEnabled(filterBy),
 		TagFilterValue:  filterBy,
 		Rates:           rates,
+		ExcludeCredits:  excludeCredits,
 	}
 
 }

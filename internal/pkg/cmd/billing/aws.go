@@ -6,12 +6,13 @@ import (
 )
 
 var (
-	groupBy     []string
-	groupByTag  string
-	granularity string
-	filterBy    string
-	rates       []string
-	billingCmd  = &cobra.Command{
+	excludeCredits bool
+	groupBy        []string
+	groupByTag     string
+	granularity    string
+	filterBy       string
+	rates          []string
+	billingCmd     = &cobra.Command{
 		Use:   "get",
 		Short: "Fetch Cost and Usage information for cloud provider",
 		Long:  paintHeader(),
@@ -54,6 +55,8 @@ func GetCommand() *cobra.Command {
 	getCmd.Flags().StringVarP(&filterBy, "filter-by", "f", "", "When grouping by tag, filter by tag value")
 
 	getCmd.Flags().StringSliceVarP(&rates, "rates", "r", []string{"UNBLENDED_COST"}, "Cost and Usage rates to fetch [ Rates: BLENDED_COST, UNBLENDED_COST, AMORTIZED_COST, NET_AMORTIZED_COST, NET_UNBLENDED_COST, USAGE_QUANTITY ]. Defaults to UNBLENDED_COST")
+
+	getCmd.Flags().BoolVarP(&excludeCredits, "exclude-credit", "c", true, "Exclude credit and refund information in the report. This is enabled by default")
 
 	return getCmd
 }

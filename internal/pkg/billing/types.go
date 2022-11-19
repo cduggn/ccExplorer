@@ -14,6 +14,7 @@ type CostAndUsageRequest struct {
 	FilterType      string
 	TagFilterValue  string
 	Rates           []string
+	ExcludeCredits  bool
 }
 
 type CostAndUsageReport struct {
@@ -27,6 +28,8 @@ type Service struct {
 	Keys    []string
 	Name    string
 	Metrics []Metrics
+	Start   string
+	End     string
 }
 
 type Metrics struct {
