@@ -13,12 +13,14 @@ type CostAndUsageRequest struct {
 	IsFilterEnabled bool
 	FilterType      string
 	TagFilterValue  string
+	Rates           []string
 }
 
 type CostAndUsageReport struct {
-	Services map[int]Service
-	Start    string
-	End      string
+	Services    map[int]Service
+	Start       string
+	End         string
+	Granularity string
 }
 
 type Service struct {

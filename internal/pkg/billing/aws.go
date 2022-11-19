@@ -12,11 +12,6 @@ import (
 )
 
 var (
-	metrics = []string{
-		"UnblendedCost",
-		"BlendedCost",
-		"UsageQuantity",
-	}
 	groupByDimension = func(dimensions []string) []types.GroupDefinition {
 		var groups []types.GroupDefinition
 		for _, d := range dimensions {
@@ -60,7 +55,7 @@ func GetAWSCostAndUsage(req CostAndUsageRequest) *CostAndUsageReport {
 
 	result, err := client.GetCostAndUsage(context.TODO(), &costexplorer.GetCostAndUsageInput{
 		Granularity: types.Granularity(req.Granularity),
-		Metrics:     metrics,
+		Metrics:     req.Rates,
 		TimePeriod: &types.DateInterval{
 			Start: aws.String(req.Time.Start), //aws.String("2022-11-01"),
 			End:   aws.String(req.Time.End),   //aws.String("2022-11-30"),
@@ -75,6 +70,7 @@ func GetAWSCostAndUsage(req CostAndUsageRequest) *CostAndUsageReport {
 	c := &CostAndUsageReport{
 		Services: make(map[int]Service),
 	}
+	c.Granularity = req.Granularity
 	c.CurateReport(result)
 	return c
 }
@@ -131,10 +127,10 @@ func (c *CostAndUsageReport) CurateReport(output *costexplorer.GetCostAndUsageOu
 func (c *CostAndUsageReport) Print() {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
-	t.AppendHeader(table.Row{"Dimension/Tag", "Dimension/Tag", "Metric Name", "Amount", "Unit"})
+	t.AppendHeader(table.Row{"Dimension/Tag", "Dimension/Tag", "Metric Name", "Amount", "Unit", "Granularity", "Start", "End"})
 	for _, m := range c.Services {
 		for _, v := range m.Metrics {
-			tempRow := table.Row{m.Keys[0], isEmpty(m.Keys), v.Name, v.Amount, v.Unit}
+			tempRow := table.Row{m.Keys[0], isEmpty(m.Keys), v.Name, v.Amount, v.Unit, c.Granularity, c.Start, c.End}
 			t.AppendRow(tempRow)
 		}
 	}

@@ -21,6 +21,11 @@ func NewCostAndUsageRequest(cmd *cobra.Command) billing.CostAndUsageRequest {
 		fmt.Println(err)
 	}
 
+	rates, err := cmd.Flags().GetStringSlice("rates")
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	filterBy, _ := cmd.Flags().GetString("filter-by")
 
 	return billing.CostAndUsageRequest{
@@ -33,6 +38,7 @@ func NewCostAndUsageRequest(cmd *cobra.Command) billing.CostAndUsageRequest {
 		},
 		IsFilterEnabled: isFilterEnabled(filterBy),
 		TagFilterValue:  filterBy,
+		Rates:           rates,
 	}
 
 }
