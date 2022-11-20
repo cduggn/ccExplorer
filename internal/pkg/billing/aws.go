@@ -103,6 +103,8 @@ func filter(req CostAndUsageRequest) *types.Expression {
 		expression = filterCredits()
 	} else if req.IsFilterEnabled {
 		expression = filterByTag(req.Tag, req.TagFilterValue)
+	} else {
+		return nil
 	}
 	return expression
 }

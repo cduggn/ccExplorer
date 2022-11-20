@@ -43,16 +43,28 @@ The minimum required command is `get aws`. This will return the cost for the pas
 
     $ cloudcost get aws
 
-The following command will return the cost for the past 30 days grouped by the tag `ApplicationName` and the dimension `SERVICE`.
+Command returns the cost for the past 30 days grouped by the tag `ApplicationName` and the dimension `SERVICE`.
     
     $ cloudcost get aws --group-by-tag ApplicationName --group-by-dimension SERVICE
 
-The following command will return the cost for the past 30 days grouped by the tag `ApplicationName` and the dimension `SERVICE` and filter by the tag `ApplicationName` and the value `myapp`.
+Command returns the cost for the past 30 days grouped by the tag `ApplicationName` and the dimension `SERVICE` and filter by the tag `ApplicationName` and the value `myapp`.
     
     $ cloudcost get aws --group-by-tag ApplicationName --filter-by myapp --group-by-dimension SERVICE
 
-The following command will group the cost by the dimension LINKED_ACCOUNT and filter by the tag `ApplicationName` and the value `myapp`.
+Command groups the cost by the dimension LINKED_ACCOUNT and filter by the tag `ApplicationName` and the value `myapp`.
     
     $ cloudcost get aws --group-by-dimension LINKED_ACCOUNT --group-by-tag ApplicationName--filter-by myapp
+
+Command returns the cost for the past x days based on the provided start date. Refunds and credits are not filtered. UNBLENDED_COST cost is returned.
+
+    $ cloudcost get aws  --group-by-tag ApplicationName --group-by-dimension SERVICE -r UNBLENDED_COST -g MONTHLY -s "2022-10-01"
+
+Command returns the cost for the past x days based on the provided start date. Refunds and credits are filtered . UNBLENDED_COST costs are returned.
+
+    $ cloudcost get aws  --group-by-tag ApplicationName --group-by-dimension SERVICE -r UNBLENDED_COST -g MONTHLY -s "2022-10-01" -c
+
+Command returns the cost for the past x days based on the provided start date and groups by cost allocation tag filtered by specific value. Refunds and credits are filtered.
+
+    $ cloudcost get aws  --group-by-tag ApplicationName --group-by-dimension SERVICE -r UNBLENDED_COST -g MONTHLY -s "2022-10-01" -c -f myapp
 
 Dimension values include the following: AZ, INSTANCE_TYPE, LINKED_ACCOUNT, OPERATION, PURCHASE_TYPE, SERVICE, USAGE_TYPE, USAGE_TYPE_GROUP, RECORD_TYPE, and OPERATING_SYSTEM. For more information, see [Grouping and Filtering](https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-costexplorer.html#ce-grouping-filtering).
