@@ -54,11 +54,14 @@ var (
 			},
 		}
 	}
-	filterByTag = func(tag string, value string) *types.TagValues {
-		return &types.TagValues{
-			Key:    aws.String(tag),
-			Values: []string{value},
+	filterByTag = func(tag string, value string) *types.Expression {
+		return &types.Expression{
+			Tags: &types.TagValues{
+				Key:    aws.String(tag),
+				Values: []string{value},
+			},
 		}
+
 	}
 )
 
@@ -94,11 +97,12 @@ func GetAWSCostAndUsage(req CostAndUsageRequest) *CostAndUsageReport {
 func filter(req CostAndUsageRequest) *types.Expression {
 	expression := &types.Expression{}
 
-	if req.ExcludeCredits {
+	if req.ExcludeCredits && req.IsFilterEnabled {
+		expression.And = []types.Expression{*filterCredits(), *filterByTag(req.Tag, req.TagFilterValue)}
+	} else if req.ExcludeCredits {
 		expression = filterCredits()
-	}
-	if req.IsFilterEnabled {
-		expression.Tags = filterByTag(req.Tag, req.TagFilterValue)
+	} else if req.IsFilterEnabled {
+		expression = filterByTag(req.Tag, req.TagFilterValue)
 	}
 	return expression
 }
@@ -148,12 +152,20 @@ func (c *CostAndUsageReport) Print() {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.AppendHeader(table.Row{"Dimension/Tag", "Dimension/Tag", "Metric Name", "Amount", "Unit", "Granularity", "Start", "End"})
+	var total float64
 	for _, m := range c.Services {
 		for _, v := range m.Metrics {
+			if v.Unit == "USD" {
+				total += ConvertToFloat(v.Amount)
+			}
 			tempRow := table.Row{m.Keys[0], isEmpty(m.Keys), v.Name, v.Amount, v.Unit, c.Granularity, m.Start, m.End}
 			t.AppendRow(tempRow)
 		}
 	}
+	totalHeaderRow := table.Row{"", "", "", "", "", "", "", ""}
+	totalRow := table.Row{"", "", "TOTAL COST", total, "", "", "", ""}
+	t.AppendRow(totalHeaderRow)
+	t.AppendRow(totalRow)
 	t.Render()
 }
 
