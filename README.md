@@ -6,10 +6,6 @@ use case is to surface costs based on pre-defined
 cost allocation tags. 
 This approach simplifies the process of tracking costs across multiple projects and teams.   
 
-**Note**
-There are a number of considerations that 
-The Cost Explorer API can access data for the last 12 months. This tool will only show data for the last 12 months.
-
 
 ## Considerations
  
@@ -19,7 +15,8 @@ There are a number of considerations that need to be taken into account before u
 cost allocation tags are applied to all resources that you want to track. See [cost allocation tags.](https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html)
 - The Cost Explorer API can access data for the last 12 months. This tool will only show data for the last 12 months.
 - Cost Explorer charges per paginated request. Using cost allocation tags help reduce the number of requests that need to be made.
-- The AWS SDK uses the default credentials provider chain. The SDK looks for credentials in the following order: environment variables, shared credentials file, and EC2 instance profile. For more information, see [Configuring the AWS SDK for Go](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html).
+- The AWS SDK uses the default credentials provider chain. The SDK looks for credentials in the following order: environment variables, 
+shared credentials file, and EC2 instance profile or ECS task definition if running on either platform. For more information, see [Configuring the AWS SDK for Go](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html).
 
 ## Installation
 
@@ -29,21 +26,30 @@ Precompiled binaries are available for Linux, Mac, and Windows on the releases [
 
 Cost Explorer supports the following commands:
 
-### `get`
+```bash
+GetBill = DESCRIPTION
+Fetches billing information for the time interval provided using the AWS Cost Explorer API
 
-The `get` command returns the results of a Cost Explorer query. The `get` command supports the following sub flags:
+Prerequisites:
+- AWS credentials must be configured in ~/.aws/credentials
+- AWS region must be configured in ~/.aws/config
+- Cost Allocation Tags if you want to filter by tag ( Note cost allocation tags can take up to 24 hours to be applied )
 
-`aws` - The AWS service to query. This is currently the only cloud service provider that can be queried.
+Usage:
+  cloudcost get aws [flags]
 
-The `aws` command provides the following sub flags:
+Flags:
+  -e, --end-date string              End date for billing information. Default is todays date. (default "2022-11-23")
+  -c, --exclude-credit               Exclude credit and refund information in the report. This is enabled by default
+  -f, --filter-by string             When grouping by tag, filter by tag value
+  -g, --granularity string           Granularity of billing information to fetch (default "DAILY")
+  -d, --group-by-dimension strings   Group by at most 2 dimension tags [ Dimensions: AZ, SERVICE, USAGE_TYPE ] (default [SERVICE,USAGE_TYPE])
+  -t, --group-by-tag string          Group by cost allocation tag
+  -h, --help                         help for aws
+  -r, --rates strings                Cost and Usage rates to fetch [ Rates: BLENDED_COST, UNBLENDED_COST, AMORTIZED_COST, NET_AMORTIZED_COST, NET_UNBLENDED_COST, USAGE_QUANTITY ]. Defaults to UNBLENDED_COST (default [UNBLENDED_COST])
+  -s, --start-date string            Start date for billing information. Defaults to the past 7 days (default "2022-10-24")
+```
 
-Arguments:
-   - --start-date string   The start date of the time period. The default is the current month.
-   - --end-date string     The end date of the time period. The default is the current month.
-   - --filter-by string    The filter to apply to the cost. The default is no filter. Used when the --group-by-tage flag is set.
-   - --granularity string  The granularity of the cost. The default is DAILY.
-   - --group-by-dimension string   The dimension to group the cost by. The default is [ SERVICE,USAGE_TYPE].
-   - --group-by-tag string         The tag to group the cost by. The default is no grouping.
 
 Basic usage:
 
