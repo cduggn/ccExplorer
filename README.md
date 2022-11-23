@@ -1,23 +1,31 @@
 # cloudcost
 
-A `Go` command line tool which supports exploring AWS costs using the AWS Cost Explorer SDK. 
+`cloudcost` is a simple command line tool to track the cost of your cloud resources.
+It is designed to be used with AWS, but could be extended to other cloud providers. It's primary 
+use case is to surface costs based on pre-defined 
+cost allocation tags. 
+This approach simplifies the process of tracking costs across multiple projects and teams.   
 
 **Note**
+There are a number of considerations that 
 The Cost Explorer API can access data for the last 12 months. This tool will only show data for the last 12 months.
 
 
-## Prerequisites
+## Considerations
+ 
+There are a number of considerations that need to be taken into account before using this tool. 
 
-The SDK uses the AWS credential chain to find AWS credentials. The SDK looks for credentials in the following order: environment variables, shared credentials file, and EC2 instance profile. For more information, see [Configuring the AWS SDK for Go](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html).
+- You will want to decide what cost allocation tags you will use to track costs. You will also need to ensure that the 
+cost allocation tags are applied to all resources that you want to track. See [cost allocation tags.](https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html)
+- The Cost Explorer API can access data for the last 12 months. This tool will only show data for the last 12 months.
+- Cost Explorer charges per paginated request. Using cost allocation tags help reduce the number of requests that need to be made.
+- The AWS SDK uses the default credentials provider chain. The SDK looks for credentials in the following order: environment variables, shared credentials file, and EC2 instance profile. For more information, see [Configuring the AWS SDK for Go](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html).
 
 ## Installation
 
-See the releases page for the latest version.
+Precompiled binaries are available for Linux, Mac, and Windows on the releases [page](https://github.com/cduggn/cloudcost/releases).
 
 ## Commands
-
-**Note**
-AWS billing information is updated up to three times daily. Querying the Cost Explorer is charged per paginated request. The default page size is 20. The default page size can be changed using the `--page-size` flag.
 
 Cost Explorer supports the following commands:
 
