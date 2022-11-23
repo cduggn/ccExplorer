@@ -17,14 +17,16 @@ cost allocation tags are applied to all resources that you want to track. See [c
 - Cost Explorer charges per paginated request. Using cost allocation tags help reduce the number of requests that need to be made.
 - The AWS SDK uses the default credentials provider chain. The SDK looks for credentials in the following order: environment variables, 
 shared credentials file, and EC2 instance profile or ECS task definition if running on either platform. For more information, see [Configuring the AWS SDK for Go](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html).
+- Unblended costs are used to calculate the total cost of a resource. Unblended costs are the sum of the costs of all usage of a resource. This is the default cost tyoe returned by the tool. 
+- Credits and refunds are automatically applied to your account. Both can be excluded from the cost data by setting the `exclude_credit` flag to `true`.
 
 ## Installation
 
 Precompiled binaries are available for Linux, Mac, and Windows on the releases [page](https://github.com/cduggn/cloudcost/releases).
 
-## Commands
+## Usage
 
-Cost Explorer supports the following commands:
+Cost Explorer supports the `get aws` command and subcommand with the following options:
 
 ```bash
 GetBill = DESCRIPTION
@@ -50,35 +52,16 @@ Flags:
   -s, --start-date string            Start date for billing information. Defaults to the past 7 days (default "2022-10-24")
 ```
 
+## Examples
+A sample command to fetch billing information for the past 7 days grouped by service and usage type:
 
-Basic usage:
+```bash
+cloudcost get aws -s 2021-10-24 -e 2021-10-31 -g DAILY -r UNBLENDED_COST -g SERVICE -g USAGE_TYPE
+```
 
-The minimum required command is `get aws`. This will return the cost for the past 30 days. The default granularity is DAILY. The default group by dimension is [ SERVICE,USAGE_TYPE]. The default group by tag is no grouping.
+Using cost allocation tags to filter by project:
 
-    $ cloudcost get aws
+```bash
+cloudcost get aws -t Project -f my-project -d SERVICE -g MONTHLY -s 2022-10-01 -e 2022-11-21 -r UNBLENDED_COST
+```
 
-Command returns the cost for the past 30 days grouped by the tag `ApplicationName` and the dimension `SERVICE`.
-    
-    $ cloudcost get aws --group-by-tag ApplicationName --group-by-dimension SERVICE
-
-Command returns the cost for the past 30 days grouped by the tag `ApplicationName` and the dimension `SERVICE` and filter by the tag `ApplicationName` and the value `myapp`.
-    
-    $ cloudcost get aws --group-by-tag ApplicationName --filter-by myapp --group-by-dimension SERVICE
-
-Command groups the cost by the dimension LINKED_ACCOUNT and filter by the tag `ApplicationName` and the value `myapp`.
-    
-    $ cloudcost get aws --group-by-dimension LINKED_ACCOUNT --group-by-tag ApplicationName--filter-by myapp
-
-Command returns the cost for the past x days based on the provided start date. Refunds and credits are not filtered. UNBLENDED_COST cost is returned.
-
-    $ cloudcost get aws  --group-by-tag ApplicationName --group-by-dimension SERVICE -r UNBLENDED_COST -g MONTHLY -s "2022-10-01"
-
-Command returns the cost for the past x days based on the provided start date. Refunds and credits are filtered . UNBLENDED_COST costs are returned.
-
-    $ cloudcost get aws  --group-by-tag ApplicationName --group-by-dimension SERVICE -r UNBLENDED_COST -g MONTHLY -s "2022-10-01" -c
-
-Command returns the cost for the past x days based on the provided start date and groups by cost allocation tag filtered by specific value. Refunds and credits are filtered.
-
-    $ cloudcost get aws  --group-by-tag ApplicationName --group-by-dimension SERVICE -r UNBLENDED_COST -g MONTHLY -s "2022-10-01" -c -f myapp
-
-Dimension values include the following: AZ, INSTANCE_TYPE, LINKED_ACCOUNT, OPERATION, PURCHASE_TYPE, SERVICE, USAGE_TYPE, USAGE_TYPE_GROUP, RECORD_TYPE, and OPERATING_SYSTEM. For more information, see [Grouping and Filtering](https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-costexplorer.html#ce-grouping-filtering).
