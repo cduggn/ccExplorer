@@ -19,6 +19,9 @@ cost allocation tags are applied to all resources that you want to track. See [c
 shared credentials file, and EC2 instance profile or ECS task definition if running on either platform. For more information, see [Configuring the AWS SDK for Go](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html).
 - Unblended costs are used to calculate the total cost of a resource. Unblended costs are the sum of the costs of all usage of a resource. This is the default cost tyoe returned by the tool. 
 - Credits and refunds are automatically applied to your account. Both can be excluded from the cost data by setting the `exclude_credit` flag to `true`.
+- Cost Explorer API calls can be expensive. The tool will cache the results of the API calls to reduce the number of calls that need to be made. The cache is stored in the `~/.cloudcost` directory. [in-progress]
+- Cost Explorer API calls can be tracked using CloudTrail. Requests are issued against us-east-1. 
+
 
 ## Installation
 
