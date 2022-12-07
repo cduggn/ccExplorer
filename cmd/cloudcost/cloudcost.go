@@ -8,38 +8,12 @@ import (
 	"os"
 )
 
-func main() {
-	//cmd.Execute()
-	createDB()
-	insertCustomer()
-}
-
-func createDB() {
-
-	if _, err := os.Stat("cloudcost.db"); os.IsNotExist(err) {
-		db, err := os.Create("cloudcost.db")
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		createTable()
-
-		defer db.Close()
-
-		log.Println("Database created")
-	}
-
-}
-
-func createTable() {
-	db, err := sql.Open("sqlite3", "./cloudcost.db")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	sqlStmt := `
-		CREATE TABLE customers (
+var (
+	dbType          = "sqlite3"
+	dbName          = "cloudcost.db"
+	dbLocation      = "./"
+	createTableStmt = `
+		CREATE TABLE cloudCostData (
 		    till_id INTEGER PRIMARY KEY AUTOINCREMENT, 
 		    client_id VARCHAR(64) NULL, 
 		    first_name VARCHAR(255) NOT NULL, 
@@ -48,23 +22,51 @@ func createTable() {
 		    dob DATETIME NULL, type VARCHAR(1))
 		    )
 		    )
-		`
+    `
+	insertStmt = "INSERT INTO cloudCostData(client_id, first_name, last_name, guid, dob, type) values(?, ?, ?, ?, ?, ?)"
+)
 
-	_, err = db.Exec(sqlStmt)
-	if err != nil {
-		log.Printf("%q: %s", err, sqlStmt)
-		return
+func main() {
+	//cmd.Execute()
+	createDatabase()
+	insertCustomer()
+}
+
+func createDatabase() {
+
+	if _, err := os.Stat(dbName); os.IsNotExist(err) {
+		db, err := os.Create(dbName)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer db.Close()
+		createCostDataTable()
+		log.Println("Database created")
 	}
 }
 
-func insertCustomer() {
-	db, err := sql.Open("sqlite3", "./cloudcost.db")
+func createCostDataTable() {
+	db, err := sql.Open("sqlite3", fmt.Sprintf("%s%s", dbLocation, dbName))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("INSERT INTO customers(client_id, first_name, last_name, guid, dob, type) values(?, ?, ?, ?, ?, ?)")
+	_, err = db.Exec(createTableStmt)
+	if err != nil {
+		log.Printf("%q: %s", err, createTableStmt)
+		return
+	}
+}
+
+func insertCustomer() {
+	db, err := sql.Open(dbType, fmt.Sprintf("%s%s", dbLocation, dbName))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	stmt, err := db.Prepare(insertStmt)
 	if err != nil {
 		log.Fatal(err)
 	}
