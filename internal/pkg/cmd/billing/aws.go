@@ -48,7 +48,7 @@ func CostAndUsageCommand() *cobra.Command {
 func GetCommand() *cobra.Command {
 	getCmd.Flags().StringSliceVarP(&groupBy, "group-by-dimension", "d", []string{"SERVICE", "USAGE_TYPE"}, "Group by at most 2 dimension tags [ Dimensions: AZ, SERVICE, USAGE_TYPE ]")
 	getCmd.Flags().StringVarP(&groupByTag, "group-by-tag", "t", "", "Group by cost allocation tag")
-	getCmd.Flags().StringVarP(&granularity, "granularity", "g", "DAILY", "Granularity of billing information to fetch")
+	getCmd.Flags().StringVarP(&granularity, "granularity", "g", "MONTHLY", "Granularity of billing information to fetch. Monthly, Daily or Hourly")
 
 	getCmd.Flags().StringVarP(&startDate, "start-date", "s", PastMonth(), "Start date for billing information. Defaults to the past 7 days")
 	getCmd.Flags().StringVarP(&endDate, "end-date", "e", Today(), "End date for billing information. Default is todays date.")

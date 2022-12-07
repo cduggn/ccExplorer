@@ -35,6 +35,10 @@ checks: $(STATICCHECK) lint goimports
 	$(STATICCHECK) ./...
 	$(GOLANGCI_LINT) run ./...
 
+run:
+	go env -w CGO_ENABLED=1
+	go run ./cmd/cloudcost/cloudcost.go
+
 build: checks
 	go build -o bin/ ./...
 
