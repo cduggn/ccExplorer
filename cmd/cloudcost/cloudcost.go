@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"github.com/cduggn/cloudcost/internal/pkg/cmd"
 	"github.com/cduggn/cloudcost/internal/pkg/storage"
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -11,10 +11,10 @@ var (
 )
 
 func main() {
-	//cmd.Execute()
+	cmd.Execute()
 	createStorageBackend(costDataStorage)
 	insertCustomer()
-	fmt.Println("Work done!")
+
 }
 
 func createStorageBackend(st storage.Persistent) {
