@@ -24,6 +24,7 @@ var (
 		    end_date DATETIME NOT NULL)
     `
 	insertStmt = "INSERT INTO cloudCostData (dimension, dimension2, tag, metric_name, amount, unit, granularity, start_date, end_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+	database   *CostDataStorage
 )
 
 func newPersistentStorage(dbName string) int {
@@ -43,13 +44,19 @@ func newConnection(dbType string, dbName string) (*CostDataStorage, error) {
 		logger.Error(err.Error())
 		return nil, err
 	}
-	return &CostDataStorage{db}, nil
+
+	database = &CostDataStorage{db}
+
+	return database, nil
 }
 
 func New(driverName, dbName string) *CostDataStorage {
 
-	newDatabase := false
+	if database != nil {
+		return database
+	}
 
+	newDatabase := false
 	if _, err := os.Stat(dbName); os.IsNotExist(err) {
 		newDatabase = true
 		res := newPersistentStorage(dbName)
