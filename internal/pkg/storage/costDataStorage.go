@@ -2,17 +2,14 @@ package storage
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/cduggn/cloudcost/internal/pkg/logger"
+	_ "github.com/mattn/go-sqlite3"
 	"go.uber.org/zap"
 	"log"
 	"os"
 )
 
 var (
-	dbType          = "sqlite3"
-	dbName          = "cloudcost.db"
-	dbLocation      = "./"
 	createTableStmt = `
 		CREATE TABLE cloudCostData (
 		    till_id INTEGER PRIMARY KEY AUTOINCREMENT, 
@@ -29,54 +26,84 @@ var (
 	insertStmt = "INSERT INTO cloudCostData (dimension, dimension2, tag, metric_name, amount, unit, granularity, start_date, end_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
 )
 
-func (cd CostDataStorage) NewPersistentStorage() {
+func newPersistentStorage(dbName string) int {
+	file, err := os.Create(dbName)
+	if err != nil {
+		logger.Error(err.Error())
+		return -1
+	}
+	defer file.Close()
+	logger.Info("Database created", zap.String("db", dbName))
+	return 0
+}
+
+func newConnection(dbType string, dbName string) (*CostDataStorage, error) {
+	db, err := sql.Open(dbType, dbName)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, err
+	}
+	return &CostDataStorage{db}, nil
+}
+
+func New(driverName, dbName string) *CostDataStorage {
+
+	newDatabase := false
 
 	if _, err := os.Stat(dbName); os.IsNotExist(err) {
-		db, err := os.Create(dbName)
-		if err != nil {
-			logger.Error(err.Error())
+		newDatabase = true
+		res := newPersistentStorage(dbName)
+		if res == -1 {
+			logger.Error("Could not create database")
+			return nil
 		}
-		defer db.Close()
-
-		logger.Info("Database created", zap.String("db", dbName))
 	}
-}
 
-func (cd CostDataStorage) CreateCostDataTable() {
-	db, err := sql.Open("sqlite3", fmt.Sprintf("%s%s", dbLocation, dbName))
+	db, err := newConnection(driverName, dbName)
 	if err != nil {
 		logger.Error(err.Error())
+		return nil
 	}
-	defer db.Close()
 
-	_, err = db.Exec(createTableStmt)
+	if newDatabase {
+		res := createCostDataTable(db)
+		if res == -1 {
+			logger.Error("Could not create table")
+			return nil
+		}
+	}
+	return db
+}
+
+func createCostDataTable(db *CostDataStorage) int {
+	_, err := db.Exec(createTableStmt)
 	if err != nil {
 		log.Printf("%q: %s", err, createTableStmt)
-		return
+		return -1
 	}
 	logger.Info("Table created", zap.String("table", "cloudCostData"))
+	return 0
 }
 
-func (cd CostDataStorage) InsertCustomer() {
-	db, err := sql.Open(dbType, fmt.Sprintf("%s%s", dbLocation, dbName))
-	if err != nil {
-		logger.Error(err.Error())
-	}
-	defer db.Close()
+func InsertCustomer(db *CostDataStorage) int {
 
 	stmt, err := db.Prepare(insertStmt)
 	if err != nil {
 		logger.Error(err.Error())
+		return -1
 	}
 	defer stmt.Close()
 
 	res, err := stmt.Exec("dimension", "dimension2", "tag", "metric_name", 1.0, "unit", "granularity", "start_date", "end_date")
 	if err != nil {
 		logger.Error(err.Error())
+		return -1
 	}
 	id, err := res.LastInsertId()
 	if err != nil {
 		logger.Error(err.Error())
+		return -1
 	}
 	logger.Info("Row added", zap.Int64("rowId", id))
+	return 0
 }

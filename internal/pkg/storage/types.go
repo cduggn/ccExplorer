@@ -1,5 +1,7 @@
 package storage
 
+import "database/sql"
+
 type Persistent interface {
 	NewPersistentStorage()
 	CreateCostDataTable()
@@ -7,4 +9,5 @@ type Persistent interface {
 }
 
 type CostDataStorage struct {
+	*sql.DB
 }

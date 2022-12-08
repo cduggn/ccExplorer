@@ -7,21 +7,12 @@ import (
 )
 
 var (
-	costDataStorage storage.CostDataStorage
+	database *storage.CostDataStorage
 )
 
 func main() {
 	cmd.Execute()
-	createStorageBackend(costDataStorage)
-	insertCustomer()
+	database = storage.New("sqlite3", "./cloudcost.db")
+	storage.InsertCustomer(database)
 
-}
-
-func createStorageBackend(st storage.Persistent) {
-	st.NewPersistentStorage()
-	st.CreateCostDataTable()
-}
-
-func insertCustomer() {
-	costDataStorage.InsertCustomer()
 }
