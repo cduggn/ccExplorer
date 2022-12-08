@@ -13,6 +13,19 @@ var (
 func main() {
 	cmd.Execute()
 	database = storage.New("sqlite3", "./cloudcost.db")
-	storage.InsertCustomer(database)
+
+	record := storage.CostDataInsert{
+		Dimension:   "test",
+		Dimension2:  "test2",
+		Tag:         "test3",
+		MetricName:  "test4",
+		Amount:      1.0,
+		Unit:        "test5",
+		Granularity: "test6",
+		StartDate:   "test7",
+		EndDate:     "test8",
+	}
+
+	storage.InsertCustomer(database, record)
 
 }

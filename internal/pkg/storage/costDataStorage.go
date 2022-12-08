@@ -85,7 +85,7 @@ func createCostDataTable(db *CostDataStorage) int {
 	return 0
 }
 
-func InsertCustomer(db *CostDataStorage) int {
+func InsertCustomer(db *CostDataStorage, data CostDataInsert) int {
 
 	stmt, err := db.Prepare(insertStmt)
 	if err != nil {
@@ -94,7 +94,7 @@ func InsertCustomer(db *CostDataStorage) int {
 	}
 	defer stmt.Close()
 
-	res, err := stmt.Exec("dimension", "dimension2", "tag", "metric_name", 1.0, "unit", "granularity", "start_date", "end_date")
+	res, err := stmt.Exec(data.Dimension, data.Dimension2, data.Tag, data.MetricName, data.Amount, data.Unit, data.Granularity, data.StartDate, data.EndDate)
 	if err != nil {
 		logger.Error(err.Error())
 		return -1
@@ -107,3 +107,6 @@ func InsertCustomer(db *CostDataStorage) int {
 	logger.Info("Row added", zap.Int64("rowId", id))
 	return 0
 }
+
+
+
