@@ -1,12 +1,10 @@
-package billing
+package cmd
 
 import (
 	"fmt"
 	"github.com/cduggn/cloudcost/internal/pkg/billing"
 	"github.com/spf13/cobra"
 )
-
-var report *billing.CostAndUsageReport
 
 func GetBillingSummary(cmd *cobra.Command, args []string) {
 	req := NewCostAndUsageRequest(cmd)

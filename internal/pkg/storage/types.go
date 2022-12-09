@@ -9,7 +9,15 @@ type Persistent interface {
 }
 
 type CostDataStorage struct {
-	*sql.DB
+	SQLite *sql.DB
+}
+
+type DBError struct {
+	msg string
+}
+
+func (e DBError) Error() string {
+	return e.msg
 }
 
 type CostDataInsert struct {

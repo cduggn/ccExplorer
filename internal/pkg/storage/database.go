@@ -2,6 +2,7 @@ package storage
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/cduggn/cloudcost/internal/pkg/logger"
 	_ "github.com/mattn/go-sqlite3"
 	"go.uber.org/zap"
@@ -27,63 +28,66 @@ var (
 	database   *CostDataStorage
 )
 
-func newPersistentStorage(dbName string) int {
-	file, err := os.Create(dbName)
-	if err != nil {
-		logger.Error(err.Error())
-		return -1
-	}
-	defer file.Close()
-	logger.Info("Database created", zap.String("db", dbName))
-	return 0
-}
+func (c CostDataStorage) New(dbName string) error {
 
-func newConnection(dbType string, dbName string) (*CostDataStorage, error) {
-	db, err := sql.Open(dbType, dbName)
-	if err != nil {
-		logger.Error(err.Error())
-		return nil, err
-	}
-
-	database = &CostDataStorage{db}
-
-	return database, nil
-}
-
-func New(driverName, dbName string) *CostDataStorage {
-
+	// if database already exists then return
 	if database != nil {
-		return database
-	}
-
-	newDatabase := false
-	if _, err := os.Stat(dbName); os.IsNotExist(err) {
-		newDatabase = true
-		res := newPersistentStorage(dbName)
-		if res == -1 {
-			logger.Error("Could not create database")
-			return nil
-		}
-	}
-
-	db, err := newConnection(driverName, dbName)
-	if err != nil {
-		logger.Error(err.Error())
 		return nil
 	}
 
-	if newDatabase {
-		res := createCostDataTable(db)
-		if res == -1 {
-			logger.Error("Could not create table")
-			return nil
-		}
+	// create the physical file if not already in place
+	_, err := c.CreateFile(dbName)
+	if err != nil {
+		logger.Error(err.Error())
+		return DBError{msg: err.Error()}
 	}
-	return db
+
+	// create the database name
+	err = c.Set(dbName)
+	if err != nil {
+		logger.Error(err.Error())
+		return DBError{msg: err.Error()}
+	}
+
+	// create the table
+	res := c.createCostDataTable()
+	if res == -1 {
+		msg := "Could not create table"
+		logger.Error(msg)
+		return DBError{msg: msg}
+	}
+
+	return nil
 }
 
-func createCostDataTable(db *CostDataStorage) int {
-	_, err := db.Exec(createTableStmt)
+// return 0 if creation was a success or -1 if file was not created
+func (c CostDataStorage) CreateFile(dbName string) (int, error) {
+	if _, err := os.Stat(dbName); os.IsNotExist(err) {
+		file, err := os.Create(dbName)
+		if err != nil {
+			logger.Error(err.Error())
+			return -1, &DBError{msg: "Could not create database"}
+		}
+		defer file.Close()
+		return 0, nil
+	}
+	return -1, nil
+}
+
+// create a database with named provided as arg
+func (c CostDataStorage) Set(s string) error {
+	// create a database connection
+	_, err := sql.Open("sqlite3", s)
+	if err != nil {
+		return err
+	}
+	//c.SQLite = db
+	return nil
+}
+
+// return -1 and or error if table was not created , return 0 if table was created
+func (c CostDataStorage) createCostDataTable() int {
+	_, err := c.SQLite.Exec(createTableStmt)
 	if err != nil {
 		log.Printf("%q: %s", err, createTableStmt)
 		return -1
@@ -92,9 +96,9 @@ func createCostDataTable(db *CostDataStorage) int {
 	return 0
 }
 
-func InsertCustomer(db *CostDataStorage, data CostDataInsert) int {
+func (c CostDataStorage) InsertCustomer(data CostDataInsert) int {
 
-	stmt, err := db.Prepare(insertStmt)
+	stmt, err := c.SQLite.Prepare(insertStmt)
 	if err != nil {
 		logger.Error(err.Error())
 		return -1
@@ -115,5 +119,10 @@ func InsertCustomer(db *CostDataStorage, data CostDataInsert) int {
 	return 0
 }
 
+func (c CostDataStorage) String() string {
+	return fmt.Sprintf("%v", c.SQLite)
+}
 
-
+func (c CostDataStorage) Type() string {
+	return "*sql.DB"
+}

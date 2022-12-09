@@ -1,4 +1,4 @@
-package billing
+package cmd
 
 import (
 	"github.com/common-nighthawk/go-figure"
@@ -39,13 +39,13 @@ func paintHeader() string {
 	return myFigure.String()
 }
 
-func CostAndUsageCommand() *cobra.Command {
+func AWSCostAndUsageCommand() *cobra.Command {
 	billingCmd.AddCommand(GetCommand())
-
 	return billingCmd
 }
 
 func GetCommand() *cobra.Command {
+
 	getCmd.Flags().StringSliceVarP(&groupBy, "group-by-dimension", "d", []string{"SERVICE", "USAGE_TYPE"}, "Group by at most 2 dimension tags [ Dimensions: AZ, SERVICE, USAGE_TYPE ]")
 	getCmd.Flags().StringVarP(&groupByTag, "group-by-tag", "t", "", "Group by cost allocation tag")
 	getCmd.Flags().StringVarP(&granularity, "granularity", "g", "MONTHLY", "Granularity of billing information to fetch. Monthly, Daily or Hourly")

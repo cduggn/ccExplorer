@@ -1,4 +1,4 @@
-package billing
+package cmd
 
 import (
 	"testing"
@@ -15,5 +15,3 @@ func TestDate(t *testing.T) {
 		t.Errorf("updatedTime %s is not before today %s", updatedTime.Format("2006-01-02"), today.Format("2006-01-02"))
 	}
 }
-
-
