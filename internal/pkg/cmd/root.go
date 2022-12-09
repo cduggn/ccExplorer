@@ -18,9 +18,7 @@ var (
 
 func init() {
 
-	rootCmd.PersistentFlags().Var(database, "db", "Database connection")
 	rootCmd.AddCommand(AWSCostAndUsageCommand())
-	//rootCmd.AddCommand(GCPCostAndUsageCommand(database))
 }
 
 func paintRootHeader() string {
@@ -30,7 +28,7 @@ func paintRootHeader() string {
 
 func Execute(db *storage.CostDataStorage) {
 	database = db
-
+	rootCmd.PersistentFlags().Var(database, "db", "Database connection")
 	err := rootCmd.Execute()
 	if err != nil {
 		os.Exit(126)

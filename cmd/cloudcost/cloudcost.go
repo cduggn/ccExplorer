@@ -7,17 +7,12 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-var (
-	database *storage.CostDataStorage
-)
-
 func main() {
-
 	// create new database if instance does not already exist
+	database := &storage.CostDataStorage{}
 	err := database.New("./cloudcost.db")
 	if err != nil {
 		logger.Error(err.Error())
 	}
-
 	cmd.Execute(database)
 }

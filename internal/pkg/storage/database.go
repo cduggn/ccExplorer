@@ -28,7 +28,7 @@ var (
 	database   *CostDataStorage
 )
 
-func (c CostDataStorage) New(dbName string) error {
+func (c *CostDataStorage) New(dbName string) error {
 
 	// if database already exists then return
 	if database != nil {
@@ -61,7 +61,7 @@ func (c CostDataStorage) New(dbName string) error {
 }
 
 // return 0 if creation was a success or -1 if file was not created
-func (c CostDataStorage) CreateFile(dbName string) (int, error) {
+func (c *CostDataStorage) CreateFile(dbName string) (int, error) {
 	if _, err := os.Stat(dbName); os.IsNotExist(err) {
 		file, err := os.Create(dbName)
 		if err != nil {
@@ -75,18 +75,17 @@ func (c CostDataStorage) CreateFile(dbName string) (int, error) {
 }
 
 // create a database with named provided as arg
-func (c CostDataStorage) Set(s string) error {
-	// create a database connection
-	_, err := sql.Open("sqlite3", s)
+func (c *CostDataStorage) Set(s string) error {
+	db, err := sql.Open("sqlite3", s)
 	if err != nil {
 		return err
 	}
-	//c.SQLite = db
+	c.SQLite = db
 	return nil
 }
 
 // return -1 and or error if table was not created , return 0 if table was created
-func (c CostDataStorage) createCostDataTable() int {
+func (c *CostDataStorage) createCostDataTable() int {
 	_, err := c.SQLite.Exec(createTableStmt)
 	if err != nil {
 		log.Printf("%q: %s", err, createTableStmt)
@@ -96,7 +95,7 @@ func (c CostDataStorage) createCostDataTable() int {
 	return 0
 }
 
-func (c CostDataStorage) InsertCustomer(data CostDataInsert) int {
+func (c *CostDataStorage) InsertCustomer(data CostDataInsert) int {
 
 	stmt, err := c.SQLite.Prepare(insertStmt)
 	if err != nil {
@@ -119,10 +118,10 @@ func (c CostDataStorage) InsertCustomer(data CostDataInsert) int {
 	return 0
 }
 
-func (c CostDataStorage) String() string {
+func (c *CostDataStorage) String() string {
 	return fmt.Sprintf("%v", c.SQLite)
 }
 
-func (c CostDataStorage) Type() string {
+func (c *CostDataStorage) Type() string {
 	return "*sql.DB"
 }
