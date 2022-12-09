@@ -2,11 +2,9 @@ package storage
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/cduggn/cloudcost/internal/pkg/logger"
 	_ "github.com/mattn/go-sqlite3"
 	"go.uber.org/zap"
-	"log"
 	"os"
 )
 
@@ -38,7 +36,6 @@ func (c *CostDataStorage) New(dbName string) error {
 	// create the physical file if not already in place
 	_, err := c.CreateFile(dbName)
 	if err != nil {
-		logger.Error(err.Error())
 		return DBError{msg: err.Error()}
 	}
 
@@ -53,7 +50,6 @@ func (c *CostDataStorage) New(dbName string) error {
 	res := c.createCostDataTable()
 	if res == -1 {
 		msg := "Could not create table"
-		logger.Error(msg)
 		return DBError{msg: msg}
 	}
 
@@ -65,7 +61,6 @@ func (c *CostDataStorage) CreateFile(dbName string) (int, error) {
 	if _, err := os.Stat(dbName); os.IsNotExist(err) {
 		file, err := os.Create(dbName)
 		if err != nil {
-			logger.Error(err.Error())
 			return -1, &DBError{msg: "Could not create database"}
 		}
 		defer file.Close()
@@ -88,7 +83,6 @@ func (c *CostDataStorage) Set(s string) error {
 func (c *CostDataStorage) createCostDataTable() int {
 	_, err := c.SQLite.Exec(createTableStmt)
 	if err != nil {
-		log.Printf("%q: %s", err, createTableStmt)
 		return -1
 	}
 	logger.Info("Table created", zap.String("table", "cloudCostData"))
@@ -116,12 +110,4 @@ func (c *CostDataStorage) InsertCustomer(data CostDataInsert) int {
 	}
 	logger.Info("Row added", zap.Int64("rowId", id))
 	return 0
-}
-
-func (c *CostDataStorage) String() string {
-	return fmt.Sprintf("%v", c.SQLite)
-}
-
-func (c *CostDataStorage) Type() string {
-	return "*sql.DB"
 }

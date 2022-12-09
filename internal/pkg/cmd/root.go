@@ -13,11 +13,10 @@ var (
 		Short: "A CLI tool to get AWS Costs, Usage and Forecasts",
 		Long:  paintRootHeader(),
 	}
-	database *storage.CostDataStorage
+	Database *storage.CostDataStorage
 )
 
 func init() {
-
 	rootCmd.AddCommand(AWSCostAndUsageCommand())
 }
 
@@ -27,8 +26,7 @@ func paintRootHeader() string {
 }
 
 func Execute(db *storage.CostDataStorage) {
-	database = db
-	rootCmd.PersistentFlags().Var(database, "db", "Database connection")
+	Database = db
 	err := rootCmd.Execute()
 	if err != nil {
 		os.Exit(126)
