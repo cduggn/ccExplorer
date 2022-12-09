@@ -6,6 +6,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
+	"github.com/cduggn/cloudcost/internal/pkg/logger"
+	"github.com/cduggn/cloudcost/internal/pkg/storage"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"log"
 	"os"
@@ -61,9 +63,21 @@ var (
 				Values: []string{value},
 			},
 		}
-
 	}
+	conn *storage.CostDataStorage
 )
+
+func newConnection() {
+	conn = &storage.CostDataStorage{}
+	err := conn.New("./cloudcost.db")
+	if err != nil {
+		logger.Error(err.Error())
+	}
+}
+
+func init() {
+	newConnection()
+}
 
 func GetAWSCostAndUsage(req CostAndUsageRequest) *CostAndUsageReport {
 	cfg, err := config.LoadDefaultConfig(context.TODO())
@@ -121,7 +135,6 @@ func groupBy(req CostAndUsageRequest) []types.GroupDefinition {
 }
 
 func (c *CostAndUsageReport) CurateReport(output *costexplorer.GetCostAndUsageOutput) {
-
 	count := 0
 	for _, v := range output.ResultsByTime {
 		c.Start = *v.TimePeriod.Start
@@ -162,6 +175,18 @@ func (c *CostAndUsageReport) Print() {
 			}
 			tempRow := table.Row{m.Keys[0], isEmpty(m.Keys), v.Name, v.Amount, v.Unit, c.Granularity, m.Start, m.End}
 			t.AppendRow(tempRow)
+
+			conn.Insert(storage.CostDataInsert{
+				Dimension:   m.Keys[0],
+				Dimension2:  "",
+				Tag:         "",
+				MetricName:  "",
+				Amount:      v.Amount,
+				Unit:        v.Unit,
+				Granularity: c.Granularity,
+				StartDate:   m.Start,
+				EndDate:     m.End,
+			})
 		}
 	}
 	totalHeaderRow := table.Row{"", "", "", "", "", "", "", ""}

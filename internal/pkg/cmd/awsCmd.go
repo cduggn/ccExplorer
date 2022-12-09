@@ -45,17 +45,19 @@ func AWSCostAndUsageCommand() *cobra.Command {
 }
 
 func GetCommand() *cobra.Command {
-
+	// create new flagset for get command
 	getCmd.Flags().StringSliceVarP(&groupBy, "group-by-dimension", "d", []string{"SERVICE", "USAGE_TYPE"}, "Group by at most 2 dimension tags [ Dimensions: AZ, SERVICE, USAGE_TYPE ]")
 	getCmd.Flags().StringVarP(&groupByTag, "group-by-tag", "t", "", "Group by cost allocation tag")
-	getCmd.Flags().StringVarP(&granularity, "granularity", "g", "MONTHLY", "Granularity of billing information to fetch. Monthly, Daily or Hourly")
+	getCmd.Flags().StringVarP(&filterBy, "filter-by", "f", "", "When grouping by tag, filter by tag value")
 
 	getCmd.Flags().StringVarP(&startDate, "start-date", "s", PastMonth(), "Start date for billing information. Defaults to the past 7 days")
 	getCmd.Flags().StringVarP(&endDate, "end-date", "e", Today(), "End date for billing information. Default is todays date.")
-	getCmd.Flags().StringVarP(&filterBy, "filter-by", "f", "", "When grouping by tag, filter by tag value")
 
+	// Granularity and rate flags
+	getCmd.Flags().StringVarP(&granularity, "granularity", "g", "MONTHLY", "Granularity of billing information to fetch. Monthly, Daily or Hourly")
 	getCmd.Flags().StringSliceVarP(&rates, "rates", "r", []string{"UNBLENDED_COST"}, "Cost and Usage rates to fetch [ Rates: BLENDED_COST, UNBLENDED_COST, AMORTIZED_COST, NET_AMORTIZED_COST, NET_UNBLENDED_COST, USAGE_QUANTITY ]. Defaults to UNBLENDED_COST")
 
+	// Other flags
 	getCmd.Flags().BoolVarP(&excludeCredits, "exclude-credit", "c", false, "Exclude credit and refund information in the report. This is enabled by default")
 
 	return getCmd

@@ -25,7 +25,7 @@ type CostDataInsert struct {
 	Dimension2  string
 	Tag         string
 	MetricName  string
-	Amount      float64
+	Amount      string
 	Unit        string
 	Granularity string
 	StartDate   string

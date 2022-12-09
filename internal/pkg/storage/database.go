@@ -23,13 +23,13 @@ var (
 		    end_date DATETIME NOT NULL)
     `
 	insertStmt = "INSERT INTO cloudCostData (dimension, dimension2, tag, metric_name, amount, unit, granularity, start_date, end_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
-	database   *CostDataStorage
+	conn       *CostDataStorage
 )
 
 func (c *CostDataStorage) New(dbName string) error {
 
 	// if database already exists then return
-	if database != nil {
+	if conn != nil {
 		return nil
 	}
 
@@ -89,7 +89,7 @@ func (c *CostDataStorage) createCostDataTable() int {
 	return 0
 }
 
-func (c *CostDataStorage) InsertCustomer(data CostDataInsert) int {
+func (c *CostDataStorage) Insert(data CostDataInsert) int {
 
 	stmt, err := c.SQLite.Prepare(insertStmt)
 	if err != nil {
