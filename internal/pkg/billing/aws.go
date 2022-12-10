@@ -86,7 +86,7 @@ func GetAWSCostAndUsage(req CostAndUsageRequest) *CostAndUsageReport {
 	}
 	client := costexplorer.NewFromConfig(cfg)
 
-	result, err := client.GetCostAndUsage(context.TODO(), &costexplorer.GetCostAndUsageInput{
+	result, err := client.GetCostAndUsageWithResources(context.TODO(), &costexplorer.GetCostAndUsageWithResourcesInput{
 		Granularity: types.Granularity(req.Granularity), //todo: add option to pass HOURLY granularity as well
 		Metrics:     req.Rates,
 		TimePeriod: &types.DateInterval{
@@ -134,7 +134,7 @@ func groupBy(req CostAndUsageRequest) []types.GroupDefinition {
 
 }
 
-func (c *CostAndUsageReport) CurateReport(output *costexplorer.GetCostAndUsageOutput) {
+func (c *CostAndUsageReport) CurateReport(output *costexplorer.GetCostAndUsageWithResourcesOutput) {
 	count := 0
 	for _, v := range output.ResultsByTime {
 		c.Start = *v.TimePeriod.Start
