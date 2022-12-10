@@ -132,6 +132,14 @@ func groupBy(req CostAndUsageRequest) []types.GroupDefinition {
 		return groupByDimension(req.GroupBy)
 	}
 
+	// todo should be grouping by resource arn 
+	//	GroupBy: []*ce.GroupDefinition{
+	//		{
+	//			Key:  aws.String("RESOURCE_ID"),
+	//			Type: aws.String("DIMENSION"),
+	//		},
+	//	},
+
 }
 
 func (c *CostAndUsageReport) CurateReport(output *costexplorer.GetCostAndUsageWithResourcesOutput) {
