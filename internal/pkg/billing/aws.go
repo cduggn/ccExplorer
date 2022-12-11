@@ -30,6 +30,9 @@ var (
 				Type: types.GroupDefinitionTypeTag,
 				Key:  aws.String(tag),
 			},
+			{
+				Type: "RESOURCE_ID",
+			},
 		}
 	}
 	groupByTagAndDimension = func(tag string, dimensions []string) []types.GroupDefinition {
@@ -132,7 +135,7 @@ func groupBy(req CostAndUsageRequest) []types.GroupDefinition {
 		return groupByDimension(req.GroupBy)
 	}
 
-	// todo should be grouping by resource arn 
+	// todo should be grouping by resource arn
 	//	GroupBy: []*ce.GroupDefinition{
 	//		{
 	//			Key:  aws.String("RESOURCE_ID"),
