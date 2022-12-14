@@ -1,4 +1,4 @@
-package billing
+package aws
 
 type Time struct {
 	Start string
