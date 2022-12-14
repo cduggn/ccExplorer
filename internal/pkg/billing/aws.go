@@ -14,59 +14,59 @@ import (
 )
 
 var (
-	groupByDimension = func(dimensions []string) []types.GroupDefinition {
-		var groups []types.GroupDefinition
-		for _, d := range dimensions {
-			groups = append(groups, types.GroupDefinition{
-				Type: types.GroupDefinitionTypeDimension,
-				Key:  aws.String(d),
-			})
-		}
-		return groups
-	}
-	groupByTag = func(tag string) []types.GroupDefinition {
-		return []types.GroupDefinition{
-			{
-				Type: types.GroupDefinitionTypeTag,
-				Key:  aws.String(tag),
-			},
-			{
-				Type: "RESOURCE_ID",
-			},
-		}
-	}
-	groupByTagAndDimension = func(tag string, dimensions []string) []types.GroupDefinition {
-		var groups []types.GroupDefinition
-		for _, d := range dimensions {
-			groups = append(groups, types.GroupDefinition{
-				Type: types.GroupDefinitionTypeDimension,
-				Key:  aws.String(d),
-			})
-		}
-		groups = append(groups, types.GroupDefinition{
-			Type: types.GroupDefinitionTypeTag,
-			Key:  aws.String(tag),
-		})
-		return groups
-	}
-	filterCredits = func() *types.Expression {
-		return &types.Expression{
-			Not: &types.Expression{
-				Dimensions: &types.DimensionValues{
-					Key:    "RECORD_TYPE",
-					Values: []string{"Refund", "Credit"},
-				},
-			},
-		}
-	}
-	filterByTag = func(tag string, value string) *types.Expression {
-		return &types.Expression{
-			Tags: &types.TagValues{
-				Key:    aws.String(tag),
-				Values: []string{value},
-			},
-		}
-	}
+	//groupByDimension = func(dimensions []string) []types.GroupDefinition {
+	//	var groups []types.GroupDefinition
+	//	for _, d := range dimensions {
+	//		groups = append(groups, types.GroupDefinition{
+	//			Type: types.GroupDefinitionTypeDimension,
+	//			Key:  aws.String(d),
+	//		})
+	//	}
+	//	return groups
+	//}
+	//groupByTag = func(tag string) []types.GroupDefinition {
+	//	return []types.GroupDefinition{
+	//		{
+	//			Type: types.GroupDefinitionTypeTag,
+	//			Key:  aws.String(tag),
+	//		},
+	//		{
+	//			Type: "RESOURCE_ID",
+	//		},
+	//	}
+	//}
+	//groupByTagAndDimension = func(tag string, dimensions []string) []types.GroupDefinition {
+	//	var groups []types.GroupDefinition
+	//	for _, d := range dimensions {
+	//		groups = append(groups, types.GroupDefinition{
+	//			Type: types.GroupDefinitionTypeDimension,
+	//			Key:  aws.String(d),
+	//		})
+	//	}
+	//	groups = append(groups, types.GroupDefinition{
+	//		Type: types.GroupDefinitionTypeTag,
+	//		Key:  aws.String(tag),
+	//	})
+	//	return groups
+	//}
+	//filterCredits = func() *types.Expression {
+	//	return &types.Expression{
+	//		Not: &types.Expression{
+	//			Dimensions: &types.DimensionValues{
+	//				Key:    "RECORD_TYPE",
+	//				Values: []string{"Refund", "Credit"},
+	//			},
+	//		},
+	//	}
+	//}
+	//filterByTag = func(tag string, value string) *types.Expression {
+	//	return &types.Expression{
+	//		Tags: &types.TagValues{
+	//			Key:    aws.String(tag),
+	//			Values: []string{value},
+	//		},
+	//	}
+	//}
 	conn *storage.CostDataStorage
 )
 
@@ -96,8 +96,31 @@ func GetAWSCostAndUsage(req CostAndUsageRequest) *CostAndUsageReport {
 			Start: aws.String(req.Time.Start),
 			End:   aws.String(req.Time.End),
 		},
-		GroupBy: groupBy(req),
-		Filter:  filter(req),
+		//GroupBy: groupBy(req),
+		//Filter:  filter(req),
+		//Filter: &types.Expression{
+		//	Dimensions: &types.DimensionValues{
+		//		Key: "SERVICE",
+		//		Values: []string{
+		//			"Amazon Elastic Compute Cloud - Compute",
+		//			"Amazon Elastic Block Store",
+		//		},
+		//	},
+		//},
+		GroupBy: []types.GroupDefinition{
+			types.GroupDefinition{
+				Type: "DIMENSION",
+				Key:  aws.String("SERVICE"),
+			},
+			//types.GroupDefinition{
+			//	Type: "TAG",
+			//	Key:  aws.String("ApplicationName"),
+			//},
+			types.GroupDefinition{
+				Type: "DIMENSION",
+				Key:  aws.String("RESOURCE_ID"),
+			},
+		},
 	})
 
 	if err != nil {
@@ -111,39 +134,39 @@ func GetAWSCostAndUsage(req CostAndUsageRequest) *CostAndUsageReport {
 	return c
 }
 
-func filter(req CostAndUsageRequest) *types.Expression {
-	expression := &types.Expression{}
+//func filter(req CostAndUsageRequest) *types.Expression {
+//	expression := &types.Expression{}
+//
+//	if req.ExcludeCredits && req.IsFilterEnabled {
+//		expression.And = []types.Expression{*filterCredits(), *filterByTag(req.Tag, req.TagFilterValue)}
+//	} else if req.ExcludeCredits {
+//		expression = filterCredits()
+//	} else if req.IsFilterEnabled {
+//		expression = filterByTag(req.Tag, req.TagFilterValue)
+//	} else {
+//		return nil
+//	}
+//	return expression
+//}
 
-	if req.ExcludeCredits && req.IsFilterEnabled {
-		expression.And = []types.Expression{*filterCredits(), *filterByTag(req.Tag, req.TagFilterValue)}
-	} else if req.ExcludeCredits {
-		expression = filterCredits()
-	} else if req.IsFilterEnabled {
-		expression = filterByTag(req.Tag, req.TagFilterValue)
-	} else {
-		return nil
-	}
-	return expression
-}
-
-func groupBy(req CostAndUsageRequest) []types.GroupDefinition {
-	if req.Tag != "" && len(req.GroupBy) == 1 {
-		return groupByTagAndDimension(req.Tag, req.GroupBy)
-	} else if req.Tag != "" {
-		return groupByTag(req.Tag)
-	} else {
-		return groupByDimension(req.GroupBy)
-	}
-
-	// todo should be grouping by resource arn
-	//	GroupBy: []*ce.GroupDefinition{
-	//		{
-	//			Key:  aws.String("RESOURCE_ID"),
-	//			Type: aws.String("DIMENSION"),
-	//		},
-	//	},
-
-}
+//func groupBy(req CostAndUsageRequest) []types.GroupDefinition {
+//	if req.Tag != "" && len(req.GroupBy) == 1 {
+//		return groupByTagAndDimension(req.Tag, req.GroupBy)
+//	} else if req.Tag != "" {
+//		return groupByTag(req.Tag)
+//	} else {
+//		return groupByDimension(req.GroupBy)
+//	}
+//
+//	// todo should be grouping by resource arn
+//	//	GroupBy: []*ce.GroupDefinition{
+//	//		{
+//	//			Key:  aws.String("RESOURCE_ID"),
+//	//			Type: aws.String("DIMENSION"),
+//	//		},
+//	//	},
+//
+//}
 
 func (c *CostAndUsageReport) CurateReport(output *costexplorer.GetCostAndUsageWithResourcesOutput) {
 	count := 0

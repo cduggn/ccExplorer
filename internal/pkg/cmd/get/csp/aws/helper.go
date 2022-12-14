@@ -1,4 +1,4 @@
-package cmd
+package aws
 
 import (
 	"time"
