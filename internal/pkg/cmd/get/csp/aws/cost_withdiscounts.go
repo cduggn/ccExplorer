@@ -4,7 +4,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func AWSCostCommand(c *cobra.Command) *cobra.Command {
+func AWSCostWithDiscountsCommand(c *cobra.Command) *cobra.Command {
 	// create new flagset for get command
 	c.Flags().StringSliceVarP(&groupBy, "group-by-dimension", "d", []string{"SERVICE", "USAGE_TYPE"}, "Group by at most 2 dimension tags [ Dimensions: AZ, SERVICE, USAGE_TYPE ]")
 	c.Flags().StringVarP(&groupByTag, "group-by-tag", "t", "", "Group by cost allocation tag")

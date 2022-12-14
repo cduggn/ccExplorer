@@ -18,7 +18,7 @@ func GetAWSCostAndUsage(req CostAndUsageRequest) *CostAndUsageReport {
 
 	result, err := client.GetCostAndUsage(context.TODO(), &costexplorer.GetCostAndUsageInput{
 		Granularity: types.Granularity(req.Granularity), //todo: add option to pass HOURLY granularity as well
-		Metrics:     req.Rates,
+		Metrics:     []string{"UNBLENDED_COST"},
 		TimePeriod: &types.DateInterval{
 			Start: aws.String(req.Time.Start),
 			End:   aws.String(req.Time.End),
