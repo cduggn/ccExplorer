@@ -49,6 +49,12 @@ func NewCostAndUsageRequest(cmd *cobra.Command) aws.CostAndUsageRequest {
 	}
 
 	end := cmd.Flags().Lookup("end").Value.String()
+	err = ValidateEndDate(end, start)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(128)
+	}
+
 	interval := cmd.Flags().Lookup("granularity").Value.String()
 
 	return aws.CostAndUsageRequest{

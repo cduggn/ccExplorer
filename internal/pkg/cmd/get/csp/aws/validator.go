@@ -78,3 +78,28 @@ func ValidateStartDate(startDate string) error {
 
 	return nil
 }
+
+func ValidateEndDate(endDate, startDate string) error {
+	if endDate == "" {
+		return ValidationError{
+			msg: "End date must be specified",
+		}
+	}
+
+	end, _ := time.Parse("2006-01-02", endDate)
+	today := time.Now()
+	if end.After(today) {
+		return ValidationError{
+			msg: "End date must be before today's date",
+		}
+	}
+
+	start, _ := time.Parse("2006-01-02", startDate)
+	if end.Before(start) {
+		return ValidationError{
+			msg: "End date must not be before start date",
+		}
+	}
+
+	return nil
+}
