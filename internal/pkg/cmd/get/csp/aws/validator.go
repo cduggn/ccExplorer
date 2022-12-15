@@ -72,7 +72,7 @@ func ValidateStartDate(startDate string) error {
 	today := time.Now()
 	if start.After(today) {
 		return ValidationError{
-			msg: "Start date must be on or before today's date",
+			msg: "Start date must be before today's date",
 		}
 	}
 
