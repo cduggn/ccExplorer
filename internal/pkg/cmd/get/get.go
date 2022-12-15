@@ -25,19 +25,19 @@ var (
 		- Cost Allocation Tags if you want to filter by tag ( Note cost allocation tags can take up to 24 hours to be applied )`,
 		Run: aws.CostSummary,
 	}
-	awsCostWithDiscount = &cobra.Command{
-		Use:   "aws-with-discounts",
-		Short: "Return unblended cost summary with discounts and credits applied",
-		Long: `
-		aws-with-discounts = DESCRIPTION
-		Fetches billing information for the time interval provided using the AWS Cost Explorer API
-		
-		Prerequisites:
-		- AWS credentials must be configured in ~/.aws/credentials
-		- AWS region must be configured in ~/.aws/config
-		- Cost Allocation Tags if you want to filter by tag ( Note cost allocation tags can take up to 24 hours to be applied )`,
-		Run: aws.CostSummary,
-	}
+	//awsCostWithDiscount = &cobra.Command{
+	//	Use:   "aws-with-discounts",
+	//	Short: "Return unblended cost summary with discounts and credits applied",
+	//	Long: `
+	//	aws-with-discounts = DESCRIPTION
+	//	Fetches billing information for the time interval provided using the AWS Cost Explorer API
+	//
+	//	Prerequisites:
+	//	- AWS credentials must be configured in ~/.aws/credentials
+	//	- AWS region must be configured in ~/.aws/config
+	//	- Cost Allocation Tags if you want to filter by tag ( Note cost allocation tags can take up to 24 hours to be applied )`,
+	//	Run: aws.CostSummary,
+	//}
 )
 
 func paintHeader() string {
@@ -47,6 +47,6 @@ func paintHeader() string {
 
 func AWSCostAndUsageCommand() *cobra.Command {
 	billingCmd.AddCommand(aws.AWSCostCommand(awsCost))
-	billingCmd.AddCommand(aws.AWSCostWithDiscountsCommand(awsCostWithDiscount))
+	//billingCmd.AddCommand(aws.AWSCostWithDiscountsCommand(awsCostWithDiscount))
 	return billingCmd
 }

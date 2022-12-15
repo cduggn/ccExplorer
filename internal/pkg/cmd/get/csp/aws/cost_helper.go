@@ -26,7 +26,7 @@ func CostSummary(cmd *cobra.Command, args []string) {
 
 func NewCostAndUsageRequest(cmd *cobra.Command) aws.CostAndUsageRequest {
 
-	dimensions, err := cmd.Flags().GetStringSlice("group-by-dimension")
+	dimensions, err := cmd.Flags().GetStringSlice("dimensions")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -36,10 +36,10 @@ func NewCostAndUsageRequest(cmd *cobra.Command) aws.CostAndUsageRequest {
 	return aws.CostAndUsageRequest{
 		Granularity: cmd.Flags().Lookup("granularity").Value.String(),
 		GroupBy:     dimensions,
-		Tag:         cmd.Flags().Lookup("group-by-tag").Value.String(),
+		Tag:         cmd.Flags().Lookup("tags").Value.String(),
 		Time: aws.Time{
-			Start: cmd.Flags().Lookup("start-date").Value.String(),
-			End:   cmd.Flags().Lookup("end-date").Value.String(),
+			Start: cmd.Flags().Lookup("start").Value.String(),
+			End:   cmd.Flags().Lookup("end").Value.String(),
 		},
 		IsFilterEnabled: isFilterEnabled(filterBy),
 		TagFilterValue:  filterBy,
@@ -48,26 +48,26 @@ func NewCostAndUsageRequest(cmd *cobra.Command) aws.CostAndUsageRequest {
 
 }
 
-func Time() time.Time {
-	return time.Now()
-}
-
-func Today() string {
-	return Format(Time())
+func DefaultEndDate(f func(date time.Time) string) string {
+	return f(time.Now())
 }
 
 func Format(date time.Time) string {
 	return date.Format("2006-01-02")
 }
 
-func PastMonth() string {
-	today := Time()
-	monthAgo := SubtractDays(today, 30)
-	return Format(monthAgo)
+func DefaultStartDate(d func(time time.Time) int, s func(time time.Time, days int) string) string {
+	today := time.Now()
+	dayOfMonth := d(today)
+	return s(today, dayOfMonth-1) // subtract 1 to get the first day of the month
 }
 
-func SubtractDays(today time.Time, days int) time.Time {
-	return today.AddDate(0, 0, -days)
+func DayOfCurrentMonth(time time.Time) int {
+	return time.Day()
+}
+
+func SubtractDays(today time.Time, days int) string {
+	return today.AddDate(0, 0, -days).Format("2006-01-02")
 }
 
 func isFilterEnabled(filterBy string) bool {

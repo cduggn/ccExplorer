@@ -21,6 +21,7 @@ shared credentials file, and EC2 instance profile or ECS task definition if runn
 - Credits and refunds are automatically applied to your account. Both can be excluded from the cost data by setting the `exclude_credit` flag to `true`.
 - Cost Explorer API calls can be expensive. The tool will cache the results of the API calls to reduce the number of calls that need to be made. The cache is stored in the `~/.cloudcost` directory. [in-progress]
 - Cost Explorer API calls can be tracked using CloudTrail. Requests are issued against us-east-1. 
+- By default CLI shows data from the beginning of the previous month
 
 
 ## Installation
