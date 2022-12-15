@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/cduggn/cloudcost/internal/pkg/csp/aws"
 	"github.com/spf13/cobra"
+	"os"
 	"time"
 )
 
@@ -18,14 +19,32 @@ func NewCostAndUsageRequest(cmd *cobra.Command) aws.CostAndUsageRequest {
 	dimensions, err := cmd.Flags().GetStringSlice("dimensions")
 	if err != nil {
 		fmt.Println(err)
+		os.Exit(128)
+	}
+	err = ValidateDimension(dimensions)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(128)
+	}
+
+	tag := cmd.Flags().Lookup("tags").Value.String()
+	err = ValidateTag(tag, dimensions)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(128)
 	}
 
 	filterBy, _ := cmd.Flags().GetString("filter-by")
+	err = ValidateFilterBy(filterBy, tag)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(128)
+	}
 
 	return aws.CostAndUsageRequest{
 		Granularity: cmd.Flags().Lookup("granularity").Value.String(),
 		GroupBy:     dimensions,
-		Tag:         cmd.Flags().Lookup("tags").Value.String(),
+		Tag:         tag,
 		Time: aws.Time{
 			Start: cmd.Flags().Lookup("start").Value.String(),
 			End:   cmd.Flags().Lookup("end").Value.String(),
