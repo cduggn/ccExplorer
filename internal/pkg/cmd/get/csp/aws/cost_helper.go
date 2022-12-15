@@ -7,17 +7,6 @@ import (
 	"time"
 )
 
-var (
-	groupBy     []string
-	groupByTag  string
-	granularity string
-	filterBy    string
-	rates       []string
-	startDate   string
-	endDate     string
-	report      *aws.CostAndUsageReport
-)
-
 func CostSummary(cmd *cobra.Command, args []string) {
 	req := NewCostAndUsageRequest(cmd)
 	report = aws.GetAWSCostAndUsage(req)

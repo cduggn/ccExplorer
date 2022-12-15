@@ -1,9 +1,19 @@
 package aws
 
 import (
-	"fmt"
+	"github.com/cduggn/cloudcost/internal/pkg/csp/aws"
 	"github.com/spf13/cobra"
-	"os"
+)
+
+var (
+	groupBy     []string
+	groupByTag  string
+	granularity string
+	filterBy    string
+	rates       []string
+	startDate   string
+	endDate     string
+	report      *aws.CostAndUsageReport
 )
 
 func AWSCostCommand(c *cobra.Command) *cobra.Command {
@@ -19,16 +29,11 @@ func AWSCostCommand(c *cobra.Command) *cobra.Command {
 	// Mandatory tags used to specify how data will be grouped.
 	//This also dictates the type of data that will be returned.
 	c.Flags().StringSliceVarP(&groupBy, "dimensions", "d",
-		[]string{"SERVICE", "USAGE_TYPE"},
+		[]string{},
 		"Group by at most 2 dimension tags [ Dimensions: AZ, SERVICE, "+
 			"USAGE_TYPE ]")
 	c.Flags().StringVarP(&groupByTag, "tags", "t", "",
 		"Group by cost allocation tag")
-
-	if len(groupBy) >= 2 && groupByTag != "" {
-		fmt.Println("When grouping by tag, you can only specify 1 dimension")
-		os.Exit(128)
-	}
 
 	// Optional flag used to filter data by tag value,
 	//this is only relevant when the data is grouped by tag
