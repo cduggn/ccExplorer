@@ -34,12 +34,14 @@ func NewCostAndUsageRequest(cmd *cobra.Command) aws.CostAndUsageRequest {
 		os.Exit(128)
 	}
 
-	filterBy, _ := cmd.Flags().GetString("filter-by")
-	err = ValidateFilterBy(filterBy, tag)
+	filter, _ := cmd.Flags().GetString("filter-by")
+	err = ValidateFilterBy(filter, tag)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(128)
 	}
+
+	// todo add validators for start and end dates, granularity and rates
 
 	return aws.CostAndUsageRequest{
 		Granularity: cmd.Flags().Lookup("granularity").Value.String(),
@@ -50,7 +52,7 @@ func NewCostAndUsageRequest(cmd *cobra.Command) aws.CostAndUsageRequest {
 			End:   cmd.Flags().Lookup("end").Value.String(),
 		},
 		IsFilterEnabled: isFilterEnabled(filterBy),
-		TagFilterValue:  filterBy,
+		TagFilterValue:  filter,
 		Rates:           rates,
 	}
 
