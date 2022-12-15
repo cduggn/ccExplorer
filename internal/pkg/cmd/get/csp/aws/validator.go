@@ -1,5 +1,7 @@
 package aws
 
+import "time"
+
 type ValidationError struct {
 	msg string
 }
@@ -56,5 +58,23 @@ func ValidateFilterBy(filterBy string, tag string) error {
 			msg: "When filtering by tag value, a tag must be specified",
 		}
 	}
+	return nil
+}
+
+func ValidateStartDate(startDate string) error {
+	if startDate == "" {
+		return ValidationError{
+			msg: "Start date must be specified",
+		}
+	}
+
+	start, _ := time.Parse("2006-01-02", startDate)
+	today := time.Now()
+	if start.After(today) {
+		return ValidationError{
+			msg: "Start date must be on or before today's date",
+		}
+	}
+
 	return nil
 }

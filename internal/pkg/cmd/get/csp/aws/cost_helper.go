@@ -41,15 +41,23 @@ func NewCostAndUsageRequest(cmd *cobra.Command) aws.CostAndUsageRequest {
 		os.Exit(128)
 	}
 
-	// todo add validators for start and end dates, granularity and rates
+	start := cmd.Flags().Lookup("start").Value.String()
+	err = ValidateStartDate(start)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(128)
+	}
+
+	end := cmd.Flags().Lookup("end").Value.String()
+	interval := cmd.Flags().Lookup("granularity").Value.String()
 
 	return aws.CostAndUsageRequest{
-		Granularity: cmd.Flags().Lookup("granularity").Value.String(),
+		Granularity: interval,
 		GroupBy:     dimensions,
 		Tag:         tag,
 		Time: aws.Time{
-			Start: cmd.Flags().Lookup("start").Value.String(),
-			End:   cmd.Flags().Lookup("end").Value.String(),
+			Start: start,
+			End:   end,
 		},
 		IsFilterEnabled: isFilterEnabled(filterBy),
 		TagFilterValue:  filter,
