@@ -7,15 +7,15 @@ import (
 )
 
 var (
-	groupBy       []string
-	groupByTag    string
-	granularity   string
-	filterBy      string
-	rates         []string
-	startDate     string
-	endDate       string
-	report        *aws.CostAndUsageReport
-	withDiscounts bool
+	groupBy          []string
+	groupByTag       string
+	granularity      string
+	filterBy         string
+	rates            []string
+	startDate        string
+	endDate          string
+	report           *aws.CostAndUsageReport
+	withoutDiscounts bool
 )
 
 func CostAndUsageSummary(cmd *cobra.Command, args []string) error {
@@ -69,7 +69,7 @@ func NewCostAndUsageRequest(cmd *cobra.Command) (aws.CostAndUsageRequestType, er
 		return aws.CostAndUsageRequestType{}, err
 	}
 
-	includeDiscounts, _ := cmd.Flags().GetBool("include-discounts")
+	excludeDiscounts, _ := cmd.Flags().GetBool("exclude-discounts")
 	interval := cmd.Flags().Lookup("granularity").Value.String()
 
 	return aws.CostAndUsageRequestType{
@@ -83,7 +83,7 @@ func NewCostAndUsageRequest(cmd *cobra.Command) (aws.CostAndUsageRequestType, er
 		IsFilterEnabled:  isFilterEnabled(filterBy),
 		TagFilterValue:   filter,
 		Rates:            rates,
-		IncludeDiscounts: includeDiscounts,
+		ExcludeDiscounts: excludeDiscounts,
 	}, nil
 
 }

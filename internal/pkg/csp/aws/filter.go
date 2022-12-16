@@ -29,10 +29,10 @@ var (
 func filter(req CostAndUsageRequestType) *types.Expression {
 	expression := &types.Expression{}
 
-	if req.IncludeDiscounts && req.IsFilterEnabled {
+	if req.ExcludeDiscounts && req.IsFilterEnabled {
 		expression.And = []types.Expression{*filterCredits(),
 			*filterByTag(req.Tag, req.TagFilterValue)}
-	} else if req.IncludeDiscounts {
+	} else if req.ExcludeDiscounts {
 		expression = filterCredits()
 	} else if req.IsFilterEnabled {
 		expression = filterByTag(req.Tag, req.TagFilterValue)

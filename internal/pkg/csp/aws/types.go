@@ -14,7 +14,7 @@ type CostAndUsageRequestType struct {
 	FilterType       string
 	TagFilterValue   string
 	Rates            []string
-	IncludeDiscounts bool
+	ExcludeDiscounts bool
 }
 
 type CostAndUsageReport struct {
