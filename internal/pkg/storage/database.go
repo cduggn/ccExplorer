@@ -115,13 +115,12 @@ func (c *CostDataStorage) Insert(data CostDataInsert) (int, error) {
 			msg: err.Error(),
 		}
 	}
-	id, err := res.LastInsertId()
+	_, err = res.LastInsertId()
 	if err != nil {
 		logger.Error(err.Error())
 		return -1, DBError{
 			msg: err.Error(),
 		}
 	}
-	logger.Info("Row added", zap.Int64("rowId", id))
 	return 0, nil
 }

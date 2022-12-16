@@ -11,7 +11,7 @@ var (
 			Not: &types.Expression{
 				Dimensions: &types.DimensionValues{
 					Key:    "RECORD_TYPE",
-					Values: []string{"Refund", "Credit"},
+					Values: []string{"Refund", "Credit", "DiscountedUsage"},
 				},
 			},
 		}
@@ -30,7 +30,8 @@ func filter(req CostAndUsageRequestType) *types.Expression {
 	expression := &types.Expression{}
 
 	if req.IncludeDiscounts && req.IsFilterEnabled {
-		expression.And = []types.Expression{*filterCredits(), *filterByTag(req.Tag, req.TagFilterValue)}
+		expression.And = []types.Expression{*filterCredits(),
+			*filterByTag(req.Tag, req.TagFilterValue)}
 	} else if req.IncludeDiscounts {
 		expression = filterCredits()
 	} else if req.IsFilterEnabled {
