@@ -30,6 +30,7 @@ func (c *CostDataStorage) New(dbName string) error {
 
 	// if database already exists then return
 	if conn != nil {
+		logger.Info("Database already exists", zap.String("database", dbName))
 		return nil
 	}
 
@@ -42,15 +43,13 @@ func (c *CostDataStorage) New(dbName string) error {
 	// create the database name
 	err = c.Set(dbName)
 	if err != nil {
-		logger.Error(err.Error())
 		return DBError{msg: err.Error()}
 	}
 
 	// create the table
-	res := c.createCostDataTable()
-	if res == -1 {
-		msg := "Could not create table"
-		return DBError{msg: msg}
+	_, err = c.createCostDataTable()
+	if err != nil {
+		return DBError{msg: err.Error()}
 	}
 
 	return nil
@@ -80,13 +79,15 @@ func (c *CostDataStorage) Set(s string) error {
 }
 
 // return -1 and or error if table was not created , return 0 if table was created
-func (c *CostDataStorage) createCostDataTable() int {
+func (c *CostDataStorage) createCostDataTable() (int, error) {
 	_, err := c.SQLite.Exec(createTableStmt)
 	if err != nil {
-		return -1
+		return -1, DBError{
+			msg: err.Error(),
+		}
 	}
 	logger.Info("Table created", zap.String("table", "cloudCostData"))
-	return 0
+	return 0, nil
 }
 
 func (c *CostDataStorage) Insert(data CostDataInsert) int {

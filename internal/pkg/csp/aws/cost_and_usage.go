@@ -6,17 +6,26 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
-	"log"
 )
 
 var (
 	metrics = []string{"UNBLENDED_COST"}
 )
 
-func GetCostAndUsage(req CostAndUsageRequestType) *CostAndUsageReport {
+type APIError struct {
+	msg string
+}
+
+func (e APIError) Error() string {
+	return e.msg
+}
+
+func GetCostAndUsage(req CostAndUsageRequestType) (*CostAndUsageReport, error) {
 	cfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
-		log.Fatal(err)
+		return nil, APIError{
+			msg: "unable to load SDK config, " + err.Error(),
+		}
 	}
 	client := costexplorer.NewFromConfig(cfg)
 
@@ -32,12 +41,14 @@ func GetCostAndUsage(req CostAndUsageRequestType) *CostAndUsageReport {
 	})
 
 	if err != nil {
-		log.Fatal(err)
+		return nil, APIError{
+			msg: "Error while fetching cost and usage data from AWS",
+		}
 	}
 	c := &CostAndUsageReport{
 		Services: make(map[int]Service),
 	}
 	c.Granularity = req.Granularity
 	c.CurateReport(result)
-	return c
+	return c, nil
 }

@@ -30,5 +30,9 @@ func CostAndUsageCommand(c *cobra.Command) *cobra.Command {
 	c.Flags().StringVarP(&granularity, "granularity", "g", "MONTHLY",
 		"Granularity of billing information to fetch. Monthly, Daily or Hourly")
 
+	c.Flags().BoolVarP(&withDiscounts, "include-discounts", "c", false,
+		"Include credit and refund information in the report summary. "+
+			"Disabled by default.")
+
 	return c
 }
