@@ -37,7 +37,7 @@ func (c *CostAndUsageReport) Print() {
 			tempRow := table.Row{m.Keys[0], isEmpty(m.Keys), v.Name, v.Amount, v.Unit, c.Granularity, m.Start, m.End}
 			t.AppendRow(tempRow)
 
-			conn.Insert(storage.CostDataInsert{
+			_, err := conn.Insert(storage.CostDataInsert{
 				Dimension:   m.Keys[0],
 				Dimension2:  "",
 				Tag:         "",
@@ -48,6 +48,9 @@ func (c *CostAndUsageReport) Print() {
 				StartDate:   m.Start,
 				EndDate:     m.End,
 			})
+			if err != nil {
+				logger.Error(err.Error())
+			}
 		}
 	}
 	totalHeaderRow := table.Row{"", "", "", "", "", "", "", ""}

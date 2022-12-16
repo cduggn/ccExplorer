@@ -30,7 +30,8 @@ func (c *CostDataStorage) New(dbName string) error {
 
 	// if database already exists then return
 	if conn != nil {
-		logger.Info("Database already exists", zap.String("database", dbName))
+		logger.Info("Database connection already established: ",
+			zap.String("db", dbName))
 		return nil
 	}
 
@@ -46,7 +47,6 @@ func (c *CostDataStorage) New(dbName string) error {
 		return DBError{msg: err.Error()}
 	}
 
-	// create the table
 	_, err = c.createCostDataTable()
 	if err != nil {
 		return DBError{msg: err.Error()}
@@ -55,7 +55,8 @@ func (c *CostDataStorage) New(dbName string) error {
 	return nil
 }
 
-// return 0 if creation was a success or -1 if file was not created
+// return 0 if creation was a success,
+//return 1 if file already exists or return -1 if an error occured
 func (c *CostDataStorage) CreateFile(dbName string) (int, error) {
 	if _, err := os.Stat(dbName); os.IsNotExist(err) {
 		file, err := os.Create(dbName)
@@ -65,14 +66,16 @@ func (c *CostDataStorage) CreateFile(dbName string) (int, error) {
 		defer file.Close()
 		return 0, nil
 	}
-	return -1, nil
+	return 1, nil
 }
 
 // create a database with named provided as arg
 func (c *CostDataStorage) Set(s string) error {
 	db, err := sql.Open("sqlite3", s)
 	if err != nil {
-		return err
+		return DBError{
+			msg: err.Error(),
+		}
 	}
 	c.SQLite = db
 	return nil
@@ -90,25 +93,35 @@ func (c *CostDataStorage) createCostDataTable() (int, error) {
 	return 0, nil
 }
 
-func (c *CostDataStorage) Insert(data CostDataInsert) int {
+// return error and -1 if insert was not successful,
+//return 0 if insert was successful
+func (c *CostDataStorage) Insert(data CostDataInsert) (int, error) {
 
 	stmt, err := c.SQLite.Prepare(insertStmt)
 	if err != nil {
 		logger.Error(err.Error())
-		return -1
+		return -1, DBError{
+			msg: err.Error(),
+		}
 	}
 	defer stmt.Close()
 
-	res, err := stmt.Exec(data.Dimension, data.Dimension2, data.Tag, data.MetricName, data.Amount, data.Unit, data.Granularity, data.StartDate, data.EndDate)
+	res, err := stmt.Exec(data.Dimension, data.Dimension2, data.Tag,
+		data.MetricName, data.Amount, data.Unit, data.Granularity,
+		data.StartDate, data.EndDate)
 	if err != nil {
 		logger.Error(err.Error())
-		return -1
+		return -1, DBError{
+			msg: err.Error(),
+		}
 	}
 	id, err := res.LastInsertId()
 	if err != nil {
 		logger.Error(err.Error())
-		return -1
+		return -1, DBError{
+			msg: err.Error(),
+		}
 	}
 	logger.Info("Row added", zap.Int64("rowId", id))
-	return 0
+	return 0, nil
 }
