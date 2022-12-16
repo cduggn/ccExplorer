@@ -117,7 +117,7 @@ func isEmpty(s []string) string {
 	}
 
 }
-func filter(req CostAndUsageRequest) *types.Expression {
+func filter(req CostAndUsageRequestType) *types.Expression {
 	expression := &types.Expression{}
 
 	if req.ExcludeCredits && req.IsFilterEnabled {
@@ -132,7 +132,7 @@ func filter(req CostAndUsageRequest) *types.Expression {
 	return expression
 }
 
-func groupBy(req CostAndUsageRequest) []types.GroupDefinition {
+func groupBy(req CostAndUsageRequestType) []types.GroupDefinition {
 	if req.Tag != "" && len(req.GroupBy) == 1 {
 		return groupByTagAndDimension(req.Tag, req.GroupBy)
 	} else if req.Tag != "" {

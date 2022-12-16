@@ -9,7 +9,11 @@ import (
 	"log"
 )
 
-func GetAWSCostAndUsage(req CostAndUsageRequest) *CostAndUsageReport {
+var (
+	metrics = []string{"UNBLENDED_COST"}
+)
+
+func GetCostAndUsage(req CostAndUsageRequestType) *CostAndUsageReport {
 	cfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
 		log.Fatal(err)
@@ -18,7 +22,7 @@ func GetAWSCostAndUsage(req CostAndUsageRequest) *CostAndUsageReport {
 
 	result, err := client.GetCostAndUsage(context.TODO(), &costexplorer.GetCostAndUsageInput{
 		Granularity: types.Granularity(req.Granularity), //todo: add option to pass HOURLY granularity as well
-		Metrics:     []string{"UNBLENDED_COST"},
+		Metrics:     metrics,
 		TimePeriod: &types.DateInterval{
 			Start: aws.String(req.Time.Start),
 			End:   aws.String(req.Time.End),

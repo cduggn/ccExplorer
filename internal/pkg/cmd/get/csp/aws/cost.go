@@ -3,6 +3,7 @@ package aws
 import (
 	"github.com/cduggn/cloudcost/internal/pkg/csp/aws"
 	"github.com/spf13/cobra"
+	"time"
 )
 
 var (
@@ -16,33 +17,95 @@ var (
 	report      *aws.CostAndUsageReport
 )
 
-func AWSCostCommand(c *cobra.Command) *cobra.Command {
+func CostAndUsageSummary(cmd *cobra.Command, args []string) error {
+	req, err := NewCostAndUsageRequest(cmd)
+	if err != nil {
+		return err
+	}
+	report = aws.GetCostAndUsage(req)
+	report.Print()
 
-	// Optional Flags used to manage start and end dates for billing
-	//information retrieval
-	c.Flags().StringVarP(&startDate, "start", "s",
-		DefaultStartDate(DayOfCurrentMonth, SubtractDays),
-		"Defaults to the start of the current month")
-	c.Flags().StringVarP(&endDate, "end", "e", DefaultEndDate(Format),
-		"Defaults to the present day")
+	return nil
+}
 
-	// Mandatory tags used to specify how data will be grouped.
-	//This also dictates the type of data that will be returned.
-	c.Flags().StringSliceVarP(&groupBy, "dimensions", "d",
-		[]string{},
-		"Group by at most 2 dimension tags [ Dimensions: AZ, SERVICE, "+
-			"USAGE_TYPE ]")
-	c.Flags().StringVarP(&groupByTag, "tags", "t", "",
-		"Group by cost allocation tag")
+func NewCostAndUsageRequest(cmd *cobra.Command) (aws.CostAndUsageRequestType, error) {
 
-	// Optional flag used to filter data by tag value,
-	//this is only relevant when the data is grouped by tag
-	c.Flags().StringVarP(&filterBy, "filter-by", "f", "",
-		"When grouping by tag, filter by tag value")
+	dimensions, err := cmd.Flags().GetStringSlice("dimensions")
+	if err != nil {
+		return aws.CostAndUsageRequestType{}, err
+	}
+	err = ValidateDimension(dimensions)
+	if err != nil {
+		return aws.CostAndUsageRequestType{}, err
+	}
 
-	// Optional flag to dictate the granularity of the data returned
-	c.Flags().StringVarP(&granularity, "granularity", "g", "MONTHLY",
-		"Granularity of billing information to fetch. Monthly, Daily or Hourly")
+	tag := cmd.Flags().Lookup("tags").Value.String()
+	err = ValidateTag(tag, dimensions)
+	if err != nil {
+		return aws.CostAndUsageRequestType{}, err
+	}
 
-	return c
+	filter, _ := cmd.Flags().GetString("filter-by")
+	err = ValidateFilterBy(filter, tag)
+	if err != nil {
+		return aws.CostAndUsageRequestType{}, err
+	}
+
+	start := cmd.Flags().Lookup("start").Value.String()
+	err = ValidateStartDate(start)
+	if err != nil {
+		return aws.CostAndUsageRequestType{}, err
+	}
+
+	end := cmd.Flags().Lookup("end").Value.String()
+	err = ValidateEndDate(end, start)
+	if err != nil {
+		return aws.CostAndUsageRequestType{}, err
+	}
+
+	interval := cmd.Flags().Lookup("granularity").Value.String()
+
+	return aws.CostAndUsageRequestType{
+		Granularity: interval,
+		GroupBy:     dimensions,
+		Tag:         tag,
+		Time: aws.Time{
+			Start: start,
+			End:   end,
+		},
+		IsFilterEnabled: isFilterEnabled(filterBy),
+		TagFilterValue:  filter,
+		Rates:           rates,
+	}, nil
+
+}
+
+func DefaultEndDate(f func(date time.Time) string) string {
+	return f(time.Now())
+}
+
+func Format(date time.Time) string {
+	return date.Format("2006-01-02")
+}
+
+func DefaultStartDate(d func(time time.Time) int, s func(time time.Time, days int) string) string {
+	today := time.Now()
+	dayOfMonth := d(today)
+	return s(today, dayOfMonth-1) // subtract 1 to get the first day of the month
+}
+
+func DayOfCurrentMonth(time time.Time) int {
+	return time.Day()
+}
+
+func SubtractDays(today time.Time, days int) string {
+	return today.AddDate(0, 0, -days).Format("2006-01-02")
+}
+
+func isFilterEnabled(filterBy string) bool {
+	if filterBy != "" {
+		return true
+	} else {
+		return false
+	}
 }

@@ -5,7 +5,7 @@ type Time struct {
 	End   string
 }
 
-type CostAndUsageRequest struct {
+type CostAndUsageRequestType struct {
 	Granularity     string
 	GroupBy         []string
 	Tag             string

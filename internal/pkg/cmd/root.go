@@ -20,7 +20,7 @@ func init() {
 }
 
 func paintRootHeader() string {
-	myFigure := figure.NewFigure("CCXplorer", "thin", true)
+	myFigure := figure.NewFigure("ccXplorer", "thin", true)
 	return myFigure.String()
 }
 

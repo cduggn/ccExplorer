@@ -16,14 +16,15 @@ var (
 		Use:   "aws",
 		Short: "Return unblended cost summary",
 		Long: `
-		aws  = DESCRIPTION
-		Fetches billing information for the time interval provided using the AWS Cost Explorer API
-		
-		Prerequisites:
-		- AWS credentials must be configured in ~/.aws/credentials
-		- AWS region must be configured in ~/.aws/config
-		- Cost Allocation Tags if you want to filter by tag ( Note cost allocation tags can take up to 24 hours to be applied )`,
-		Run: aws.CostSummary,
+Command: aws 
+Description: Returns cost and usage summary for the specified time period.
+
+Prerequisites:
+- AWS credentials must be configured in ~/.aws/credentials
+- AWS region must be configured in ~/.aws/config
+- Cost Allocation Tags must exist in AWS console if you want to filter by tag ( 
+Note cost allocation tags can take up to 24 hours to be applied )`,
+		RunE: aws.CostAndUsageSummary,
 	}
 	//awsCostWithDiscount = &cobra.Command{
 	//	Use:   "aws-with-discounts",
@@ -41,12 +42,11 @@ var (
 )
 
 func paintHeader() string {
-	myFigure := figure.NewFigure("billing", "thin", true)
+	myFigure := figure.NewFigure("Cost And Usage", "thin", true)
 	return myFigure.String()
 }
 
 func AWSCostAndUsageCommand() *cobra.Command {
-	billingCmd.AddCommand(aws.AWSCostCommand(awsCost))
-	//billingCmd.AddCommand(aws.AWSCostWithDiscountsCommand(awsCostWithDiscount))
+	billingCmd.AddCommand(aws.CostAndUsageCommand(awsCost))
 	return billingCmd
 }
