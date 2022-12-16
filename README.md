@@ -1,6 +1,6 @@
-# cloudcost
+# ccExplorer
 
-`cloudcost` is a simple command line tool to track the cost of your cloud resources.
+`ccExplorer` (Cloud cost explorer) is a simple command line tool to track the cost of your cloud resources.
 It is designed to be used with AWS, but could be extended to other cloud providers. It's primary 
 use case is to surface costs based on pre-defined 
 cost allocation tags. 
