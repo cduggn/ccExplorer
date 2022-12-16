@@ -33,39 +33,40 @@ Precompiled binaries are available for Linux, Mac, and Windows on the releases [
 Cost Explorer supports the `get aws` command and subcommand with the following options:
 
 ```bash
-GetBill = DESCRIPTION
-Fetches billing information for the time interval provided using the AWS Cost Explorer API
+Command: aws
+Description: Returns cost and usage summary for the specified time period.
 
 Prerequisites:
 - AWS credentials must be configured in ~/.aws/credentials
 - AWS region must be configured in ~/.aws/config
-- Cost Allocation Tags if you want to filter by tag ( Note cost allocation tags can take up to 24 hours to be applied )
+- Cost Allocation Tags must exist in AWS console if you want to filter by tag (
+Note cost allocation tags can take up to 24 hours to be applied )
 
 Usage:
-  cloudcost get aws [flags]
+  ccxplorer get aws [flags]
 
 Flags:
-  -e, --end-date string              End date for billing information. Default is todays date. (default "2022-11-23")
-  -c, --exclude-credit               Exclude credit and refund information in the report. This is enabled by default
-  -f, --filter-by string             When grouping by tag, filter by tag value
-  -g, --granularity string           Granularity of billing information to fetch (default "DAILY")
-  -d, --group-by-dimension strings   Group by at most 2 dimension tags [ Dimensions: AZ, SERVICE, USAGE_TYPE ] (default [SERVICE,USAGE_TYPE])
-  -t, --group-by-tag string          Group by cost allocation tag
-  -h, --help                         help for aws
-  -r, --rates strings                Cost and Usage rates to fetch [ Rates: BLENDED_COST, UNBLENDED_COST, AMORTIZED_COST, NET_AMORTIZED_COST, NET_UNBLENDED_COST, USAGE_QUANTITY ]. Defaults to UNBLENDED_COST (default [UNBLENDED_COST])
-  -s, --start-date string            Start date for billing information. Defaults to the past 7 days (default "2022-10-24")
+  -d, --dimensions strings   Group by at most 2 dimension tags [ Dimensions: AZ, SERVICE, USAGE_TYPE ]
+  -e, --end string           Defaults to the present day (default "2022-12-16")
+  -f, --filter-by string     When grouping by tag, filter by tag value
+  -g, --granularity string   Granularity of billing information to fetch. Monthly, Daily or Hourly (default "MONTHLY")
+  -h, --help                 help for aws
+  -c, --include-discounts    Include credit, refund, and discount information in the report summary. Disabled by default.
+  -s, --start string         Defaults to the start of the current month (default "2022-12-01")
+  -t, --tags string          Group by cost allocation tag
 ```
 
 ## Examples
-A sample command to fetch billing information for the past 7 days grouped by service and usage type:
+A sample command to fetch cost and usage information and grouped by service and 
+operation type:
 
 ```bash
-cloudcost get aws -s 2021-10-24 -e 2021-10-31 -g DAILY -r UNBLENDED_COST -g SERVICE -g USAGE_TYPE
+cloudcost get aws -d SERVICE -d OPERATION -s 2022-12-10
 ```
 
 Using cost allocation tags to filter by project:
 
 ```bash
-cloudcost get aws -t Project -f my-project -d SERVICE -g MONTHLY -s 2022-10-01 -e 2022-11-21 -r UNBLENDED_COST
+cloudcost get aws -t ApplicationName -d OPERATION -s 2022-12-10 -f "my-project"
 ```
 
