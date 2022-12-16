@@ -1,20 +1,20 @@
-package billing
+package aws
 
 type Time struct {
 	Start string
 	End   string
 }
 
-type CostAndUsageRequest struct {
-	Granularity     string
-	GroupBy         []string
-	Tag             string
-	Time            Time
-	IsFilterEnabled bool
-	FilterType      string
-	TagFilterValue  string
-	Rates           []string
-	ExcludeCredits  bool
+type CostAndUsageRequestType struct {
+	Granularity      string
+	GroupBy          []string
+	Tag              string
+	Time             Time
+	IsFilterEnabled  bool
+	FilterType       string
+	TagFilterValue   string
+	Rates            []string
+	IncludeDiscounts bool
 }
 
 type CostAndUsageReport struct {

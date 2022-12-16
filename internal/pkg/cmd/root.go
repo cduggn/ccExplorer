@@ -1,25 +1,27 @@
 package cmd
 
 import (
-	"github.com/cduggn/cloudcost/internal/pkg/cmd/billing"
+	"github.com/cduggn/cloudcost/internal/pkg/cmd/get"
 	"github.com/common-nighthawk/go-figure"
 	"github.com/spf13/cobra"
 	"os"
 )
 
-var rootCmd = &cobra.Command{
-	Use:   "cloudcost",
-	Short: "A CLI tool to get AWS Costs, Usage and Forecasts",
-	Long:  paintHeader(),
-}
-
-func paintHeader() string {
-	myFigure := figure.NewFigure("CloudCost", "thin", true)
-	return myFigure.String()
-}
+var (
+	rootCmd = &cobra.Command{
+		Use:   "ccxplorer",
+		Short: "A CLI tool to explore cloud costs and usage",
+		Long:  paintRootHeader(),
+	}
+)
 
 func init() {
-	rootCmd.AddCommand(billing.CostAndUsageCommand())
+	rootCmd.AddCommand(get.AWSCostAndUsageCommand())
+}
+
+func paintRootHeader() string {
+	myFigure := figure.NewFigure("ccXplorer", "thin", true)
+	return myFigure.String()
 }
 
 func Execute() {
