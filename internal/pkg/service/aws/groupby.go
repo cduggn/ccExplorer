@@ -49,7 +49,3 @@ func groupBy(req CostAndUsageRequestType) []types.GroupDefinition {
 		return groupByDimension(req.GroupBy)
 	}
 }
-
-func groupByArn(req CostAndUsageRequestType) []types.GroupDefinition {
-	return groupByDimension(req.GroupBy)
-}

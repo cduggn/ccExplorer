@@ -1,7 +1,7 @@
 package aws
 
 import (
-	"github.com/cduggn/cloudcost/internal/pkg/csp/aws"
+	"github.com/cduggn/cloudcost/internal/pkg/service/aws"
 	"github.com/spf13/cobra"
 	"time"
 )

@@ -17,6 +17,18 @@ type CostAndUsageRequestType struct {
 	ExcludeDiscounts bool
 }
 
+type CostAndUsageRequestWithResourcesType struct {
+	Granularity      string
+	GroupBy          []string
+	Tag              string
+	Time             Time
+	IsFilterEnabled  bool
+	FilterType       string
+	TagFilterValue   string
+	Rates            []string
+	ExcludeDiscounts bool
+}
+
 type CostAndUsageReport struct {
 	Services    map[int]Service
 	Start       string

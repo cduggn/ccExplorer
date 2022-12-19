@@ -26,15 +26,6 @@ Prerequisites:
 Note cost allocation tags can take up to 24 hours to be applied )`,
 		RunE: aws.CostAndUsageSummary,
 	}
-	awsCostAndResources = &cobra.Command{
-		Use: "with-resources",
-		Short: "Return cost, usage, " +
-			"and resoucrce information including ARN",
-		//Long: `
-		//aws-with-discounts = DESCRIPTION
-		//Fetches billing information for the time interval provided using the AWS Cost Explorer API `,
-		RunE: aws.ResourceList,
-	}
 )
 
 func paintHeader() string {
@@ -44,6 +35,5 @@ func paintHeader() string {
 
 func AWSCostAndUsageCommand() *cobra.Command {
 	costAndUsageCmd.AddCommand(aws.CostAndUsageCommand(awsCost))
-	awsCost.AddCommand(aws.CostAndResourcesCommand(awsCostAndResources))
 	return costAndUsageCmd
 }
