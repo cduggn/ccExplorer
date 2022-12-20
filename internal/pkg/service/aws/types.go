@@ -5,9 +5,27 @@ type Time struct {
 	End   string
 }
 
-type GetCostForecastRequestType struct {
-	Time        Time
-	Granularity string
+type Dimension struct {
+	Key   string
+	Value []string
+}
+
+type Tag struct {
+	Key   string
+	Value []string
+}
+
+type Filter struct {
+	Dimensions []Dimension
+	Tags       []Tag
+}
+
+type GetCostForecastRequest struct {
+	Time                    Time
+	Granularity             string
+	Metric                  string
+	Filter                  Filter
+	PredictionIntervalLevel int32
 }
 
 type GetCostForecastReport struct {

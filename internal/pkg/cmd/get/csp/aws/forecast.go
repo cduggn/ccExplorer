@@ -5,19 +5,35 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type ForecastRequestType struct {
-	Granularity     string
-	GroupBy         []string
-	IsFilterEnabled bool
-	Tag             string
-	FilterType      string
-	TagFilterValue  string
-}
-
 func CostForecast(cmd *cobra.Command, args []string) error {
-
-	res, _ := aws.GetCostForecast(aws.GetCostForecastRequestType{})
-
+	req := NewGetCostForecastRequestType()
+	res, _ := aws.GetCostForecast(req)
 	aws.PrintGetCostForecastReport(res)
 	return nil
+}
+
+func NewGetCostForecastRequestType() aws.GetCostForecastRequest {
+	return aws.GetCostForecastRequest{
+		Granularity:             "MONTHLY",
+		Metric:                  "UNBLENDED_COST",
+		PredictionIntervalLevel: 95,
+		Time: aws.Time{
+			Start: "2022-12-20",
+			End:   "2023-04-30",
+		},
+		Filter: aws.Filter{
+			Dimensions: []aws.Dimension{
+				{
+					Key:   "REGION",
+					Value: []string{"eu-west-1", "us-east-1", "us-west-1"},
+				},
+			},
+			//Tags: []aws.Tag{
+			//	{
+			//		Key:   "Name",
+			//		Value: "test",
+			//	},
+			//},
+		},
+	}
 }

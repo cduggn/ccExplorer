@@ -2,13 +2,14 @@ package aws
 
 import (
 	"context"
+	"fmt"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
 )
 
-func GetCostForecast(req GetCostForecastRequestType) (*costexplorer.GetCostForecastOutput, error) {
+func GetCostForecast(req GetCostForecastRequest) (*costexplorer.GetCostForecastOutput, error) {
 
 	cfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
@@ -22,8 +23,8 @@ func GetCostForecast(req GetCostForecastRequestType) (*costexplorer.GetCostForec
 		&costexplorer.GetDimensionValuesInput{
 			Dimension: "SERVICE",
 			TimePeriod: &types.DateInterval{
-				Start: aws.String("2022-12-01"),
-				End:   aws.String("2022-12-30"),
+				Start: aws.String(req.Time.Start),
+				End:   aws.String(req.Time.End),
 			},
 		})
 
@@ -33,41 +34,19 @@ func GetCostForecast(req GetCostForecastRequestType) (*costexplorer.GetCostForec
 		servicesSlice = append(servicesSlice, *service.Value)
 	}
 
+	fmt.Println(servicesSlice)
+
 	result, err := client.GetCostForecast(context.TODO(), &costexplorer.GetCostForecastInput{
-		Granularity: types.Granularity("MONTHLY"),
-		Metric:      "UNBLENDED_COST",
+		Granularity: types.Granularity(req.Granularity),
+		Metric:      types.Metric(req.Metric),
 		TimePeriod: &types.DateInterval{
-			Start: aws.String("2022-12-20"),
-			End:   aws.String("2023-04-30"),
+			Start: aws.String(req.Time.Start),
+			End:   aws.String(req.Time.End),
 		},
+		PredictionIntervalLevel: aws.Int32(req.PredictionIntervalLevel),
 		Filter: &types.Expression{
-			Dimensions: &types.DimensionValues{
-				Key:    "SERVICE",
-				Values: servicesSlice,
-
-				//And: []types.Expression{
-				//	{
-				//		Dimensions: &types.DimensionValues{
-				//			Key:    "SERVICE",
-				//			Values: servicesSlice,
-				//		},
-				//	},
-				//{
-				//	Dimensions: &types.DimensionValues{
-				//		Key:    "REGION",
-				//		Values: []string{"eu-west-1"},
-				//	},
-				//},
-			},
+			And: GenerateFilterExpression(req),
 		},
-		//
-		//Filter: &types.Expression{
-		//	Tags: &types.TagValues{
-		//		Key:    aws.String("ApplicationName"),
-		//
-		//	},
-		//},
-
 	})
 
 	// convert result to GetCostForecastResult struct
@@ -84,4 +63,31 @@ func GetCostForecast(req GetCostForecastRequestType) (*costexplorer.GetCostForec
 	//c.Granularity = req.Granularity
 
 	return result, nil
+}
+
+func GenerateFilterExpression(req GetCostForecastRequest) []types.Expression {
+
+	var exp []types.Expression
+
+	for _, dimension := range req.Filter.Dimensions {
+		temp := &types.DimensionValues{
+			Key:    types.Dimension(dimension.Key),
+			Values: dimension.Value,
+		}
+		exp = append(exp, types.Expression{
+			Dimensions: temp,
+		})
+	}
+
+	for _, tag := range req.Filter.Tags {
+		temp := &types.TagValues{
+			Key:    aws.String(tag.Key),
+			Values: tag.Value,
+		}
+		exp = append(exp, types.Expression{
+			Tags: temp,
+		})
+	}
+
+	return exp
 }
