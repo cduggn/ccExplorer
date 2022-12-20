@@ -26,6 +26,12 @@ Prerequisites:
 Note cost allocation tags can take up to 24 hours to be applied )`,
 		RunE: aws.CostAndUsageSummary,
 	}
+	forecast = &cobra.Command{
+		Use: "forecast",
+		Short: "Return cost, usage, " +
+			"and resoucrce information including ARN",
+		RunE: aws.CostForecast,
+	}
 )
 
 func paintHeader() string {
@@ -35,5 +41,6 @@ func paintHeader() string {
 
 func AWSCostAndUsageCommand() *cobra.Command {
 	costAndUsageCmd.AddCommand(aws.CostAndUsageCommand(awsCost))
+	awsCost.AddCommand(aws.ForecastCommand(forecast))
 	return costAndUsageCmd
 }

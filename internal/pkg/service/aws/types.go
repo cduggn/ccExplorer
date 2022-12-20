@@ -5,6 +5,14 @@ type Time struct {
 	End   string
 }
 
+type GetCostForecastRequestType struct {
+	Time        Time
+	Granularity string
+}
+
+type GetCostForecastReport struct {
+}
+
 type CostAndUsageRequestType struct {
 	Granularity      string
 	GroupBy          []string

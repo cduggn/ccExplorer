@@ -49,6 +49,6 @@ func GetCostAndUsage(req CostAndUsageRequestType) (*CostAndUsageReport, error) {
 		Services: make(map[int]Service),
 	}
 	c.Granularity = req.Granularity
-	c.CurateReport(result)
+	c.CurateCostAndUsageReport(result)
 	return c, nil
 }
