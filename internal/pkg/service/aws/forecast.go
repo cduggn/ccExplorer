@@ -18,6 +18,21 @@ func GetCostForecast(req GetCostForecastRequestType) (*costexplorer.GetCostForec
 	}
 	client := costexplorer.NewFromConfig(cfg)
 
+	services, _ := client.GetDimensionValues(context.TODO(),
+		&costexplorer.GetDimensionValuesInput{
+			Dimension: "SERVICE",
+			TimePeriod: &types.DateInterval{
+				Start: aws.String("2022-12-01"),
+				End:   aws.String("2022-12-30"),
+			},
+		})
+
+	// copy add services.DimensionValues to a slice of strings
+	var servicesSlice []string
+	for _, service := range services.DimensionValues {
+		servicesSlice = append(servicesSlice, *service.Value)
+	}
+
 	result, err := client.GetCostForecast(context.TODO(), &costexplorer.GetCostForecastInput{
 		Granularity: types.Granularity("MONTHLY"),
 		Metric:      "UNBLENDED_COST",
@@ -27,15 +42,29 @@ func GetCostForecast(req GetCostForecastRequestType) (*costexplorer.GetCostForec
 		},
 		Filter: &types.Expression{
 			Dimensions: &types.DimensionValues{
-				Key:    "REGION",
-				Values: []string{"eu-west-1"},
+				Key:    "SERVICE",
+				Values: servicesSlice,
+
+				//And: []types.Expression{
+				//	{
+				//		Dimensions: &types.DimensionValues{
+				//			Key:    "SERVICE",
+				//			Values: servicesSlice,
+				//		},
+				//	},
+				//{
+				//	Dimensions: &types.DimensionValues{
+				//		Key:    "REGION",
+				//		Values: []string{"eu-west-1"},
+				//	},
+				//},
 			},
 		},
-
+		//
 		//Filter: &types.Expression{
 		//	Tags: &types.TagValues{
 		//		Key:    aws.String("ApplicationName"),
-
+		//
 		//	},
 		//},
 
