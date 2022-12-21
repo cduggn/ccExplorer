@@ -1,7 +1,7 @@
 package get
 
 import (
-	"github.com/cduggn/cloudcost/internal/pkg/cmd/get/csp/aws"
+	aws2 "github.com/cduggn/cloudcost/internal/pkg/cmd/get/aws"
 	"github.com/common-nighthawk/go-figure"
 	"github.com/spf13/cobra"
 )
@@ -24,13 +24,13 @@ Prerequisites:
 - AWS region must be configured in ~/.aws/config
 - Cost Allocation Tags must exist in AWS console if you want to filter by tag ( 
 Note cost allocation tags can take up to 24 hours to be applied )`,
-		RunE: aws.CostAndUsageSummary,
+		RunE: aws2.CostAndUsageSummary,
 	}
 	forecast = &cobra.Command{
 		Use: "forecast",
 		Short: "Return cost, usage, " +
 			"and resoucrce information including ARN",
-		RunE: aws.CostForecast,
+		RunE: aws2.CostForecast,
 	}
 )
 
@@ -40,7 +40,7 @@ func paintHeader() string {
 }
 
 func AWSCostAndUsageCommand() *cobra.Command {
-	costAndUsageCmd.AddCommand(aws.CostAndUsageCommand(awsCost))
-	awsCost.AddCommand(aws.ForecastCommand(forecast))
+	costAndUsageCmd.AddCommand(aws2.CostAndUsageCommand(awsCost))
+	awsCost.AddCommand(aws2.ForecastCommand(forecast))
 	return costAndUsageCmd
 }
