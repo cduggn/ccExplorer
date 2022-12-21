@@ -9,6 +9,46 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
 )
 
+type GetDimensionValuesRequest struct {
+	Dimension string
+	Time      Time
+}
+
+func GetDimensionValues(d GetDimensionValuesRequest) ([]string, error) {
+
+	cfg, err := config.LoadDefaultConfig(context.TODO())
+	if err != nil {
+		return nil, APIError{
+			msg: "unable to load SDK config, " + err.Error(),
+		}
+	}
+	client := costexplorer.NewFromConfig(cfg)
+
+	services, err := client.GetDimensionValues(context.TODO(),
+		&costexplorer.GetDimensionValuesInput{
+			Dimension: types.Dimension(d.Dimension),
+			TimePeriod: &types.DateInterval{
+				Start: aws.String(d.Time.Start),
+				End:   aws.String(d.Time.End),
+			},
+		})
+
+	if err != nil {
+		return nil, APIError{
+			msg: "Error while fetching Dimension Values for Dimension from AWS",
+		}
+	}
+
+	// copy add services.DimensionValues to a slice of strings
+	var servicesSlice []string
+	for _, service := range services.DimensionValues {
+		servicesSlice = append(servicesSlice, *service.Value)
+	}
+
+	fmt.Println(servicesSlice)
+	return servicesSlice, nil
+}
+
 func GetCostForecast(req GetCostForecastRequest) (*costexplorer.GetCostForecastOutput, error) {
 
 	cfg, err := config.LoadDefaultConfig(context.TODO())
@@ -19,23 +59,6 @@ func GetCostForecast(req GetCostForecastRequest) (*costexplorer.GetCostForecastO
 	}
 	client := costexplorer.NewFromConfig(cfg)
 
-	services, _ := client.GetDimensionValues(context.TODO(),
-		&costexplorer.GetDimensionValuesInput{
-			Dimension: "SERVICE",
-			TimePeriod: &types.DateInterval{
-				Start: aws.String(req.Time.Start),
-				End:   aws.String(req.Time.End),
-			},
-		})
-
-	// copy add services.DimensionValues to a slice of strings
-	var servicesSlice []string
-	for _, service := range services.DimensionValues {
-		servicesSlice = append(servicesSlice, *service.Value)
-	}
-
-	fmt.Println(servicesSlice)
-
 	result, err := client.GetCostForecast(context.TODO(), &costexplorer.GetCostForecastInput{
 		Granularity: types.Granularity(req.Granularity),
 		Metric:      types.Metric(req.Metric),
@@ -44,9 +67,7 @@ func GetCostForecast(req GetCostForecastRequest) (*costexplorer.GetCostForecastO
 			End:   aws.String(req.Time.End),
 		},
 		PredictionIntervalLevel: aws.Int32(req.PredictionIntervalLevel),
-		Filter: &types.Expression{
-			And: GenerateFilterExpression(req),
-		},
+		Filter:                  GenerateFilterExpression(req),
 	})
 
 	// convert result to GetCostForecastResult struct
@@ -65,29 +86,49 @@ func GetCostForecast(req GetCostForecastRequest) (*costexplorer.GetCostForecastO
 	return result, nil
 }
 
-func GenerateFilterExpression(req GetCostForecastRequest) []types.Expression {
+func GenerateFilterExpression(req GetCostForecastRequest) *types.Expression {
+	var filterExpression types.Expression
+	var expList []types.Expression
+	var exp types.Expression
 
-	var exp []types.Expression
+	var isMultiFilter bool
+	if len(req.Filter.Dimensions) > 1 {
+		isMultiFilter = true
+	}
 
 	for _, dimension := range req.Filter.Dimensions {
 		temp := &types.DimensionValues{
 			Key:    types.Dimension(dimension.Key),
 			Values: dimension.Value,
 		}
-		exp = append(exp, types.Expression{
-			Dimensions: temp,
-		})
-	}
 
-	for _, tag := range req.Filter.Tags {
-		temp := &types.TagValues{
-			Key:    aws.String(tag.Key),
-			Values: tag.Value,
+		if len(req.Filter.Dimensions) == 1 {
+			expList = append(expList, types.Expression{
+				Dimensions: temp,
+			})
+		} else if len(req.Filter.Dimensions) > 1 {
+			exp.And = append(exp.And, types.Expression{
+				Dimensions: temp,
+			})
 		}
-		exp = append(exp, types.Expression{
-			Tags: temp,
-		})
 	}
 
-	return exp
+	if isMultiFilter {
+		expList = append(expList, exp)
+	}
+
+	//
+	//for _, tag := range req.Filter.Tags {
+	//	temp := &types.TagValues{
+	//		Key:    aws.String(tag.Key),
+	//		Values: tag.Value,
+	//	}
+	//	exp = append(exp, types.Expression{
+	//		Tags: temp,
+	//	})
+	//}
+
+	filterExpression = expList[0]
+
+	return &filterExpression
 }
