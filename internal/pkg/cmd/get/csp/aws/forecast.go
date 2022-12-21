@@ -11,7 +11,7 @@ func CostForecast(cmd *cobra.Command, args []string) error {
 
 	apiClient := aws.NewAPIClient()
 	req := NewGetCostForecastRequestType(GetDimensionValues(apiClient))
-	res, _ := apiClient.GetCostForecast(req)
+	res, _ := apiClient.GetCostForecast(context.TODO(), apiClient.Client, req)
 	aws.PrintGetCostForecastReport(res)
 	return nil
 }

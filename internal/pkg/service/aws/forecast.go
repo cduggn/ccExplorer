@@ -7,10 +7,14 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
 )
 
-func (api *APIClient) GetCostForecast(req GetCostForecastRequest) (
-	*costexplorer.GetCostForecastOutput, error) {
+type GetCostForecastAPI interface {
+	GetCostForecast(ctx context.Context, params *costexplorer.GetCostForecastInput, optFns ...func(*costexplorer.Options)) (*costexplorer.GetCostForecastOutput, error)
+}
 
-	result, err := api.Client.GetCostForecast(context.TODO(),
+func (*APIClient) GetCostForecast(ctx context.Context,
+	api GetCostForecastAPI, req GetCostForecastRequest) (*costexplorer.GetCostForecastOutput, error) {
+
+	result, err := api.GetCostForecast(context.TODO(),
 		&costexplorer.GetCostForecastInput{
 			Granularity: types.Granularity(req.Granularity),
 			Metric:      types.Metric(req.Metric),

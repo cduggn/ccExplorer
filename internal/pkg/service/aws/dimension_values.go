@@ -8,10 +8,11 @@ import (
 )
 
 type GetDimensionValuesAPI interface {
-	GetDimensionValues(ctx context.Context, params *costexplorer.GetDimensionValuesInput, optFns ...func(*costexplorer.Options)) (*costexplorer.GetDimensionValuesOutput, error)
+	GetDimensionValues(ctx context.Context,
+		params *costexplorer.GetDimensionValuesInput, optFns ...func(*costexplorer.Options)) (*costexplorer.GetDimensionValuesOutput, error)
 }
 
-func (c *APIClient) GetDimensionValues(ctx context.Context,
+func (*APIClient) GetDimensionValues(ctx context.Context,
 	api GetDimensionValuesAPI, d GetDimensionValuesRequest) (
 	[]string, error) {
 

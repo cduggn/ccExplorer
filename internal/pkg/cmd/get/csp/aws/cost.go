@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"context"
 	"github.com/cduggn/cloudcost/internal/pkg/service/aws"
 	"github.com/spf13/cobra"
 	"time"
@@ -27,7 +28,8 @@ func CostAndUsageSummary(cmd *cobra.Command, args []string) error {
 
 	awsClient := aws.NewAPIClient()
 
-	report, err = awsClient.GetCostAndUsage(req)
+	report, err = awsClient.GetCostAndUsage(context.TODO(), awsClient.Client,
+		req)
 	if err != nil {
 		return err
 	}

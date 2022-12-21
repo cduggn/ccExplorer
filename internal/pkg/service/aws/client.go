@@ -8,21 +8,26 @@ import (
 	"github.com/cduggn/cloudcost/internal/pkg/storage"
 )
 
+var (
+	apiClient         *APIClient
+	connectionManager DatabaseManager
+)
+
 type AWSClient interface {
-	GetCostAndUsage(req CostAndUsageRequestType) (*CostAndUsageReport, error)
+	GetCostAndUsage(ctx context.Context, api GetCostAndUsageAPI,
+		req CostAndUsageRequestType) (
+		*CostAndUsageReport,
+		error)
 	GetDimensionValues(ctx context.Context, api GetDimensionValuesAPI,
 		d GetDimensionValuesRequest) ([]string, error)
-	GetCostForecast(req GetCostForecastRequest) (*costexplorer.GetCostForecastOutput, error)
+	GetCostForecast(ctx context.Context,
+		api GetCostForecastAPI, req GetCostForecastRequest) (
+		*costexplorer.GetCostForecastOutput, error)
 }
 
 type APIClient struct {
 	*costexplorer.Client
 }
-
-var (
-	apiClient         *APIClient
-	connectionManager DatabaseManager
-)
 
 type DatabaseManager struct {
 	dbClient *storage.CostDataStorage

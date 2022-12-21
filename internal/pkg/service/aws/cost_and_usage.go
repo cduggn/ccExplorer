@@ -11,11 +11,16 @@ var (
 	metrics = []string{"UNBLENDED_COST"}
 )
 
-func (api *APIClient) GetCostAndUsage(req CostAndUsageRequestType) (
+type GetCostAndUsageAPI interface {
+	GetCostAndUsage(ctx context.Context, params *costexplorer.GetCostAndUsageInput, optFns ...func(*costexplorer.Options)) (*costexplorer.GetCostAndUsageOutput, error)
+}
+
+func (*APIClient) GetCostAndUsage(ctx context.Context, api GetCostAndUsageAPI,
+	req CostAndUsageRequestType) (
 	*CostAndUsageReport,
 	error) {
 
-	result, err := api.Client.GetCostAndUsage(context.TODO(),
+	result, err := api.GetCostAndUsage(context.TODO(),
 		&costexplorer.GetCostAndUsageInput{
 			Granularity: types.Granularity(req.Granularity), //todo: add option to pass HOURLY granularity as well
 			Metrics:     metrics,
