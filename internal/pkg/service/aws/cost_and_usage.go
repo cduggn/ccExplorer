@@ -12,14 +12,6 @@ var (
 	metrics = []string{"UNBLENDED_COST"}
 )
 
-type APIError struct {
-	msg string
-}
-
-func (e APIError) Error() string {
-	return e.msg
-}
-
 func GetCostAndUsage(req CostAndUsageRequestType) (*CostAndUsageReport, error) {
 	cfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {

@@ -1,5 +1,13 @@
 package aws
 
+type APIError struct {
+	msg string
+}
+
+func (e APIError) Error() string {
+	return e.msg
+}
+
 type Time struct {
 	Start string
 	End   string
@@ -74,4 +82,9 @@ type Metrics struct {
 	Name   string
 	Amount string
 	Unit   string
+}
+
+type GetDimensionValuesRequest struct {
+	Dimension string
+	Time      Time
 }

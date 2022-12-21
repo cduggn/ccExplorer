@@ -2,52 +2,11 @@ package aws
 
 import (
 	"context"
-	"fmt"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
 )
-
-type GetDimensionValuesRequest struct {
-	Dimension string
-	Time      Time
-}
-
-func GetDimensionValues(d GetDimensionValuesRequest) ([]string, error) {
-
-	cfg, err := config.LoadDefaultConfig(context.TODO())
-	if err != nil {
-		return nil, APIError{
-			msg: "unable to load SDK config, " + err.Error(),
-		}
-	}
-	client := costexplorer.NewFromConfig(cfg)
-
-	services, err := client.GetDimensionValues(context.TODO(),
-		&costexplorer.GetDimensionValuesInput{
-			Dimension: types.Dimension(d.Dimension),
-			TimePeriod: &types.DateInterval{
-				Start: aws.String(d.Time.Start),
-				End:   aws.String(d.Time.End),
-			},
-		})
-
-	if err != nil {
-		return nil, APIError{
-			msg: "Error while fetching Dimension Values for Dimension from AWS",
-		}
-	}
-
-	// copy add services.DimensionValues to a slice of strings
-	var servicesSlice []string
-	for _, service := range services.DimensionValues {
-		servicesSlice = append(servicesSlice, *service.Value)
-	}
-
-	fmt.Println(servicesSlice)
-	return servicesSlice, nil
-}
 
 func GetCostForecast(req GetCostForecastRequest) (*costexplorer.GetCostForecastOutput, error) {
 
