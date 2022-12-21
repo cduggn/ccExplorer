@@ -16,7 +16,7 @@ var (
 type AWSClient interface {
 	GetCostAndUsage(ctx context.Context, api GetCostAndUsageAPI,
 		req CostAndUsageRequestType) (
-		*CostAndUsageReport,
+		*costexplorer.GetCostAndUsageOutput,
 		error)
 	GetDimensionValues(ctx context.Context, api GetDimensionValuesAPI,
 		d GetDimensionValuesRequest) ([]string, error)

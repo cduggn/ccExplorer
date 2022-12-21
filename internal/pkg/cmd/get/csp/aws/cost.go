@@ -8,14 +8,14 @@ import (
 )
 
 var (
-	groupBy          []string
-	groupByTag       string
-	granularity      string
-	filterBy         string
-	rates            []string
-	startDate        string
-	endDate          string
-	report           *aws.CostAndUsageReport
+	groupBy     []string
+	groupByTag  string
+	granularity string
+	filterBy    string
+	rates       []string
+	startDate   string
+	endDate     string
+	//report           *aws.CostAndUsageReport
 	withoutDiscounts bool
 )
 
@@ -27,12 +27,16 @@ func CostAndUsageSummary(cmd *cobra.Command, args []string) error {
 	}
 
 	awsClient := aws.NewAPIClient()
-
-	report, err = awsClient.GetCostAndUsage(context.TODO(), awsClient.Client,
-		req)
+	usage, err := awsClient.GetCostAndUsage(context.Background(), awsClient.Client, req)
 	if err != nil {
 		return err
 	}
+
+	report := aws.CostAndUsageReport{
+		Services: make(map[int]aws.Service),
+	}
+	report.Granularity = req.Granularity
+	report.CurateCostAndUsageReport(usage)
 	report.PrintCostAndUsageReport()
 
 	return nil

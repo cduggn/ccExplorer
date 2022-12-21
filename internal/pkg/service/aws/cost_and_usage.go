@@ -12,12 +12,12 @@ var (
 )
 
 type GetCostAndUsageAPI interface {
-	GetCostAndUsage(ctx context.Context, params *costexplorer.GetCostAndUsageInput, optFns ...func(*costexplorer.Options)) (*costexplorer.GetCostAndUsageOutput, error)
+	GetCostAndUsage(ctx context.Context, params *costexplorer.GetCostAndUsageInput,
+		optFns ...func(*costexplorer.Options)) (*costexplorer.GetCostAndUsageOutput, error)
 }
 
-func (*APIClient) GetCostAndUsage(ctx context.Context, api GetCostAndUsageAPI,
-	req CostAndUsageRequestType) (
-	*CostAndUsageReport,
+func (*APIClient) GetCostAndUsage(ctx context.Context, api GetCostAndUsageAPI, req CostAndUsageRequestType) (
+	*costexplorer.GetCostAndUsageOutput,
 	error) {
 
 	result, err := api.GetCostAndUsage(context.TODO(),
@@ -37,10 +37,6 @@ func (*APIClient) GetCostAndUsage(ctx context.Context, api GetCostAndUsageAPI,
 			msg: "Error while fetching cost and usage data from AWS",
 		}
 	}
-	c := &CostAndUsageReport{
-		Services: make(map[int]Service),
-	}
-	c.Granularity = req.Granularity
-	c.CurateCostAndUsageReport(result)
-	return c, nil
+
+	return result, nil
 }
