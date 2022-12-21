@@ -9,3 +9,12 @@ func ConvertToFloat(amount string) float64 {
 	}
 	return f
 }
+
+func isEmpty(s []string) string {
+	if len(s) == 1 {
+		return ""
+	} else {
+		return s[1]
+	}
+
+}

@@ -2,8 +2,6 @@ package aws
 
 import (
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
-	"github.com/cduggn/cloudcost/internal/pkg/logger"
-	"github.com/cduggn/cloudcost/internal/pkg/storage"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"os"
 )
@@ -69,20 +67,20 @@ func (c *CostAndUsageReport) PrintCostAndUsageReport() {
 			tempRow := table.Row{m.Keys[0], isEmpty(m.Keys), v.Name, v.Amount, v.Unit, c.Granularity, m.Start, m.End}
 			t.AppendRow(tempRow)
 
-			_, err := conn.Insert(storage.CostDataInsert{
-				Dimension:   m.Keys[0],
-				Dimension2:  "",
-				Tag:         "",
-				MetricName:  "",
-				Amount:      v.Amount,
-				Unit:        v.Unit,
-				Granularity: c.Granularity,
-				StartDate:   m.Start,
-				EndDate:     m.End,
-			})
-			if err != nil {
-				logger.Error(err.Error())
-			}
+			//_, err := conn.Insert(storage.CostDataInsert{
+			//	Dimension:   m.Keys[0],
+			//	Dimension2:  "",
+			//	Tag:         "",
+			//	MetricName:  "",
+			//	Amount:      v.Amount,
+			//	Unit:        v.Unit,
+			//	Granularity: c.Granularity,
+			//	StartDate:   m.Start,
+			//	EndDate:     m.End,
+			//})
+			//if err != nil {
+			//	logger.Error(err.Error())
+			//}
 		}
 	}
 	totalHeaderRow := table.Row{"", "", "", "", "", "", "", ""}

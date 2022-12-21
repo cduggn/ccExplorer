@@ -3,31 +3,24 @@ package aws
 import (
 	"context"
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
 )
 
-func GetCostForecast(req GetCostForecastRequest) (*costexplorer.GetCostForecastOutput, error) {
+func (api *APIClient) GetCostForecast(req GetCostForecastRequest) (
+	*costexplorer.GetCostForecastOutput, error) {
 
-	cfg, err := config.LoadDefaultConfig(context.TODO())
-	if err != nil {
-		return nil, APIError{
-			msg: "unable to load SDK config, " + err.Error(),
-		}
-	}
-	client := costexplorer.NewFromConfig(cfg)
-
-	result, err := client.GetCostForecast(context.TODO(), &costexplorer.GetCostForecastInput{
-		Granularity: types.Granularity(req.Granularity),
-		Metric:      types.Metric(req.Metric),
-		TimePeriod: &types.DateInterval{
-			Start: aws.String(req.Time.Start),
-			End:   aws.String(req.Time.End),
-		},
-		PredictionIntervalLevel: aws.Int32(req.PredictionIntervalLevel),
-		Filter:                  GenerateFilterExpression(req),
-	})
+	result, err := api.Client.GetCostForecast(context.TODO(),
+		&costexplorer.GetCostForecastInput{
+			Granularity: types.Granularity(req.Granularity),
+			Metric:      types.Metric(req.Metric),
+			TimePeriod: &types.DateInterval{
+				Start: aws.String(req.Time.Start),
+				End:   aws.String(req.Time.End),
+			},
+			PredictionIntervalLevel: aws.Int32(req.PredictionIntervalLevel),
+			Filter:                  GenerateFilterExpression(req),
+		})
 
 	// convert result to GetCostForecastResult struct
 

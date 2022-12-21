@@ -3,22 +3,19 @@ package aws
 import (
 	"context"
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
 )
 
-func GetDimensionValues(d GetDimensionValuesRequest) ([]string, error) {
+type GetDimensionValuesAPI interface {
+	GetDimensionValues(ctx context.Context, params *costexplorer.GetDimensionValuesInput, optFns ...func(*costexplorer.Options)) (*costexplorer.GetDimensionValuesOutput, error)
+}
 
-	cfg, err := config.LoadDefaultConfig(context.TODO())
-	if err != nil {
-		return nil, APIError{
-			msg: "unable to load SDK config, " + err.Error(),
-		}
-	}
-	client := costexplorer.NewFromConfig(cfg)
+func (c *APIClient) GetDimensionValues(ctx context.Context,
+	api GetDimensionValuesAPI, d GetDimensionValuesRequest) (
+	[]string, error) {
 
-	dimensionValues, err := client.GetDimensionValues(context.TODO(),
+	dimensionValues, err := api.GetDimensionValues(context.TODO(),
 		&costexplorer.GetDimensionValuesInput{
 			Dimension: types.Dimension(d.Dimension),
 			TimePeriod: &types.DateInterval{

@@ -1,21 +1,24 @@
 package aws
 
 import (
+	"context"
 	"github.com/cduggn/cloudcost/internal/pkg/service/aws"
 	"github.com/spf13/cobra"
 	"time"
 )
 
 func CostForecast(cmd *cobra.Command, args []string) error {
-	req := NewGetCostForecastRequestType()
-	res, _ := aws.GetCostForecast(req)
+
+	apiClient := aws.NewAPIClient()
+	req := NewGetCostForecastRequestType(GetDimensionValues(apiClient))
+	res, _ := apiClient.GetCostForecast(req)
 	aws.PrintGetCostForecastReport(res)
 	return nil
 }
 
-func NewGetCostForecastRequestType() aws.GetCostForecastRequest {
-
-	services, err := aws.GetDimensionValues(aws.GetDimensionValuesRequest{
+func GetDimensionValues(c *aws.APIClient) []string {
+	services, err := c.GetDimensionValues(context.TODO(), c.Client, aws.
+		GetDimensionValuesRequest{
 		Dimension: "SERVICE",
 		Time: aws.Time{
 			Start: DefaultStartDate(DayOfCurrentMonth, SubtractDays),
@@ -25,7 +28,11 @@ func NewGetCostForecastRequestType() aws.GetCostForecastRequest {
 	if err != nil {
 		panic(err)
 	}
+	return services
+}
 
+func NewGetCostForecastRequestType(dimensions []string) aws.
+	GetCostForecastRequest {
 	return aws.GetCostForecastRequest{
 		Granularity:             "MONTHLY",
 		Metric:                  "UNBLENDED_COST",
@@ -38,7 +45,7 @@ func NewGetCostForecastRequestType() aws.GetCostForecastRequest {
 			Dimensions: []aws.Dimension{
 				{
 					Key:   "SERVICE",
-					Value: services,
+					Value: dimensions,
 				},
 				//{
 				//	Key:   "REGION",

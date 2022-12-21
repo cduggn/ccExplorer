@@ -25,7 +25,9 @@ func CostAndUsageSummary(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	report, err = aws.GetCostAndUsage(req)
+	awsClient := aws.NewAPIClient()
+
+	report, err = awsClient.GetCostAndUsage(req)
 	if err != nil {
 		return err
 	}
