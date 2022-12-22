@@ -333,3 +333,167 @@ func TestCostForecastFilterGenerator_SingleDimension(t *testing.T) {
 		}
 	}
 }
+
+func TestCostAndUsageGroupByGenerator_SingleDimension(t *testing.T) {
+	cases := []struct {
+		input  CostAndUsageRequestType
+		expect []types.GroupDefinition
+	}{
+		{
+			input: CostAndUsageRequestType{
+				Granularity: "MONTHLY",
+				GroupBy:     []string{"SERVICE"},
+				Tag:         "",
+				Time: Time{
+					Start: "2020-01-01",
+					End:   "2020-01-01",
+				},
+				IsFilterEnabled:  false,
+				TagFilterValue:   "",
+				Rates:            []string{"UNBLENDED"},
+				ExcludeDiscounts: true,
+			},
+			expect: []types.GroupDefinition{
+				{
+					Type: "DIMENSION",
+					Key:  aws.String("SERVICE"),
+				},
+			},
+		},
+	}
+	for _, c := range cases {
+		result := CostAndUsageGroupByGenerator(c.input)
+		if *result[0].Key != *c.expect[0].Key {
+			t.Errorf("CostAndUsageGroupByGenerator(%v) == %v, want %v",
+				c.input, result[0].Key, c.expect[0].Key)
+		}
+	}
+}
+
+func TestCostAndUsageGroupByGenerator_MultiDimension(t *testing.T) {
+	cases := []struct {
+		input  CostAndUsageRequestType
+		expect []types.GroupDefinition
+	}{
+		{
+			input: CostAndUsageRequestType{
+				Granularity: "MONTHLY",
+				GroupBy:     []string{"SERVICE", "RECORD_TYPE"},
+				Tag:         "",
+				Time: Time{
+					Start: "2020-01-01",
+					End:   "2020-01-01",
+				},
+				IsFilterEnabled:  false,
+				TagFilterValue:   "",
+				Rates:            []string{"UNBLENDED"},
+				ExcludeDiscounts: true,
+			},
+			expect: []types.GroupDefinition{
+				{
+					Type: "DIMENSION",
+					Key:  aws.String("SERVICE"),
+				},
+				{
+					Type: "DIMENSION",
+					Key:  aws.String("RECORD_TYPE"),
+				},
+			},
+		},
+	}
+	for _, c := range cases {
+		result := CostAndUsageGroupByGenerator(c.input)
+		if *result[0].Key != *c.expect[0].Key {
+			t.Errorf("CostAndUsageGroupByGenerator(%v) == %v, want %v",
+				c.input, result[0].Key, c.expect[0].Key)
+		}
+		if *result[1].Key != *c.expect[1].Key {
+			t.Errorf("CostAndUsageGroupByGenerator(%v) == %v, want %v",
+				c.input, result[1].Key, c.expect[1].Key)
+		}
+	}
+}
+
+func TestCostAndUsageGroupByGenerator_ByTag(t *testing.T) {
+	cases := []struct {
+		input  CostAndUsageRequestType
+		expect []types.GroupDefinition
+	}{
+		{
+			input: CostAndUsageRequestType{
+				Granularity: "MONTHLY",
+				GroupBy:     []string{"OPERATION"},
+				Tag:         "ApplicationName",
+				Time: Time{
+					Start: "2020-01-01",
+					End:   "2020-01-01",
+				},
+				IsFilterEnabled:  false,
+				TagFilterValue:   "MyApp",
+				Rates:            []string{"UNBLENDED"},
+				ExcludeDiscounts: true,
+			},
+			expect: []types.GroupDefinition{
+				{
+					Type: "DIMENSION",
+					Key:  aws.String("OPERATION"),
+				},
+				{
+					Type: "TAG",
+					Key:  aws.String("ApplicationName"),
+				},
+			},
+		},
+	}
+	for _, c := range cases {
+		result := CostAndUsageGroupByGenerator(c.input)
+		if *result[0].Key != *c.expect[0].Key {
+			t.Errorf("CostAndUsageGroupByGenerator(%v) == %v, want %v",
+				c.input, result[0].Key, c.expect[0].Key)
+		}
+	}
+}
+
+func TestCostAndUsageGroupByGenerator_ByTagAndDimesion(t *testing.T) {
+	cases := []struct {
+		input  CostAndUsageRequestType
+		expect []types.GroupDefinition
+	}{
+		{
+			input: CostAndUsageRequestType{
+				Granularity: "MONTHLY",
+				GroupBy:     []string{"SERVICE"},
+				Tag:         "ApplicationName",
+				Time: Time{
+					Start: "2020-01-01",
+					End:   "2020-01-01",
+				},
+				IsFilterEnabled:  false,
+				TagFilterValue:   "MyApp",
+				Rates:            []string{"UNBLENDED"},
+				ExcludeDiscounts: true,
+			},
+			expect: []types.GroupDefinition{
+				{
+					Type: "DIMENSION",
+					Key:  aws.String("SERVICE"),
+				},
+				{
+					Type: "TAG",
+					Key:  aws.String("ApplicationName"),
+				},
+			},
+		},
+	}
+	for _, c := range cases {
+		result := CostAndUsageGroupByGenerator(c.input)
+		if *result[0].Key != *c.expect[0].Key {
+			t.Errorf("CostAndUsageGroupByGenerator(%v) == %v, want %v",
+				c.input, result[0].Key, c.expect[0].Key)
+		}
+		if *result[1].Key != *c.expect[1].Key {
+			t.Errorf("CostAndUsageGroupByGenerator(%v) == %v, want %v",
+				c.input, result[1].Key, c.expect[1].Key)
+		}
+	}
+}
