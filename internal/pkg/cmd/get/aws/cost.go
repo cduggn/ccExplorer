@@ -1,21 +1,9 @@
 package aws
 
 import (
-	"github.com/cduggn/cloudcost/internal/pkg/csp/aws"
+	"context"
+	"github.com/cduggn/cloudcost/internal/pkg/service/aws"
 	"github.com/spf13/cobra"
-	"time"
-)
-
-var (
-	groupBy       []string
-	groupByTag    string
-	granularity   string
-	filterBy      string
-	rates         []string
-	startDate     string
-	endDate       string
-	report        *aws.CostAndUsageReport
-	withDiscounts bool
 )
 
 func CostAndUsageSummary(cmd *cobra.Command, args []string) error {
@@ -25,11 +13,18 @@ func CostAndUsageSummary(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	report, err = aws.GetCostAndUsage(req)
+	awsClient := aws.NewAPIClient()
+	usage, err := awsClient.GetCostAndUsage(context.Background(), awsClient.Client, req)
 	if err != nil {
 		return err
 	}
-	report.Print()
+
+	report := aws.CostAndUsageReport{
+		Services: make(map[int]aws.Service),
+	}
+	report.Granularity = req.Granularity
+	report.CurateCostAndUsageReport(usage)
+	report.PrintCostAndUsageReport()
 
 	return nil
 }
@@ -69,7 +64,7 @@ func NewCostAndUsageRequest(cmd *cobra.Command) (aws.CostAndUsageRequestType, er
 		return aws.CostAndUsageRequestType{}, err
 	}
 
-	includeDiscounts, _ := cmd.Flags().GetBool("include-discounts")
+	excludeDiscounts, _ := cmd.Flags().GetBool("exclude-discounts")
 	interval := cmd.Flags().Lookup("granularity").Value.String()
 
 	return aws.CostAndUsageRequestType{
@@ -80,40 +75,10 @@ func NewCostAndUsageRequest(cmd *cobra.Command) (aws.CostAndUsageRequestType, er
 			Start: start,
 			End:   end,
 		},
-		IsFilterEnabled:  isFilterEnabled(filterBy),
-		TagFilterValue:   filter,
-		Rates:            rates,
-		IncludeDiscounts: includeDiscounts,
+		IsFilterEnabled: isFilterEnabled(filter),
+		TagFilterValue:  filter,
+		//Rates:            rates,
+		ExcludeDiscounts: excludeDiscounts,
 	}, nil
 
-}
-
-func DefaultEndDate(f func(date time.Time) string) string {
-	return f(time.Now())
-}
-
-func Format(date time.Time) string {
-	return date.Format("2006-01-02")
-}
-
-func DefaultStartDate(d func(time time.Time) int, s func(time time.Time, days int) string) string {
-	today := time.Now()
-	dayOfMonth := d(today)
-	return s(today, dayOfMonth-1) // subtract 1 to get the first day of the month
-}
-
-func DayOfCurrentMonth(time time.Time) int {
-	return time.Day()
-}
-
-func SubtractDays(today time.Time, days int) string {
-	return today.AddDate(0, 0, -days).Format("2006-01-02")
-}
-
-func isFilterEnabled(filterBy string) bool {
-	if filterBy != "" {
-		return true
-	} else {
-		return false
-	}
 }

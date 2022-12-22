@@ -28,10 +28,8 @@ var (
 
 func (c *CostDataStorage) New(dbName string) error {
 
-	// if database already exists then return
+	// if database already exists then no work required
 	if conn != nil {
-		logger.Info("Database connection already established: ",
-			zap.String("db", dbName))
 		return nil
 	}
 
