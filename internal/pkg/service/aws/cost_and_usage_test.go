@@ -16,7 +16,7 @@ type mockGetCostAndUsageAPI func(ctx context.Context,
 
 func (m mockGetCostAndUsageAPI) GetCostAndUsage(ctx context.Context,
 	params *costexplorer.GetCostAndUsageInput, optFns ...func(*costexplorer.Options)) (*costexplorer.GetCostAndUsageOutput, error) {
-	return &costexplorer.GetCostAndUsageOutput{}, nil
+	return m(ctx, params, optFns...)
 }
 
 var mockOutput = &costexplorer.GetCostAndUsageOutput{
