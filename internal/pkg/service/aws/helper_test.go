@@ -233,7 +233,7 @@ func TestCostAndUsageFilterGenerator_FilterByDiscount(t *testing.T) {
 	}
 }
 
-func TestCostForecastFilterGenerator(t *testing.T) {
+func TestCostForecastFilterGenerator_MultiDimension(t *testing.T) {
 	cases := []struct {
 		input  GetCostForecastRequest
 		expect *types.Expression
@@ -287,6 +287,47 @@ func TestCostForecastFilterGenerator(t *testing.T) {
 				c.input, result.Tags.Key, c.expect.Tags.Key)
 		}
 		if result.And[1].Dimensions.Key != c.expect.And[1].Dimensions.Key {
+			t.Errorf("CostForecastFilterGenerator(%v) == %v, want %v",
+				c.input, result.Tags.Key, c.expect.Tags.Key)
+		}
+	}
+}
+
+func TestCostForecastFilterGenerator_SingleDimension(t *testing.T) {
+	cases := []struct {
+		input  GetCostForecastRequest
+		expect *types.Expression
+	}{
+		{
+			input: GetCostForecastRequest{
+				Time: Time{
+					Start: "2020-01-01",
+					End:   "2020-01-01",
+				},
+				Granularity: "MONTHLY",
+				Metric:      "UNBLENDED_COST",
+				Filter: Filter{
+					Dimensions: []Dimension{
+						{
+							Key:   "SERVICE",
+							Value: []string{"Amazon Elastic Compute Cloud - Compute"},
+						},
+					},
+					Tags: nil,
+				},
+				PredictionIntervalLevel: 0,
+			},
+			expect: &types.Expression{
+				Dimensions: &types.DimensionValues{
+					Key:    "SERVICE",
+					Values: []string{"Amazon Elastic Compute Cloud - Compute"},
+				},
+			},
+		},
+	}
+	for _, c := range cases {
+		result := CostForecastFilterGenerator(c.input)
+		if result.Dimensions.Key != c.expect.Dimensions.Key {
 			t.Errorf("CostForecastFilterGenerator(%v) == %v, want %v",
 				c.input, result.Tags.Key, c.expect.Tags.Key)
 		}
