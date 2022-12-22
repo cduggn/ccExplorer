@@ -64,7 +64,7 @@ func (c *CostAndUsageReport) PrintCostAndUsageReport() {
 			if v.Unit == "USD" {
 				total += ConvertToFloat(v.Amount)
 			}
-			tempRow := table.Row{m.Keys[0], isEmpty(m.Keys), v.Name, v.Amount, v.Unit, c.Granularity, m.Start, m.End}
+			tempRow := table.Row{m.Keys[0], ReturnIfPresent(m.Keys), v.Name, v.Amount, v.Unit, c.Granularity, m.Start, m.End}
 			t.AppendRow(tempRow)
 
 			//_, err := conn.Insert(storage.CostDataInsert{

@@ -9,52 +9,39 @@ import (
 )
 
 var (
-	apiClient         *APIClient
+	awsAPIClient      *APIClient
 	connectionManager DatabaseManager
 )
 
-type AWSClient interface {
-	GetCostAndUsage(ctx context.Context, api GetCostAndUsageAPI,
-		req CostAndUsageRequestType) (
-		*costexplorer.GetCostAndUsageOutput,
-		error)
-	GetDimensionValues(ctx context.Context, api GetDimensionValuesAPI,
-		d GetDimensionValuesRequest) ([]string, error)
-	GetCostForecast(ctx context.Context,
-		api GetCostForecastAPI, req GetCostForecastRequest) (
-		*costexplorer.GetCostForecastOutput, error)
-}
-
-type APIClient struct {
-	*costexplorer.Client
-}
-
-type DatabaseManager struct {
-	dbClient *storage.CostDataStorage
-}
-
 func init() {
-	//db
+
 	connectionManager = DatabaseManager{}
-	connectionManager.newDBClient()
-	// aws client
-	apiClient = &APIClient{}
-	err := apiClient.newAWSClient()
+	err := connectionManager.newDBClient()
+	if err != nil {
+		logger.Fatal(err.Error())
+	}
+
+	awsAPIClient = &APIClient{}
+	err = awsAPIClient.newAWSClient()
 	if err != nil {
 		logger.Error(err.Error())
 	}
 }
 
 func NewAPIClient() *APIClient {
-	return apiClient
+	return awsAPIClient
 }
 
-func (c *DatabaseManager) newDBClient() {
+func (c *DatabaseManager) newDBClient() error {
 	c.dbClient = &storage.CostDataStorage{}
 	err := c.dbClient.New("./cloudcost.db")
 	if err != nil {
-		logger.Error(err.Error())
+		return DBError{
+			msg: "unable to create database client, " + err.Error(),
+		}
 	}
+	logger.Info("database connection established")
+	return nil
 }
 
 func (c *APIClient) newAWSClient() error {
@@ -65,5 +52,6 @@ func (c *APIClient) newAWSClient() error {
 		}
 	}
 	c.Client = costexplorer.NewFromConfig(cfg)
+	logger.Info("aws cost explorer client created")
 	return nil
 }

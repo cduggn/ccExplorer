@@ -1,5 +1,39 @@
 package aws
 
+import (
+	"context"
+	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
+	"github.com/cduggn/cloudcost/internal/pkg/storage"
+)
+
+type AWSClient interface {
+	GetCostAndUsage(ctx context.Context, api GetCostAndUsageAPI,
+		req CostAndUsageRequestType) (
+		*costexplorer.GetCostAndUsageOutput,
+		error)
+	GetDimensionValues(ctx context.Context, api GetDimensionValuesAPI,
+		d GetDimensionValuesRequest) ([]string, error)
+	GetCostForecast(ctx context.Context,
+		api GetCostForecastAPI, req GetCostForecastRequest) (
+		*costexplorer.GetCostForecastOutput, error)
+}
+
+type APIClient struct {
+	*costexplorer.Client
+}
+
+type DatabaseManager struct {
+	dbClient *storage.CostDataStorage
+}
+
+type DBError struct {
+	msg string
+}
+
+func (e DBError) Error() string {
+	return e.msg
+}
+
 type APIError struct {
 	msg string
 }
@@ -45,7 +79,6 @@ type CostAndUsageRequestType struct {
 	Tag              string
 	Time             Time
 	IsFilterEnabled  bool
-	FilterType       string
 	TagFilterValue   string
 	Rates            []string
 	ExcludeDiscounts bool

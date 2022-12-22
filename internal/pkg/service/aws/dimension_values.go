@@ -32,14 +32,5 @@ func (*APIClient) GetDimensionValues(ctx context.Context,
 	}
 
 	ds := ToSlice(*dimensionValues)
-
 	return ds, nil
-}
-
-func ToSlice(d costexplorer.GetDimensionValuesOutput) []string {
-	var servicesSlice []string
-	for _, service := range d.DimensionValues {
-		servicesSlice = append(servicesSlice, *service.Value)
-	}
-	return servicesSlice
 }

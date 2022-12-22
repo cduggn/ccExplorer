@@ -9,22 +9,6 @@ import (
 	"testing"
 )
 
-func TestToSlice(t *testing.T) {
-	mockDimensionValuesOutput := costexplorer.GetDimensionValuesOutput{
-		DimensionValues: []types.DimensionValuesWithAttributes{
-			{
-				Attributes: map[string]string{
-					"ServiceName": "Amazon Elastic Compute Cloud - Compute",
-				},
-				Value: aws.String("value"),
-			},
-		},
-	}
-	slice := ToSlice(mockDimensionValuesOutput)
-	assert.Equal(t, "value", slice[0])
-	assert.Equal(t, slice, []string{"value"})
-}
-
 type mockGetDimensionValuesAPI func(ctx context.Context,
 	params *costexplorer.GetDimensionValuesInput, optFns ...func(*costexplorer.Options)) (*costexplorer.GetDimensionValuesOutput, error)
 

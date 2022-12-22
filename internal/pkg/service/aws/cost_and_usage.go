@@ -28,8 +28,8 @@ func (*APIClient) GetCostAndUsage(ctx context.Context, api GetCostAndUsageAPI, r
 				Start: aws.String(req.Time.Start),
 				End:   aws.String(req.Time.End),
 			},
-			GroupBy: groupBy(req),
-			Filter:  filter(req),
+			GroupBy: CostAndUsageGroupByGenerator(req),
+			Filter:  CostAndUsageFilterGenerator(req),
 		})
 
 	if err != nil {
@@ -37,6 +37,5 @@ func (*APIClient) GetCostAndUsage(ctx context.Context, api GetCostAndUsageAPI, r
 			msg: "Error while fetching cost and usage data from AWS",
 		}
 	}
-
 	return result, nil
 }
