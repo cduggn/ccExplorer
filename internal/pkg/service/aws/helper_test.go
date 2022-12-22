@@ -207,26 +207,16 @@ func TestCostAndUsageFilterGenerator_FilterByDiscount(t *testing.T) {
 					Start: "2020-01-01",
 					End:   "2020-01-01",
 				},
-				IsFilterEnabled:  true,
+				IsFilterEnabled:  false,
 				TagFilterValue:   "",
 				Rates:            []string{"UNBLENDED"},
 				ExcludeDiscounts: true,
 			},
 			expect: &types.Expression{
-				And: []types.Expression{
-					{
-						Not: &types.Expression{
-							Dimensions: &types.DimensionValues{
-								Key:    "RECORD_TYPE",
-								Values: []string{"Refund", "Credit", "DiscountedUsage"},
-							},
-						},
-					},
-					{
-						Tags: &types.TagValues{
-							Key:    aws.String(""),
-							Values: []string{""},
-						},
+				Not: &types.Expression{
+					Dimensions: &types.DimensionValues{
+						Key:    "RECORD_TYPE",
+						Values: []string{"Refund", "Credit", "DiscountedUsage"},
 					},
 				},
 			},
@@ -234,14 +224,11 @@ func TestCostAndUsageFilterGenerator_FilterByDiscount(t *testing.T) {
 	}
 	for _, c := range cases {
 		result := CostAndUsageFilterGenerator(c.input)
-		if result.And[0].Not.Dimensions.Key != c.expect.And[0].Not.Dimensions.
+		if result.Not.Dimensions.Key != c.expect.Not.Dimensions.
 			Key {
 			t.Errorf("CostAndUsageFilterGenerator(%v) == %v, want %v",
 				c.input, result.Not.Dimensions.Key, c.expect.Not.Dimensions.Key)
 		}
-		if *result.And[1].Tags.Key != *c.expect.And[1].Tags.Key {
-			t.Errorf("CostAndUsageFilterGenerator(%v) == %v, want %v",
-				c.input, result.Tags.Key, c.expect.Tags.Key)
-		}
+		
 	}
 }
