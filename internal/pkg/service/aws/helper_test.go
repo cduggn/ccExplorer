@@ -229,6 +229,66 @@ func TestCostAndUsageFilterGenerator_FilterByDiscount(t *testing.T) {
 			t.Errorf("CostAndUsageFilterGenerator(%v) == %v, want %v",
 				c.input, result.Not.Dimensions.Key, c.expect.Not.Dimensions.Key)
 		}
-		
+
+	}
+}
+
+func TestCostForecastFilterGenerator(t *testing.T) {
+	cases := []struct {
+		input  GetCostForecastRequest
+		expect *types.Expression
+	}{
+		{
+			input: GetCostForecastRequest{
+				Time: Time{
+					Start: "2020-01-01",
+					End:   "2020-01-01",
+				},
+				Granularity: "MONTHLY",
+				Metric:      "UNBLENDED_COST",
+				Filter: Filter{
+					Dimensions: []Dimension{
+						{
+							Key: "SERVICE",
+							Value: []string{"Amazon Elastic Compute Cloud" +
+								" - Compute"},
+						},
+						{
+							Key:   "RECORD_TYPE",
+							Value: []string{"Usage"},
+						},
+					},
+					Tags: nil,
+				},
+				PredictionIntervalLevel: 0,
+			},
+			expect: &types.Expression{
+				And: []types.Expression{
+					{
+						Dimensions: &types.DimensionValues{
+							Key:    "SERVICE",
+							Values: []string{"Amazon Elastic Compute Cloud - Compute"},
+						},
+					},
+					{
+						Dimensions: &types.DimensionValues{
+							Key:    "RECORD_TYPE",
+							Values: []string{"Usage"},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, c := range cases {
+		result := CostForecastFilterGenerator(c.input)
+		if result.And[0].Dimensions.Key != c.expect.And[0].Dimensions.Key {
+			t.Errorf("CostForecastFilterGenerator(%v) == %v, want %v",
+				c.input, result.Tags.Key, c.expect.Tags.Key)
+		}
+		if result.And[1].Dimensions.Key != c.expect.And[1].Dimensions.Key {
+			t.Errorf("CostForecastFilterGenerator(%v) == %v, want %v",
+				c.input, result.Tags.Key, c.expect.Tags.Key)
+		}
 	}
 }
