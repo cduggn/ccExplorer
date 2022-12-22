@@ -6,18 +6,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	groupBy     []string
-	groupByTag  string
-	granularity string
-	filterBy    string
-	rates       []string
-	startDate   string
-	endDate     string
-	//report           *aws.CostAndUsageReport
-	withoutDiscounts bool
-)
-
 func CostAndUsageSummary(cmd *cobra.Command, args []string) error {
 
 	req, err := NewCostAndUsageRequest(cmd)
@@ -87,9 +75,9 @@ func NewCostAndUsageRequest(cmd *cobra.Command) (aws.CostAndUsageRequestType, er
 			Start: start,
 			End:   end,
 		},
-		IsFilterEnabled:  isFilterEnabled(filterBy),
-		TagFilterValue:   filter,
-		Rates:            rates,
+		IsFilterEnabled: isFilterEnabled(filter),
+		TagFilterValue:  filter,
+		//Rates:            rates,
 		ExcludeDiscounts: excludeDiscounts,
 	}, nil
 

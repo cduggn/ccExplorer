@@ -4,60 +4,71 @@ import (
 	"context"
 	"github.com/cduggn/cloudcost/internal/pkg/service/aws"
 	"github.com/spf13/cobra"
-	"time"
 )
 
 func CostForecast(cmd *cobra.Command, args []string) error {
 
 	apiClient := aws.NewAPIClient()
-	req := NewGetCostForecastRequestType(GetDimensionValues(apiClient))
+	dimensions := GetDimensionValues(apiClient)
+
+	req := NewGetCostForecastRequestType(cmd, dimensions)
 	res, _ := apiClient.GetCostForecast(context.TODO(), apiClient.Client, req)
+
 	aws.PrintGetCostForecastReport(res)
+
+	//TODO add error handling
+
 	return nil
 }
 
-func GetDimensionValues(c *aws.APIClient) []string {
-	services, err := c.GetDimensionValues(context.TODO(), c.Client, aws.
-		GetDimensionValuesRequest{
-		Dimension: "SERVICE",
+func NewGetCostForecastRequestType(cmd *cobra.Command, dimensions []string) aws.
+	GetCostForecastRequest {
+
+	granularity, _ := cmd.Flags().GetString("granularity")
+
+	predictionIntervalLevel, _ := cmd.Flags().GetInt32("predictionIntervalLevel")
+	start := cmd.Flags().Lookup("start").Value.String()
+	end := cmd.Flags().Lookup("end").Value.String()
+	filterName, _ := cmd.Flags().GetString(
+		"forecast-filter")
+	filterValue, _ := cmd.Flags().GetString("forecast-filter-value")
+	filterType := cmd.Flags().Lookup("forecast-filter-type").Value.String()
+
+	//TODO add validation for all flags
+
+	return aws.GetCostForecastRequest{
+		Granularity:             granularity,
+		Metric:                  "UNBLENDED_COST",
+		PredictionIntervalLevel: predictionIntervalLevel,
 		Time: aws.Time{
-			Start: DefaultStartDate(DayOfCurrentMonth, SubtractDays),
-			End:   Format(time.Now()),
+			Start: start,
+			End:   end,
 		},
-	})
-	if err != nil {
-		panic(err)
+		Filter: generateFilter(filterType, filterName, filterValue),
 	}
-	return services
 }
 
-func NewGetCostForecastRequestType(dimensions []string) aws.
-	GetCostForecastRequest {
-	return aws.GetCostForecastRequest{
-		Granularity:             "MONTHLY",
-		Metric:                  "UNBLENDED_COST",
-		PredictionIntervalLevel: 95,
-		Time: aws.Time{
-			Start: Format(time.Now()),
-			End:   "2023-04-30",
-		},
-		Filter: aws.Filter{
+func generateFilter(filterType, filterName, filterValue string) aws.Filter {
+
+	if filterType == "TAG" {
+		return aws.Filter{
+			Tags: []aws.Tag{
+				{
+					Key:   filterName,
+					Value: []string{filterValue},
+				},
+			},
+		}
+	} else if filterType == "DIMENSION" {
+		return aws.Filter{
 			Dimensions: []aws.Dimension{
 				{
-					Key:   "SERVICE",
-					Value: dimensions,
+					Key:   filterName,
+					Value: []string{filterValue},
 				},
-				//{
-				//	Key:   "REGION",
-				//	Value: []string{"eu-west-1", "us-east-1", "us-west-1"},
-				//},
 			},
-			//Tags: []aws.Tag{
-			//	{
-			//		Key:   "Name",
-			//		Value: "test",
-			//	},
-			//},
-		},
+		}
 	}
+
+	return aws.Filter{}
 }
