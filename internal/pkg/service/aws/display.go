@@ -13,8 +13,8 @@ func PrintGetCostForecastReport(r *costexplorer.GetCostForecastOutput) {
 		"PredictionIntervalUpperBound", "Start", "End", "Unit", "Total"})
 	for _, v := range r.ForecastResultsByTime {
 
-		tempRow := table.Row{*v.MeanValue, v.PredictionIntervalUpperBound,
-			v.PredictionIntervalLowerBound, *v.TimePeriod.Start,
+		tempRow := table.Row{*v.MeanValue, *v.PredictionIntervalUpperBound,
+			*v.PredictionIntervalLowerBound, *v.TimePeriod.Start,
 			*v.TimePeriod.End}
 		t.AppendRow(tempRow)
 	}
