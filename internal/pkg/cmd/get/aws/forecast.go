@@ -9,8 +9,11 @@ import (
 func CostForecast(cmd *cobra.Command, args []string) error {
 
 	apiClient := aws.NewAPIClient()
-	
-	req := NewGetCostForecastRequestType(cmd)
+
+	req, err := NewGetCostForecastRequestType(cmd)
+	if err != nil {
+		return err
+	}
 	res, _ := apiClient.GetCostForecast(context.TODO(), apiClient.Client, req)
 
 	aws.PrintGetCostForecastReport(res)
@@ -20,9 +23,10 @@ func CostForecast(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func NewGetCostForecastRequestType(cmd *cobra.Command) aws.
-GetCostForecastRequest {
+func NewGetCostForecastRequestType(cmd *cobra.Command) (aws.
+	GetCostForecastRequest, error) {
 
+	// TODO add error handling
 	granularity, _ := cmd.Flags().GetString("granularity")
 
 	predictionIntervalLevel, _ := cmd.Flags().GetInt32("predictionIntervalLevel")
@@ -30,6 +34,15 @@ GetCostForecastRequest {
 	end := cmd.Flags().Lookup("end").Value.String()
 
 	dimensions, _ := cmd.Flags().GetStringToString("forecast-filter-dimensions")
+	err := validateForecastDimensionKey(dimensions)
+	if err != nil {
+		return aws.GetCostForecastRequest{}, err
+	}
+	err = validateForecastDimensionValue(dimensions)
+	if err != nil {
+		return aws.GetCostForecastRequest{}, err
+	}
+
 	tags, _ := cmd.Flags().GetStringToString("filter-tags")
 
 	//TODO add validation for all flags
@@ -43,10 +56,15 @@ GetCostForecastRequest {
 			End:   end,
 		},
 		Filter: populateFilter(dimensions, tags),
-	}
+	}, nil
 }
 
 func populateFilter(dimensions map[string]string, tags map[string]string) aws.Filter {
+
+	if len(dimensions) == 0 && len(tags) == 0 {
+		return aws.Filter{}
+	}
+
 	return aws.Filter{
 		Dimensions: createDimensionFilter(dimensions),
 		Tags:       createTagFilter(tags),
@@ -54,6 +72,11 @@ func populateFilter(dimensions map[string]string, tags map[string]string) aws.Fi
 }
 
 func createDimensionFilter(m map[string]string) []aws.Dimension {
+
+	if len(m) == 0 {
+		return nil
+	}
+
 	var dimensions []aws.Dimension
 	for k, v := range m {
 		dimensions = append(dimensions, aws.Dimension{
@@ -65,6 +88,11 @@ func createDimensionFilter(m map[string]string) []aws.Dimension {
 }
 
 func createTagFilter(m map[string]string) []aws.Tag {
+
+	if len(m) == 0 {
+		return nil
+	}
+
 	var tags []aws.Tag
 	for k, v := range m {
 		tags = append(tags, aws.Tag{
