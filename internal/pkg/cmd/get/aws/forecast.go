@@ -40,11 +40,6 @@ func NewGetCostForecastRequestType(cmd *cobra.Command) (aws.
 	if err != nil {
 		return aws.GetCostForecastRequest{}, err
 	}
-	//err = validateForecastDimensionValue(dimensions)
-	//if err != nil {
-	//	return aws.GetCostForecastRequest{}, err
-	//}
-
 	tags, _ := cmd.Flags().GetStringToString("filter-tags")
 
 	//TODO add validation for all flags

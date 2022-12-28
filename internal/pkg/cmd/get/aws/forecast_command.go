@@ -20,7 +20,9 @@ func ForecastCommand(c *cobra.Command) *cobra.Command {
 	c.Flags().StringToStringVarP(&forecastFilterDimension,
 		"forecast-filter-dimensions",
 		"d",
-		nil, "Filter by dimension key and value")
+		nil, "Filter by dimension. "+
+			"Example: -d SERVICE='Amazon EC2' Dimension values can be found in"+
+			" the AWS Cost Explorer UI")
 
 	c.Flags().StringToStringVarP(&forecastFilterTag, "filter-tags",
 		"t",
