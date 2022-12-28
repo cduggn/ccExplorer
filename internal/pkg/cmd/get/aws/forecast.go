@@ -14,8 +14,10 @@ func CostForecast(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	res, _ := apiClient.GetCostForecast(context.TODO(), apiClient.Client, req)
-
+	res, err := apiClient.GetCostForecast(context.TODO(), apiClient.Client, req)
+	if err != nil {
+		return err
+	}
 	aws.PrintGetCostForecastReport(res)
 
 	//TODO add error handling
@@ -38,10 +40,10 @@ func NewGetCostForecastRequestType(cmd *cobra.Command) (aws.
 	if err != nil {
 		return aws.GetCostForecastRequest{}, err
 	}
-	err = validateForecastDimensionValue(dimensions)
-	if err != nil {
-		return aws.GetCostForecastRequest{}, err
-	}
+	//err = validateForecastDimensionValue(dimensions)
+	//if err != nil {
+	//	return aws.GetCostForecastRequest{}, err
+	//}
 
 	tags, _ := cmd.Flags().GetStringToString("filter-tags")
 

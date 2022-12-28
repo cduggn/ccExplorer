@@ -1,8 +1,6 @@
 package aws
 
 import (
-	"github.com/cduggn/cloudcost/internal/pkg/service/aws"
-	"golang.org/x/exp/slices"
 	"time"
 )
 
@@ -134,31 +132,6 @@ func validateForecastDimensionKey(dimensions map[string]string) error {
 					"DATABASE_ENGINE, CACHE_ENGINE, INSTANCE_TYPE_FAMILY, " +
 					"REGION, BILLING_ENTITY, RESERVATION_ID, " +
 					"SAVINGS_PLANS_TYPE, SAVINGS_PLAN_ARN, OPERATING_SYSTEM",
-			}
-		}
-	}
-	return nil
-}
-
-func validateForecastDimensionValue(dimensions map[string]string) error {
-
-	client := &aws.APIClient{}
-
-	for _, value := range dimensions {
-		if value == "" {
-			return ValidationError{
-				msg: "Dimension VALUE must be specified",
-			}
-		} else {
-			validValues := GetDimensionValues(client, value)
-			if len(validValues) == 0 {
-				return ValidationError{
-					msg: "Dimension VALUE is invalid",
-				}
-			} else if !slices.Contains(validValues, value) {
-				return ValidationError{
-					msg: "Dimension VALUE does not match supported types",
-				}
 			}
 		}
 	}
