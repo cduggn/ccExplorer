@@ -6,9 +6,8 @@ import (
 )
 
 var (
-	forecastFilter                  string
-	forecastFilterValue             string
-	forecastFilterType              string
+	forecastFilterDimension         map[string]string
+	forecastFilterTag               map[string]string
 	forecastStartDate               string
 	forecastEndDate                 string
 	forecastGranularity             string
@@ -17,23 +16,23 @@ var (
 
 func ForecastCommand(c *cobra.Command) *cobra.Command {
 
+	// create flag with keyvalue type
+	c.Flags().StringToStringVarP(&forecastFilterDimension,
+		"forecast-filter-dimensions",
+		"d",
+		nil, "Filter by dimension. "+
+			"Example: -d SERVICE='Amazon EC2' Dimension values can be found in"+
+			" the AWS Cost Explorer UI")
+
+	c.Flags().StringToStringVarP(&forecastFilterTag, "filter-tags",
+		"t",
+		nil, "Filter by tag key and value")
+
 	c.Flags().StringVarP(&forecastStartDate, "start", "s",
 		Format(time.Now()), "Must start from today's date")
 
 	c.Flags().StringVarP(&forecastEndDate, "end", "e", DefaultEndDate(Format),
 		"Defaults to the present day")
-
-	c.Flags().StringVarP(&forecastFilterType, "forecast-filter-type", "t",
-		DefaultEndDate(Format),
-		"Forecast filter type")
-
-	c.Flags().StringVarP(&forecastFilter, "forecast-filter", "f",
-		DefaultEndDate(Format),
-		"Forecast filter name")
-
-	c.Flags().StringVarP(&forecastFilterValue, "forecast-filter-value", "v",
-		DefaultEndDate(Format),
-		"Forecast filter value")
 
 	// Optional flag to dictate the granularity of the data returned
 	c.Flags().StringVarP(&forecastGranularity, "granularity", "g", "MONTHLY",
