@@ -40,6 +40,7 @@ func paintHeader() string {
 }
 
 func AWSCostAndUsageCommand() *cobra.Command {
+
 	costAndUsageCmd.AddCommand(aws2.CostAndUsageCommand(awsCost))
 	awsCost.AddCommand(aws2.ForecastCommand(forecast))
 	return costAndUsageCmd

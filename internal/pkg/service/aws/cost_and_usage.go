@@ -34,7 +34,7 @@ func (*APIClient) GetCostAndUsage(ctx context.Context, api GetCostAndUsageAPI, r
 
 	if err != nil {
 		return nil, APIError{
-			msg: "Error while fetching cost and usage data from AWS",
+			msg: err.Error(),
 		}
 	}
 	return result, nil
