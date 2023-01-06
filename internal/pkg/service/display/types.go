@@ -17,6 +17,6 @@ type Service struct {
 
 type Metrics struct {
 	Name   string
-	Amount string
+	Amount float64
 	Unit   string
 }

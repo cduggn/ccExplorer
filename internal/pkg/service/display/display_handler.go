@@ -29,7 +29,7 @@ func CurateCostAndUsageReport(output *costexplorer.GetCostAndUsageOutput,
 			for key, m := range g.Metrics {
 				metrics := Metrics{
 					Name:   key,
-					Amount: *m.Amount,
+					Amount: ConvertToFloat(*m.Amount),
 					Unit:   *m.Unit,
 				}
 				service.Metrics = append(service.Metrics, metrics)
@@ -51,7 +51,7 @@ func PrintCostAndUsageReport(c CostAndUsageReport) {
 	for _, m := range c.Services {
 		for _, v := range m.Metrics {
 			if v.Unit == "USD" {
-				total += ConvertToFloat(v.Amount)
+				total += v.Amount
 			}
 			tempRow := table.Row{m.Keys[0], ReturnIfPresent(m.Keys), v.Name, v.Amount, v.Unit, c.Granularity, m.Start, m.End}
 			t.AppendRow(tempRow)
