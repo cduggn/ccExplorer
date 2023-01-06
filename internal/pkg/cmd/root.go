@@ -5,7 +5,6 @@ import (
 	"github.com/cduggn/cloudcost/internal/pkg/logger"
 	"github.com/common-nighthawk/go-figure"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	//"go.uber.org/zap"
 	//"go.uber.org/zap/zapcore"
 	"os"
@@ -37,9 +36,9 @@ func Execute() {
 
 	//defer logger.Sync()
 	err = rootCmd.Execute()
-	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
+	//rootCmd.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
 	// Bind the flag to a Viper variable
-	viper.BindPFlag("log", rootCmd.PersistentFlags().Lookup("log"))
+	//viper.BindPFlag("log", rootCmd.PersistentFlags().Lookup("log"))
 
 	if err != nil {
 		os.Exit(126)
