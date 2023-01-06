@@ -1,9 +1,11 @@
-package aws
+package display
 
 import (
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
+	"github.com/cduggn/cloudcost/internal/pkg/service/aws"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"os"
+	"strconv"
 )
 
 func PrintGetCostForecastReport(r *costexplorer.GetCostForecastOutput) {
@@ -24,22 +26,21 @@ func PrintGetCostForecastReport(r *costexplorer.GetCostForecastOutput) {
 	t.Render()
 }
 
-func (c *CostAndUsageReport) CurateCostAndUsageReport(output *costexplorer.
-	GetCostAndUsageOutput) {
+func CurateCostAndUsageReport(output *costexplorer.GetCostAndUsageOutput, c *aws.CostAndUsageReport) {
 	count := 0
 	for _, v := range output.ResultsByTime {
 		c.Start = *v.TimePeriod.Start
 		c.End = *v.TimePeriod.End
 		for _, g := range v.Groups {
 			keys := make([]string, 0)
-			service := Service{
+			service := aws.Service{
 				Start: c.Start,
 				End:   c.End,
 			}
 			keys = append(keys, g.Keys...)
 
 			for key, m := range g.Metrics {
-				metrics := Metrics{
+				metrics := aws.Metrics{
 					Name:   key,
 					Amount: *m.Amount,
 					Unit:   *m.Unit,
@@ -54,7 +55,7 @@ func (c *CostAndUsageReport) CurateCostAndUsageReport(output *costexplorer.
 	}
 }
 
-func (c *CostAndUsageReport) PrintCostAndUsageReport() {
+func PrintCostAndUsageReport(c *aws.CostAndUsageReport) {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.AppendHeader(table.Row{"Dimension/Tag", "Dimension/Tag", "Metric Name", "Amount", "Unit", "Granularity", "Start", "End"})
@@ -88,4 +89,21 @@ func (c *CostAndUsageReport) PrintCostAndUsageReport() {
 	t.AppendRow(totalHeaderRow)
 	t.AppendRow(totalRow)
 	t.Render()
+}
+
+func ConvertToFloat(amount string) float64 {
+	f, err := strconv.ParseFloat(amount, 64)
+	if err != nil {
+		panic(err)
+	}
+	return f
+}
+
+func ReturnIfPresent(s []string) string {
+	if len(s) == 1 {
+		return ""
+	} else {
+		return s[1]
+	}
+
 }

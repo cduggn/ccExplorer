@@ -3,6 +3,7 @@ package aws
 import (
 	"context"
 	"github.com/cduggn/cloudcost/internal/pkg/service/aws"
+	"github.com/cduggn/cloudcost/internal/pkg/service/display"
 	"github.com/spf13/cobra"
 )
 
@@ -23,8 +24,8 @@ func CostAndUsageSummary(cmd *cobra.Command, args []string) error {
 		Services: make(map[int]aws.Service),
 	}
 	report.Granularity = req.Granularity
-	report.CurateCostAndUsageReport(usage)
-	report.PrintCostAndUsageReport()
+	display.CurateCostAndUsageReport(usage, &report)
+	display.PrintCostAndUsageReport(&report)
 
 	return nil
 }
