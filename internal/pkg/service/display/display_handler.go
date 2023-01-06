@@ -2,45 +2,32 @@ package display
 
 import (
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
-	"github.com/cduggn/cloudcost/internal/pkg/service/aws"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"os"
 	"strconv"
 )
 
-func PrintGetCostForecastReport(r *costexplorer.GetCostForecastOutput) {
-	t := table.NewWriter()
-	t.SetOutputMirror(os.Stdout)
-	t.AppendHeader(table.Row{"Mean Value", "PredictionIntervalLowerBound",
-		"PredictionIntervalUpperBound", "Start", "End", "Unit", "Total"})
-	for _, v := range r.ForecastResultsByTime {
+func CurateCostAndUsageReport(output *costexplorer.GetCostAndUsageOutput,
+	granularity string) CostAndUsageReport {
 
-		tempRow := table.Row{*v.MeanValue, *v.PredictionIntervalUpperBound,
-			*v.PredictionIntervalLowerBound, *v.TimePeriod.Start,
-			*v.TimePeriod.End}
-		t.AppendRow(tempRow)
+	c := CostAndUsageReport{
+		Services:    make(map[int]Service),
+		Granularity: granularity,
 	}
-
-	totalRow := table.Row{"", "", "", "", "", *r.Total.Unit, *r.Total.Amount}
-	t.AppendRow(totalRow)
-	t.Render()
-}
-
-func CurateCostAndUsageReport(output *costexplorer.GetCostAndUsageOutput, c *aws.CostAndUsageReport) {
 	count := 0
 	for _, v := range output.ResultsByTime {
 		c.Start = *v.TimePeriod.Start
 		c.End = *v.TimePeriod.End
 		for _, g := range v.Groups {
 			keys := make([]string, 0)
-			service := aws.Service{
+			service := Service{
 				Start: c.Start,
 				End:   c.End,
 			}
 			keys = append(keys, g.Keys...)
 
 			for key, m := range g.Metrics {
-				metrics := aws.Metrics{
+				metrics := Metrics{
 					Name:   key,
 					Amount: *m.Amount,
 					Unit:   *m.Unit,
@@ -53,9 +40,10 @@ func CurateCostAndUsageReport(output *costexplorer.GetCostAndUsageOutput, c *aws
 		}
 
 	}
+	return c
 }
 
-func PrintCostAndUsageReport(c *aws.CostAndUsageReport) {
+func PrintCostAndUsageReport(c CostAndUsageReport) {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.AppendHeader(table.Row{"Dimension/Tag", "Dimension/Tag", "Metric Name", "Amount", "Unit", "Granularity", "Start", "End"})
@@ -87,6 +75,24 @@ func PrintCostAndUsageReport(c *aws.CostAndUsageReport) {
 	totalHeaderRow := table.Row{"", "", "", "", "", "", "", ""}
 	totalRow := table.Row{"", "", "TOTAL COST", total, "", "", "", ""}
 	t.AppendRow(totalHeaderRow)
+	t.AppendRow(totalRow)
+	t.Render()
+}
+
+func PrintGetCostForecastReport(r *costexplorer.GetCostForecastOutput) {
+	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
+	t.AppendHeader(table.Row{"Mean Value", "PredictionIntervalLowerBound",
+		"PredictionIntervalUpperBound", "Start", "End", "Unit", "Total"})
+	for _, v := range r.ForecastResultsByTime {
+
+		tempRow := table.Row{*v.MeanValue, *v.PredictionIntervalUpperBound,
+			*v.PredictionIntervalLowerBound, *v.TimePeriod.Start,
+			*v.TimePeriod.End}
+		t.AppendRow(tempRow)
+	}
+
+	totalRow := table.Row{"", "", "", "", "", *r.Total.Unit, *r.Total.Amount}
 	t.AppendRow(totalRow)
 	t.Render()
 }

@@ -20,12 +20,8 @@ func CostAndUsageSummary(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	report := aws.CostAndUsageReport{
-		Services: make(map[int]aws.Service),
-	}
-	report.Granularity = req.Granularity
-	display.CurateCostAndUsageReport(usage, &report)
-	display.PrintCostAndUsageReport(&report)
+	report := display.CurateCostAndUsageReport(usage, req.Granularity)
+	display.PrintCostAndUsageReport(report)
 
 	return nil
 }
