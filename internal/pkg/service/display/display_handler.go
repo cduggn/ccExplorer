@@ -4,6 +4,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"os"
+	"sort"
 	"strconv"
 )
 
@@ -43,17 +44,31 @@ func CurateCostAndUsageReport(output *costexplorer.GetCostAndUsageOutput,
 	return c
 }
 
-func PrintCostAndUsageReport(c CostAndUsageReport) {
+func SortByAmount(c *CostAndUsageReport) CostAndUsageReport {
+	for _, v := range c.Services {
+		sort.Slice(v.Metrics, func(i, j int) bool {
+			return v.Metrics[i].Amount > v.Metrics[j].Amount
+		})
+	}
+	return *c
+}
+
+func PrintCostAndUsageReport(s func(r *CostAndUsageReport) CostAndUsageReport,
+	r *CostAndUsageReport) {
+	c := s(r)
+
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
-	t.AppendHeader(table.Row{"Dimension/Tag", "Dimension/Tag", "Metric Name", "Amount", "Unit", "Granularity", "Start", "End"})
+	t.AppendHeader(table.Row{"Rank", "Dimension/Tag", "Dimension/Tag",
+		"Metric Name", "Amount", "Unit", "Granularity", "Start", "End"})
 	var total float64
-	for _, m := range c.Services {
+	for index, m := range c.Services {
 		for _, v := range m.Metrics {
 			if v.Unit == "USD" {
 				total += v.Amount
 			}
-			tempRow := table.Row{m.Keys[0], ReturnIfPresent(m.Keys), v.Name, v.Amount, v.Unit, c.Granularity, m.Start, m.End}
+			tempRow := table.Row{index, m.Keys[0], ReturnIfPresent(m.Keys),
+				v.Name, v.Amount, v.Unit, c.Granularity, m.Start, m.End}
 			t.AppendRow(tempRow)
 
 			//_, err := conn.Insert(storage.CostDataInsert{
@@ -72,8 +87,8 @@ func PrintCostAndUsageReport(c CostAndUsageReport) {
 			//}
 		}
 	}
-	totalHeaderRow := table.Row{"", "", "", "", "", "", "", ""}
-	totalRow := table.Row{"", "", "TOTAL COST", total, "", "", "", ""}
+	totalHeaderRow := table.Row{"", "", "", "", "", "", "", "", ""}
+	totalRow := table.Row{"", "", "", "TOTAL COST", total, "", "", "", ""}
 	t.AppendRow(totalHeaderRow)
 	t.AppendRow(totalRow)
 	t.Render()

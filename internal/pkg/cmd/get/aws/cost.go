@@ -21,7 +21,7 @@ func CostAndUsageSummary(cmd *cobra.Command, args []string) error {
 	}
 
 	report := display.CurateCostAndUsageReport(usage, req.Granularity)
-	display.PrintCostAndUsageReport(report)
+	display.PrintCostAndUsageReport(display.SortByAmount, &report)
 
 	return nil
 }
