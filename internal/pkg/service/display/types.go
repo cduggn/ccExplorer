@@ -14,7 +14,7 @@ func (c CostAndUsageReport) Len() int {
 }
 
 func (c CostAndUsageReport) Less(i, j int) bool {
-	return c.Services[i].Metrics[0].Amount > c.Services[j].Metrics[0].Amount
+	return c.Services[i].Metrics[0].NumericAmount > c.Services[j].Metrics[0].NumericAmount
 }
 
 func (c CostAndUsageReport) Swap(i, j int) {
@@ -45,7 +45,6 @@ type Service struct {
 	End     string
 }
 
-// create Equals method for Service
 func (s Service) Equals(s2 Service) bool {
 	if s.Start != s2.Start || s.End != s2.End {
 		return false
@@ -70,12 +69,12 @@ func (s Service) Equals(s2 Service) bool {
 }
 
 type Metrics struct {
-	Name   string
-	Amount float64
-	Unit   string
+	Name          string
+	Amount        string
+	NumericAmount float64
+	Unit          string
 }
 
-// create Equals method for Metrics
 func (m Metrics) Equals(m2 Metrics) bool {
 	if m.Name != m2.Name || m.Amount != m2.Amount || m.Unit != m2.Unit {
 		return false
@@ -83,8 +82,7 @@ func (m Metrics) Equals(m2 Metrics) bool {
 	return true
 }
 
-// function to sort cost and usage report by amount
-func SortByAmount(c *CostAndUsageReport) CostAndUsageReport {
-	sort.Sort(c)
-	return *c
+func SortByAmount(r *CostAndUsageReport) CostAndUsageReport {
+	sort.Sort(r)
+	return *r
 }

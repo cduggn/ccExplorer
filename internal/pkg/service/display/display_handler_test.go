@@ -1,6 +1,11 @@
 package display
 
-import "testing"
+import (
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
+	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
+	"testing"
+)
 
 func TestConvertToFloat(t *testing.T) {
 	cases := []struct {
@@ -48,44 +53,59 @@ func TestConvertToFloat(t *testing.T) {
 	}
 }
 
-// create test for SortByAmount function
-func TestSortByAmount(t *testing.T) {
+// Test for CurateCostAndUsageReport
+func TestCurateCostAndUsageReport(t *testing.T) {
 	cases := []struct {
-		input  CostAndUsageReport
+		input  *costexplorer.GetCostAndUsageOutput
 		expect CostAndUsageReport
 	}{
 		{
-			input: CostAndUsageReport{
-				Services: map[int]Service{
-					0: Service{
-						Metrics: []Metrics{
-							{
-								Amount: 100,
-							},
+			input: &costexplorer.GetCostAndUsageOutput{
+				ResultsByTime: []types.ResultByTime{
+					{
+						TimePeriod: &types.DateInterval{
+							Start: aws.String("2019-01-01"),
+							End:   aws.String("2019-01-02"),
 						},
-					},
-					1: Service{
-						Metrics: []Metrics{
+						Groups: []types.Group{
 							{
-								Amount: 200,
+								Keys: []string{"key1", "key2"},
+								Metrics: map[string]types.MetricValue{
+									"metric1": {
+										Amount: aws.String("100"),
+										Unit:   aws.String("USD"),
+									},
+									"metric2": {
+										Amount: aws.String("200"),
+										Unit:   aws.String("USD"),
+									},
+								},
 							},
 						},
 					},
 				},
 			},
 			expect: CostAndUsageReport{
+				Start:       "2019-01-01",
+				End:         "2019-01-02",
+				Granularity: "DAILY",
 				Services: map[int]Service{
-					0: Service{
+					0: {
+						Start: "2019-01-01",
+						End:   "2019-01-02",
+						Keys:  []string{"key1", "key2"},
 						Metrics: []Metrics{
 							{
-								Amount: 200,
+								Name:          "metric1",
+								Amount:        "100",
+								NumericAmount: 100,
+								Unit:          "USD",
 							},
-						},
-					},
-					1: Service{
-						Metrics: []Metrics{
 							{
-								Amount: 100,
+								Name:          "metric2",
+								Amount:        "200",
+								NumericAmount: 200,
+								Unit:          "USD",
 							},
 						},
 					},
@@ -94,9 +114,9 @@ func TestSortByAmount(t *testing.T) {
 		},
 	}
 	for _, c := range cases {
-		result := SortByAmount(&c.input)
+		result := CurateCostAndUsageReport(c.input, "DAILY")
 		if !result.Equals(c.expect) {
-			t.Errorf("SortByAmount(%v) == %v, want %v", c.input, result, c.expect)
+			t.Errorf("CurateCostAndUsageReport(%v) == %v, want %v", c.input, result, c.expect)
 		}
 	}
 }

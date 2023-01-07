@@ -1,6 +1,7 @@
 package display
 
 import (
+	"fmt"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"os"
@@ -28,9 +29,10 @@ func CurateCostAndUsageReport(output *costexplorer.GetCostAndUsageOutput,
 
 			for key, m := range g.Metrics {
 				metrics := Metrics{
-					Name:   key,
-					Amount: ConvertToFloat(*m.Amount),
-					Unit:   *m.Unit,
+					Name:          key,
+					Amount:        *m.Amount,
+					NumericAmount: ConvertToFloat(*m.Amount),
+					Unit:          *m.Unit,
 				}
 				service.Metrics = append(service.Metrics, metrics)
 			}
@@ -44,40 +46,33 @@ func CurateCostAndUsageReport(output *costexplorer.GetCostAndUsageOutput,
 }
 func PrintCostAndUsageReport(s func(r *CostAndUsageReport) CostAndUsageReport,
 	r *CostAndUsageReport) {
-	c := s(r)
+	sortedReport := s(r)
 
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.AppendHeader(table.Row{"Rank", "Dimension/Tag", "Dimension/Tag",
-		"Metric Name", "Amount", "Unit", "Granularity", "Start", "End"})
+		"Metric Name", "Numeric Amount", "String Amount", "Unit",
+		"Granularity",
+		"Start",
+		"End"})
 	var total float64
-	for index, m := range c.Services {
+	for index, m := range sortedReport.Services {
 		for _, v := range m.Metrics {
 			if v.Unit == "USD" {
-				total += v.Amount
+				// add to total
+				//total.Add(&total, &v.NumericAmount)
+				total += v.NumericAmount
 			}
 			tempRow := table.Row{index, m.Keys[0], ReturnIfPresent(m.Keys),
-				v.Name, v.Amount, v.Unit, c.Granularity, m.Start, m.End}
+				v.Name, fmt.Sprintf("%f10", v.NumericAmount), v.Amount, v.Unit,
+				r.Granularity,
+				m.Start, m.End}
 			t.AppendRow(tempRow)
 
-			//_, err := conn.Insert(storage.CostDataInsert{
-			//	Dimension:   m.Keys[0],
-			//	Dimension2:  "",
-			//	Tag:         "",
-			//	MetricName:  "",
-			//	Amount:      v.Amount,
-			//	Unit:        v.Unit,
-			//	Granularity: c.Granularity,
-			//	StartDate:   m.Start,
-			//	EndDate:     m.End,
-			//})
-			//if err != nil {
-			//	logger.Error(err.Error())
-			//}
 		}
 	}
-	totalHeaderRow := table.Row{"", "", "", "", "", "", "", "", ""}
-	totalRow := table.Row{"", "", "", "TOTAL COST", total, "", "", "", ""}
+	totalHeaderRow := table.Row{"", "", "", "", "", "", "", "", "", ""}
+	totalRow := table.Row{"", "", "", "", "TOTAL COST", total, "", "", "", ""}
 	t.AppendRow(totalHeaderRow)
 	t.AppendRow(totalRow)
 	t.Render()
