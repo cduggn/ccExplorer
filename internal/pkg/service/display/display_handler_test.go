@@ -47,3 +47,56 @@ func TestConvertToFloat(t *testing.T) {
 		}
 	}
 }
+
+// create test for SortByAmount function
+func TestSortByAmount(t *testing.T) {
+	cases := []struct {
+		input  CostAndUsageReport
+		expect CostAndUsageReport
+	}{
+		{
+			input: CostAndUsageReport{
+				Services: map[int]Service{
+					0: Service{
+						Metrics: []Metrics{
+							{
+								Amount: 100,
+							},
+						},
+					},
+					1: Service{
+						Metrics: []Metrics{
+							{
+								Amount: 200,
+							},
+						},
+					},
+				},
+			},
+			expect: CostAndUsageReport{
+				Services: map[int]Service{
+					0: Service{
+						Metrics: []Metrics{
+							{
+								Amount: 200,
+							},
+						},
+					},
+					1: Service{
+						Metrics: []Metrics{
+							{
+								Amount: 100,
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, c := range cases {
+		result := SortByAmount(&c.input)
+		if !result.Equals(c.expect) {
+			t.Errorf("SortByAmount(%v) == %v, want %v", c.input, result, c.expect)
+		}
+	}
+}

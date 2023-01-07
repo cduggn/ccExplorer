@@ -4,7 +4,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"os"
-	"sort"
 	"strconv"
 )
 
@@ -43,16 +42,6 @@ func CurateCostAndUsageReport(output *costexplorer.GetCostAndUsageOutput,
 	}
 	return c
 }
-
-func SortByAmount(c *CostAndUsageReport) CostAndUsageReport {
-	for _, v := range c.Services {
-		sort.Slice(v.Metrics, func(i, j int) bool {
-			return v.Metrics[i].Amount > v.Metrics[j].Amount
-		})
-	}
-	return *c
-}
-
 func PrintCostAndUsageReport(s func(r *CostAndUsageReport) CostAndUsageReport,
 	r *CostAndUsageReport) {
 	c := s(r)
