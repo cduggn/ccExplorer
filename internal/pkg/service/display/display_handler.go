@@ -44,9 +44,9 @@ func CurateCostAndUsageReport(output *costexplorer.GetCostAndUsageOutput,
 	}
 	return c
 }
-func PrintCostAndUsageReport(s func(r *CostAndUsageReport) CostAndUsageReport,
+func PrintCostAndUsageReport(s func(r *CostAndUsageReport),
 	r *CostAndUsageReport) {
-	sortedReport := s(r)
+	s(r)
 
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
@@ -56,7 +56,7 @@ func PrintCostAndUsageReport(s func(r *CostAndUsageReport) CostAndUsageReport,
 		"Start",
 		"End"})
 	var total float64
-	for index, m := range sortedReport.Services {
+	for index, m := range r.Services {
 		for _, v := range m.Metrics {
 			if v.Unit == "USD" {
 				// add to total

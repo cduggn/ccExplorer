@@ -120,3 +120,90 @@ func TestCurateCostAndUsageReport(t *testing.T) {
 		}
 	}
 }
+
+// Test for SortServicesByMetricAmount function
+func TestSortServicesByMetricAmount(t *testing.T) {
+	cases := []struct {
+		input  *CostAndUsageReport
+		expect *CostAndUsageReport
+	}{
+		{
+			input: &CostAndUsageReport{
+				Services: map[int]Service{
+					0: {
+						//Keys: []string{"key1", "key2"},
+						Metrics: []Metrics{
+							{
+								Name:          "metric1",
+								Amount:        "0.00000147",
+								NumericAmount: 0.00000147,
+								Unit:          "USD",
+							},
+						},
+					},
+					1: {
+						Metrics: []Metrics{
+							{
+								Name:          "metric1",
+								Amount:        "0.01000147",
+								NumericAmount: 0.01000147,
+								Unit:          "USD",
+							},
+						},
+					},
+					2: {
+						Metrics: []Metrics{
+							{
+								Name:          "metric1",
+								Amount:        "1.0147",
+								NumericAmount: 1.0147,
+								Unit:          "USD",
+							},
+						},
+					},
+				},
+			},
+			expect: &CostAndUsageReport{
+				Services: map[int]Service{
+					0: {
+						Metrics: []Metrics{
+							{
+								Name:          "metric1",
+								Amount:        "1.0147",
+								NumericAmount: 1.0147,
+								Unit:          "USD",
+							},
+						},
+					},
+					1: {
+						Metrics: []Metrics{
+							{
+								Name:          "metric1",
+								Amount:        "0.01000147",
+								NumericAmount: 0.01000147,
+								Unit:          "USD",
+							},
+						},
+					},
+					2: {
+						Metrics: []Metrics{
+							{
+								Name:          "metric1",
+								Amount:        "0.00000147",
+								NumericAmount: 0.00000147,
+								Unit:          "USD",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, c := range cases {
+		SortServicesByMetricAmount(c.input)
+		if !c.input.Equals(*c.expect) {
+			t.Errorf("SortServicesByMetricAmount(%v) == %v, want %v",
+				c.input, c.input, c.expect)
+		}
+	}
+}
