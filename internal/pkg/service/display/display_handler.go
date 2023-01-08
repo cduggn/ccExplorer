@@ -8,6 +8,11 @@ import (
 	"strconv"
 )
 
+var tableDivider = table.Row{"-", "-", "-",
+	"-", "-", "-", "-",
+	"-",
+	"-", ""}
+
 func CurateCostAndUsageReport(output *costexplorer.GetCostAndUsageOutput,
 	granularity string) CostAndUsageReport {
 
@@ -58,6 +63,11 @@ func PrintCostAndUsageReport(s func(r map[int]Service) []Service,
 	var total float64
 	for index, m := range sortedServices {
 		for _, v := range m.Metrics {
+
+			if index%10 == 0 {
+				t.AppendRow(tableDivider)
+
+			}
 			if v.Unit == "USD" {
 				// add to total
 				//total.Add(&total, &v.NumericAmount)
