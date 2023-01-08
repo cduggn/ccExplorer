@@ -67,7 +67,7 @@ by cost.
 
 <sub>
 
-| RANK | DIMENSION/TAG   | DIMENSION/TAG   | METRIC NAME | NUMERIC AMOUNT | STRING AMOUNT | UNIT | GRANULARITY | START | END  |
+| RANK | DIMENSION/TAG   | DIMENSION/TAG   | METRIC | NUMERIC | STRING AMOUNT | UNIT | GRANULARITY | START | END  |
 |---------|-----------|--------|------|------| ------|------|------|------|------|
 | 1 | Amazon Route 53   | HostedZone | UnblendedCost |  1.50000010 | 1.5  | USD | MONTHLY | 2021-12-01 | 2021-12-31 |
 | 2 | AWS Cost Explorer  | GetCostAndUsage | UnblendedCost | 0.46000010  | 0.46 | USD | MONTHLY | 2021-12-01 | 2021-12-31 |
