@@ -65,6 +65,12 @@ cloudcost get aws -d SERVICE -d OPERATION c
 Results are grouped by SERVICE name and OPERATION type in descending order 
 by cost.
 
+<style>
+table {
+  font-size: 8pt;
+}
+</style>
+
 | RANK | DIMENSION/TAG   | DIMENSION/TAG   | METRIC NAME | NUMERIC AMOUNT | STRING AMOUNT | UNIT | GRANULARITY | START | END  |
 |---------|-----------|--------|------|------| ------|------|------|------|------|
 | 1 | Amazon Route 53   | HostedZone | UnblendedCost |  1.50000010 | 1.5  | USD | MONTHLY | 2021-12-01 | 2021-12-31 |
