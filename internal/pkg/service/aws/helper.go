@@ -76,7 +76,7 @@ func ToSlice(d costexplorer.GetDimensionValuesOutput) []string {
 }
 
 func CostAndUsageFilterGenerator(req CostAndUsageRequestType) *types.
-Expression {
+	Expression {
 	expression := &types.Expression{}
 
 	if req.ExcludeDiscounts && req.IsFilterByTagEnabled {
@@ -93,7 +93,7 @@ Expression {
 }
 
 func CostForecastFilterGenerator(req GetCostForecastRequest) *types.
-Expression {
+	Expression {
 	var filterExpression types.Expression
 	var expList []types.Expression
 	var exp types.Expression
