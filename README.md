@@ -71,9 +71,9 @@ by cost.
 |---------|-----------|--------|------|------| ------|------|------|------|------|
 | 1 | Amazon Route 53   | HostedZone | UnblendedCost |  1.50000010 | 1.5  | USD | MONTHLY | 2021-12-01 | 2021-12-31 |
 | 2 | AWS Cost Explorer  | GetCostAndUsage | UnblendedCost | 0.46000010  | 0.46 | USD | MONTHLY | 2021-12-01 | 2021-12-31 |
-| 3 | Amazon Route 53  | Health-Check-HTTPS | UnblendedCost | 0.22580610|   0.23 | USD | MONTHLY | 2021-12-01 | 2021-12-31 |
+| 3 | Amazon Route 53  | Health-Check | UnblendedCost | 0.22580610|   0.23 | USD | MONTHLY | 2021-12-01 | 2021-12-31 |
 | 4 | AWS Config   | None | UnblendedCost | 0.18900010 | 0.19 | USD | MONTHLY | 2021-12-01 | 2021-12-31 |
-| 5 | Amazon Route 53   | Health-Check-HTTPS | UnblendedCost | 0.18900010 | 0.19 | USD | MONTHLY | 2021-12-01 | 2021-12-31 |
+| 5 | Amazon Route 53   | Health-Check | UnblendedCost | 0.18900010 | 0.19 | USD | MONTHLY | 2021-12-01 | 2021-12-31 |
 
 </sub> 
   
