@@ -44,18 +44,34 @@ Flags:
   -t, --tags string          Group by cost allocation tag
 ```
 
-## Cost And Usage Report
-This command fetches the cost and usage information for the authenticated 
-account. Results are grouped by SERVICE name and OPERATION type. ( Note: The 
-dimension types impact the volume of results returned. )
+## Cost And Usage Report 
+This command fetches the cost and usage information for the 
+authenticated 
+account. Results are grouped by SERVICE name and OPERATION type and excludes 
+and credits or discounts. 
+
+```bash
+Note: The dimension types impact the volume of results returned. )
 
 ```bash) 
 service 
 and operation type:
 
 ```bash
-cloudcost get aws -d SERVICE -d OPERATION -s 2022-12-10
+cloudcost get aws -d SERVICE -d OPERATION c
+
 ```
+
+Results are grouped by SERVICE name and OPERATION type in descending order 
+by cost.
+
+| RANK | DIMENSION/TAG   | DIMENSION/TAG   | METRIC NAME | NUMERIC AMOUNT | STRING AMOUNT | UNIT | GRANULARITY | START | END  |
+|---------|-----------|--------|------|------| ------|------|------|------|------|
+| 1 | Amazon Route 53   | HostedZone | UnblendedCost |  1.50000010 | 1.5  | USD | MONTHLY | 2021-12-01 | 2021-12-31 |
+| 2 | AWS Cost Explorer  | GetCostAndUsage | UnblendedCost | 0.46000010  | 0.46 | USD | MONTHLY | 2021-12-01 | 2021-12-31 |
+| 3 | Amazon Route 53  | Health-Check-HTTPS | UnblendedCost | 0.22580610|   0.23 | USD | MONTHLY | 2021-12-01 | 2021-12-31 |
+| 4 | AWS Config   | None | UnblendedCost | 0.18900010 | 0.19 | USD | MONTHLY | 2021-12-01 | 2021-12-31 |
+| 5 | Amazon Route 53   | Health-Check-HTTPS | UnblendedCost | 0.18900010 | 0.19 | USD | MONTHLY | 2021-12-01 | 2021-12-31 |
 
 Using cost allocation tags to filter by project:
 
