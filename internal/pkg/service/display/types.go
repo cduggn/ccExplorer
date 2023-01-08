@@ -75,6 +75,10 @@ func (s Service) Equals(s2 Service) bool {
 	return true
 }
 
+func (s Service) Less(i, j int) bool {
+	return s.Metrics[i].NumericAmount > s.Metrics[j].NumericAmount
+}
+
 func (m Metrics) Equals(m2 Metrics) bool {
 	if m.Name != m2.Name || m.Amount != m2.Amount || m.Unit != m2.Unit {
 		return false
@@ -82,14 +86,14 @@ func (m Metrics) Equals(m2 Metrics) bool {
 	return true
 }
 
-func SortServicesByMetricAmount(r *CostAndUsageReport) {
+func SortServicesByMetricAmount(r map[int]Service) []Service {
 	// Create a slice of key-value pairs
 	pairs := make([]struct {
 		Key   int
 		Value Service
-	}, len(r.Services))
+	}, len(r))
 	i := 0
-	for k, v := range r.Services {
+	for k, v := range r {
 		pairs[i] = struct {
 			Key   int
 			Value Service
@@ -99,12 +103,13 @@ func SortServicesByMetricAmount(r *CostAndUsageReport) {
 
 	// Sort the slice by the Value.Metrics[0].Amount field
 	sort.SliceStable(pairs, func(i, j int) bool {
-		return pairs[i].Value.Metrics[0].Amount > pairs[j].Value.Metrics[0].
-			Amount
+		return pairs[i].Value.Metrics[0].NumericAmount > pairs[j].Value.
+			Metrics[0].NumericAmount
 	})
 
+	result := make([]Service, len(pairs))
 	for i, pair := range pairs {
-		r.Services[i] = pair.Value
+		result[i] = pair.Value
 	}
-
+	return result
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
+	"reflect"
 	"testing"
 )
 
@@ -121,78 +122,74 @@ func TestCurateCostAndUsageReport(t *testing.T) {
 	}
 }
 
-// Test for SortServicesByMetricAmount function
+// Test for SortServicesByMetricAmount function with input type map[int
+//]Service and output type []Service
 func TestSortServicesByMetricAmount(t *testing.T) {
 	cases := []struct {
-		input  *CostAndUsageReport
-		expect *CostAndUsageReport
+		input  map[int]Service
+		expect []Service
 	}{
 		{
-			input: &CostAndUsageReport{
-				Services: map[int]Service{
-					0: {
-						//Keys: []string{"key1", "key2"},
-						Metrics: []Metrics{
-							{
-								Name:          "metric1",
-								Amount:        "0.00000147",
-								NumericAmount: 0.00000147,
-								Unit:          "USD",
-							},
+			input: map[int]Service{
+				0: {
+					Metrics: []Metrics{
+						{
+							Name:          "metric1",
+							Amount:        "0.00000147",
+							NumericAmount: 0.00000147,
+							Unit:          "USD",
 						},
 					},
-					1: {
-						Metrics: []Metrics{
-							{
-								Name:          "metric1",
-								Amount:        "0.01000147",
-								NumericAmount: 0.01000147,
-								Unit:          "USD",
-							},
+				},
+				1: {
+					Metrics: []Metrics{
+						{
+							Name:          "metric1",
+							Amount:        "0.0000147",
+							NumericAmount: 0.0000147,
+							Unit:          "USD",
 						},
 					},
-					2: {
-						Metrics: []Metrics{
-							{
-								Name:          "metric1",
-								Amount:        "1.0147",
-								NumericAmount: 1.0147,
-								Unit:          "USD",
-							},
+				},
+				2: {
+					Metrics: []Metrics{
+						{
+							Name:          "metric1",
+							Amount:        "1.5",
+							NumericAmount: 1.5,
+							Unit:          "USD",
 						},
 					},
 				},
 			},
-			expect: &CostAndUsageReport{
-				Services: map[int]Service{
-					0: {
-						Metrics: []Metrics{
-							{
-								Name:          "metric1",
-								Amount:        "1.0147",
-								NumericAmount: 1.0147,
-								Unit:          "USD",
-							},
+			expect: []Service{
+				{
+					Metrics: []Metrics{
+						{
+							Name:          "metric1",
+							Amount:        "1.5",
+							NumericAmount: 1.5,
+							Unit:          "USD",
 						},
 					},
-					1: {
-						Metrics: []Metrics{
-							{
-								Name:          "metric1",
-								Amount:        "0.01000147",
-								NumericAmount: 0.01000147,
-								Unit:          "USD",
-							},
+				},
+				{
+					Metrics: []Metrics{
+						{
+							Name:          "metric1",
+							Amount:        "0.0000147",
+							NumericAmount: 0.0000147,
+							Unit:          "USD",
 						},
 					},
-					2: {
-						Metrics: []Metrics{
-							{
-								Name:          "metric1",
-								Amount:        "0.00000147",
-								NumericAmount: 0.00000147,
-								Unit:          "USD",
-							},
+				},
+				{
+					Metrics: []Metrics{
+						{
+							Name:          "metric1",
+							Amount:        "0.00000147",
+							NumericAmount: 0.00000147,
+							Unit:          "USD",
 						},
 					},
 				},
@@ -200,10 +197,9 @@ func TestSortServicesByMetricAmount(t *testing.T) {
 		},
 	}
 	for _, c := range cases {
-		SortServicesByMetricAmount(c.input)
-		if !c.input.Equals(*c.expect) {
-			t.Errorf("SortServicesByMetricAmount(%v) == %v, want %v",
-				c.input, c.input, c.expect)
+		result := SortServicesByMetricAmount(c.input)
+		if !reflect.DeepEqual(result, c.expect) {
+			t.Errorf("expected %v, got %v", c.expect, result)
 		}
 	}
 }
