@@ -3,13 +3,14 @@ package aws
 import "github.com/spf13/cobra"
 
 var (
-	costUsageGroupBy          []string
-	costUsageGroupByTag       string
-	costUsageGranularity      string
-	costUsageFilterBy         string
-	costUsageStartDate        string
-	costUsageEndDate          string
-	costUsageWithoutDiscounts bool
+	costUsageGroupBy           []string
+	costUsageGroupByTag        string
+	costUsageFilterByDimension string
+	costUsageGranularity       string
+	costUsageFilterBy          string
+	costUsageStartDate         string
+	costUsageEndDate           string
+	costUsageWithoutDiscounts  bool
 	//costAndUsageVerboseMode   bool
 )
 
@@ -34,8 +35,12 @@ func CostAndUsageCommand(c *cobra.Command) *cobra.Command {
 
 	// Optional flag used to filter data by tag value,
 	//this is only relevant when the data is grouped by tag
-	c.Flags().StringVarP(&costUsageFilterBy, "filter-by", "f", "",
-		"When grouping by tag, filter by tag value")
+	c.Flags().StringVarP(&costUsageFilterBy, "filter-by-tag", "f", "",
+		"When filtering by tag, filter by tag value")
+
+	c.Flags().StringVarP(&costUsageFilterByDimension, "filter-by-dimension",
+		"y", "",
+		"When filtering by dimension, filter by dimension value")
 
 	// Optional flag to dictate the granularity of the data returned
 	c.Flags().StringVarP(&costUsageGranularity, "granularity", "g", "MONTHLY",

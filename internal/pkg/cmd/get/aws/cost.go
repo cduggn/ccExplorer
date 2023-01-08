@@ -43,8 +43,14 @@ func NewCostAndUsageRequest(cmd *cobra.Command) (aws.CostAndUsageRequestType, er
 		return aws.CostAndUsageRequestType{}, err
 	}
 
-	filter, _ := cmd.Flags().GetString("filter-by")
-	err = ValidateFilterBy(filter, tag)
+	filterByTag, _ := cmd.Flags().GetString("filter-by-tag")
+	err = ValidateFilterBy(filterByTag, tag)
+	if err != nil {
+		return aws.CostAndUsageRequestType{}, err
+	}
+
+	filterByDimension, _ := cmd.Flags().GetString("filter-by-dimension")
+	err = ValidateFilterByDimension(filterByDimension, dimensions)
 	if err != nil {
 		return aws.CostAndUsageRequestType{}, err
 	}
@@ -72,8 +78,9 @@ func NewCostAndUsageRequest(cmd *cobra.Command) (aws.CostAndUsageRequestType, er
 			Start: start,
 			End:   end,
 		},
-		IsFilterEnabled: isFilterEnabled(filter),
-		TagFilterValue:  filter,
+		IsFilterByTagEnabled:       isFilterEnabled(filterByTag),
+		IsFilterByDimensionEnabled: isFilterDimensionEnabled(filterByDimension),
+		TagFilterValue:             filterByTag,
 		//Rates:            rates,
 		ExcludeDiscounts: excludeDiscounts,
 	}, nil

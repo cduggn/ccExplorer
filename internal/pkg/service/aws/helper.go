@@ -57,6 +57,14 @@ var (
 			},
 		}
 	}
+	//filterByDimension = func(dimension string, value string) *types.Expression {
+	//	return &types.Expression{
+	//		Dimensions: &types.DimensionValues{
+	//			Key:    types.Dimension(dimension),
+	//			Values: []string{value},
+	//		},
+	//	}
+	//}
 )
 
 func ToSlice(d costexplorer.GetDimensionValuesOutput) []string {
@@ -68,15 +76,15 @@ func ToSlice(d costexplorer.GetDimensionValuesOutput) []string {
 }
 
 func CostAndUsageFilterGenerator(req CostAndUsageRequestType) *types.
-	Expression {
+Expression {
 	expression := &types.Expression{}
 
-	if req.ExcludeDiscounts && req.IsFilterEnabled {
+	if req.ExcludeDiscounts && req.IsFilterByTagEnabled {
 		expression.And = []types.Expression{*filterCredits(),
 			*filterByTag(req.Tag, req.TagFilterValue)}
 	} else if req.ExcludeDiscounts {
 		expression = filterCredits()
-	} else if req.IsFilterEnabled {
+	} else if req.IsFilterByTagEnabled {
 		expression = filterByTag(req.Tag, req.TagFilterValue)
 	} else {
 		return nil
@@ -85,7 +93,7 @@ func CostAndUsageFilterGenerator(req CostAndUsageRequestType) *types.
 }
 
 func CostForecastFilterGenerator(req GetCostForecastRequest) *types.
-	Expression {
+Expression {
 	var filterExpression types.Expression
 	var expList []types.Expression
 	var exp types.Expression

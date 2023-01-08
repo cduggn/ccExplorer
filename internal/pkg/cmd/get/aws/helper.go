@@ -24,8 +24,16 @@ func SubtractDays(today time.Time, days int) string {
 	return today.AddDate(0, 0, -days).Format("2006-01-02")
 }
 
-func isFilterEnabled(filterBy string) bool {
-	if filterBy != "" {
+func isFilterEnabled(filterByTag string) bool {
+	if filterByTag != "" {
+		return true
+	} else {
+		return false
+	}
+}
+
+func isFilterDimensionEnabled(filterByDimension string) bool {
+	if filterByDimension != "" {
 		return true
 	} else {
 		return false

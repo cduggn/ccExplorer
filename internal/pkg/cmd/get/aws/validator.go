@@ -63,6 +63,15 @@ func ValidateFilterBy(filterBy string, tag string) error {
 	return nil
 }
 
+func ValidateFilterByDimension(filterByDimension string, tag []string) error {
+	if filterByDimension != "" && len(tag) != 1 {
+		return ValidationError{
+			msg: "When filtering by dimension value, a dimension must be specified",
+		}
+	}
+	return nil
+}
+
 func ValidateStartDate(startDate string) error {
 	if startDate == "" {
 		return ValidationError{

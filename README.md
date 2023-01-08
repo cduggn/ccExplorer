@@ -65,11 +65,7 @@ cloudcost get aws -d SERVICE -d OPERATION c
 Results are grouped by SERVICE name and OPERATION type in descending order 
 by cost.
 
-<style>
-table {
-  font-size: 8pt;
-}
-</style>
+<sub>
 
 | RANK | DIMENSION/TAG   | DIMENSION/TAG   | METRIC NAME | NUMERIC AMOUNT | STRING AMOUNT | UNIT | GRANULARITY | START | END  |
 |---------|-----------|--------|------|------| ------|------|------|------|------|
@@ -78,6 +74,8 @@ table {
 | 3 | Amazon Route 53  | Health-Check-HTTPS | UnblendedCost | 0.22580610|   0.23 | USD | MONTHLY | 2021-12-01 | 2021-12-31 |
 | 4 | AWS Config   | None | UnblendedCost | 0.18900010 | 0.19 | USD | MONTHLY | 2021-12-01 | 2021-12-31 |
 | 5 | Amazon Route 53   | Health-Check-HTTPS | UnblendedCost | 0.18900010 | 0.19 | USD | MONTHLY | 2021-12-01 | 2021-12-31 |
+
+</sub>
 
 Using cost allocation tags to filter by project:
 
