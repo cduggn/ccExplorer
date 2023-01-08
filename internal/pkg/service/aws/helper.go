@@ -4,7 +4,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
-	"strconv"
 )
 
 var (
@@ -59,23 +58,6 @@ var (
 		}
 	}
 )
-
-func ConvertToFloat(amount string) float64 {
-	f, err := strconv.ParseFloat(amount, 64)
-	if err != nil {
-		panic(err)
-	}
-	return f
-}
-
-func ReturnIfPresent(s []string) string {
-	if len(s) == 1 {
-		return ""
-	} else {
-		return s[1]
-	}
-
-}
 
 func ToSlice(d costexplorer.GetDimensionValuesOutput) []string {
 	var servicesSlice []string

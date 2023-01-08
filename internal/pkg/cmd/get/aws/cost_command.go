@@ -10,6 +10,7 @@ var (
 	costUsageStartDate        string
 	costUsageEndDate          string
 	costUsageWithoutDiscounts bool
+	//costAndUsageVerboseMode   bool
 )
 
 func CostAndUsageCommand(c *cobra.Command) *cobra.Command {

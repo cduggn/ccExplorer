@@ -3,6 +3,7 @@ package aws
 import (
 	"context"
 	"github.com/cduggn/cloudcost/internal/pkg/service/aws"
+	"github.com/cduggn/cloudcost/internal/pkg/service/display"
 	"github.com/spf13/cobra"
 )
 
@@ -18,7 +19,7 @@ func CostForecast(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	aws.PrintGetCostForecastReport(res)
+	display.PrintGetCostForecastReport(res)
 
 	//TODO add error handling
 
