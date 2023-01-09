@@ -34,36 +34,33 @@ Available Commands:
   forecast    Return cost, usage, and resoucrce information including ARN
 
 Flags:
-  -d, --dimensions strings   Group by at most 2 dimension tags [ Dimensions: AZ, SERVICE, USAGE_TYPE ]
-  -e, --end string           Defaults to the present day (default "2022-12-29")
-  -c, --exclude-discounts    Exclude credit, refund, and discount information in the report summary. Disabled by default.
-  -f, --filter-by string     When grouping by tag, filter by tag value
-  -g, --granularity string   Granularity of billing information to fetch. Monthly, Daily or Hourly (default "MONTHLY")
-  -h, --help                 help for aws
-  -s, --start string         Defaults to the start of the current month (default "2022-12-01")
-  -t, --tags string          Group by cost allocation tag
+  -e, --endDate string                              Defaults to the present day (default "2023-01-09")
+  -c, --excludeDiscounts                            Excludes credit, refund, and discount information in the report summary. Disabled by default.
+  -u, --filterByDimensionNameValue stringToString   Filter by dimension . Example: -U SERVICE='Amazon Simple Storage Service' (default [])
+  -f, --filterByTagName string                      Results can be filtered by custom cost allocation tags. The groupByTag flag must be set with an active cost allocation tag. Once the tag is set, the filterByTagName flag can be used
+  -d, --groupByDimension strings                    Group by at most 2 dimension tags [ Dimensions: AZ, SERVICE, USAGE_TYPE ]
+  -t, --groupByTag string                           Group by cost allocation tag. Example: ApplicationName, Environment, BucketName
+  -h, --help                                        help for aws
+  -g, --reportGranularity string                    Specify the granularity of pricing information returned from GetCostAndUsage API request. Possible values include: Monthly, Daily or Hourly (default "MONTHLY")
+  -s, --startDate string                            Defaults to the start of the current month (default "2023-01-01")
 ```
 
 ## Cost And Usage Report 
 This command fetches the cost and usage information for the 
 authenticated 
-account. Results are grouped by SERVICE name and OPERATION type and excludes 
-and credits or discounts. 
+account.
+
+#### Example 1: Results are grouped by SERVICE name and OPERATION type. 
+Refunds , 
+discounts and credits are excluded from the final pricing infotmation. 
 
 ```bash
-Note: The dimension types impact the volume of results returned. )
 
-```bash) 
-service 
-and operation type:
-
-```bash
 cloudcost get aws -d SERVICE -d OPERATION c
 
 ```
 
-Results are grouped by SERVICE name and OPERATION type in descending order 
-by cost.
+#### Example 2: Results are grouped by SERVICE name and OPERATION type in descending order by cost.
 
 <sub>
 
@@ -77,26 +74,43 @@ by cost.
 
 </sub>
 
-Using cost allocation tags to filter by project:
+#### Example 3: Using cost allocation tags to filter by project:
 
 ```bash
 cloudcost get aws -t ApplicationName -d OPERATION -s 2022-12-10 -f "my-project"
 ```
 
+#### Example 4: Using cost allocation tags to filter S3 results :
+
+The first command returns the cost and usage information for all S3 buckets
+
+```bash
+cloudcost get aws -d SERVICE -t ApplicationName -u SERVICE="Amazon Simple Storage Service"  -c
+```
+
+The second command returns the cost and usage information for each specific 
+S3 bucket using a custom cost allocation tag named BucketName
+
+```bash
+cloudcost get aws -d SERVICE -t BucketName -u SERVICE="Amazon Simple Storage"
+
+```
+
+
 ## Cost Forecast
 The cost forecast command supports both wide ranging and granular forecasts.
 
-Example 1: Cost forecast for AWS Lambda given a specific end date:
+#### Example 1: Cost forecast for AWS Lambda given a specific end date:
 
 ```bash 
 cloudcost get aws forecast -e 2023-01-21 -d SERVICE="AWS Lambda"
 ```
 
-Example 2: Cost forecast for S3's PutObject API. 
+#### Example 2: Cost forecast for S3's PutObject API. 
 
 
 ```bash
-cloudcost get aws forecast -e 2023-01-21 -d OPERATION="PutObject"
+cloudcost get aws -d OPERATION -t ApplicationName -u OPERATION="PutObject"  -c
 ```
 
 
