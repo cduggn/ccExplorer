@@ -110,7 +110,7 @@ cloudcost get aws forecast -e 2023-01-21 -d SERVICE="AWS Lambda"
 
 
 ```bash
-cloudcost get aws forecast -e 2023-01-21 -d OPERATION="PutObject"
+cloudcost get aws -d OPERATION -t ApplicationName -u OPERATION="PutObject"  -c
 ```
 
 
