@@ -32,8 +32,8 @@ func isFilterEnabled(filterByTag string) bool {
 	}
 }
 
-func isFilterDimensionEnabled(filterByDimension string) bool {
-	if filterByDimension != "" {
+func isFilterDimensionEnabled(dimensionFilterMap map[string]string) bool {
+	if len(dimensionFilterMap) > 0 {
 		return true
 	} else {
 		return false

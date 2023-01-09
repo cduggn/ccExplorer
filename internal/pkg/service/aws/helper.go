@@ -87,7 +87,10 @@ func CostAndUsageFilterGenerator(req CostAndUsageRequestType) *types.
 		filters = append(filters, *filterByTag(req.Tag, req.TagFilterValue))
 	}
 	if req.IsFilterByDimensionEnabled {
-		filters = append(filters, *filterByDimension(req.DimensionFilterName, req.DimensionFilterValue))
+		for key, value := range req.DimensionFilter {
+			filters = append(filters, *filterByDimension(key, value))
+		}
+		//filters = append(filters, *filterByDimension(req.DimensionFilterName, req.DimensionFilterValue))
 	}
 
 	if len(filters) == 0 {
@@ -132,17 +135,6 @@ func CostForecastFilterGenerator(req GetCostForecastRequest) *types.
 		expList = append(expList, exp)
 	}
 
-	//
-	//for _, tag := range req.Filter.Tags {
-	//	temp := &types.TagValues{
-	//		Key:    aws.String(tag.Key),
-	//		Values: tag.Value,
-	//	}
-	//	exp = append(exp, types.Expression{
-	//		Tags: temp,
-	//	})
-	//}
-
 	filterExpression = expList[0]
 
 	return &filterExpression
@@ -156,4 +148,11 @@ func CostAndUsageGroupByGenerator(req CostAndUsageRequestType) []types.GroupDefi
 	} else {
 		return groupByDimension(req.GroupBy)
 	}
+
+	//if len(req.DimensionSubFilterName) > 0 {
+	//	// extract key value from map index 0
+	//	for k, v := range req.DimensionSubFilterName {
+	//		filters = append(filters, *filterByDimension(k, v))
+	//	}
+	//}
 }

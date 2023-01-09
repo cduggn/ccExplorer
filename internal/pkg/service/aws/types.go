@@ -82,10 +82,11 @@ type CostAndUsageRequestType struct {
 	IsFilterByTagEnabled       bool
 	IsFilterByDimensionEnabled bool
 	TagFilterValue             string
-	DimensionFilterName        string
-	DimensionFilterValue       string
-	Rates                      []string
-	ExcludeDiscounts           bool
+	//DimensionFilterName        string
+	//DimensionFilterValue       string
+	DimensionFilter  map[string]string
+	Rates            []string
+	ExcludeDiscounts bool
 }
 
 type CostAndUsageRequestWithResourcesType struct {
