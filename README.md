@@ -60,9 +60,7 @@ cloudcost get aws -d SERVICE -d OPERATION c
 
 ```
 
-#### Example 2: Results are grouped by SERVICE name and OPERATION type in 
-descending order 
-by cost.
+#### Example 2: Results are grouped by SERVICE name and OPERATION type in descending order by cost.
 
 <sub>
 
