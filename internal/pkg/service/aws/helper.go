@@ -57,14 +57,14 @@ var (
 			},
 		}
 	}
-	//filterByDimension = func(dimension string, value string) *types.Expression {
-	//	return &types.Expression{
-	//		Dimensions: &types.DimensionValues{
-	//			Key:    types.Dimension(dimension),
-	//			Values: []string{value},
-	//		},
-	//	}
-	//}
+	filterByDimension = func(dimension string, value string) *types.Expression {
+		return &types.Expression{
+			Dimensions: &types.DimensionValues{
+				Key:    types.Dimension(dimension),
+				Values: []string{value},
+			},
+		}
+	}
 )
 
 func ToSlice(d costexplorer.GetDimensionValuesOutput) []string {
@@ -78,16 +78,24 @@ func ToSlice(d costexplorer.GetDimensionValuesOutput) []string {
 func CostAndUsageFilterGenerator(req CostAndUsageRequestType) *types.
 	Expression {
 	expression := &types.Expression{}
+	var filters []types.Expression
 
-	if req.ExcludeDiscounts && req.IsFilterByTagEnabled {
-		expression.And = []types.Expression{*filterCredits(),
-			*filterByTag(req.Tag, req.TagFilterValue)}
-	} else if req.ExcludeDiscounts {
-		expression = filterCredits()
-	} else if req.IsFilterByTagEnabled {
-		expression = filterByTag(req.Tag, req.TagFilterValue)
-	} else {
+	if req.ExcludeDiscounts {
+		filters = append(filters, *filterCredits())
+	}
+	if req.IsFilterByTagEnabled {
+		filters = append(filters, *filterByTag(req.Tag, req.TagFilterValue))
+	}
+	if req.IsFilterByDimensionEnabled {
+		filters = append(filters, *filterByDimension(req.DimensionFilterName, req.DimensionFilterValue))
+	}
+
+	if len(filters) == 0 {
 		return nil
+	} else if len(filters) == 1 {
+		expression = &filters[0]
+	} else {
+		expression.And = filters
 	}
 	return expression
 }

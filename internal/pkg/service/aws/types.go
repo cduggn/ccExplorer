@@ -76,11 +76,13 @@ type GetCostForecastReport struct {
 type CostAndUsageRequestType struct {
 	Granularity                string
 	GroupBy                    []string
+	DimensionTag               string
 	Tag                        string
 	Time                       Time
 	IsFilterByTagEnabled       bool
 	IsFilterByDimensionEnabled bool
 	TagFilterValue             string
+	DimensionFilterName        string
 	DimensionFilterValue       string
 	Rates                      []string
 	ExcludeDiscounts           bool

@@ -50,10 +50,12 @@ func NewCostAndUsageRequest(cmd *cobra.Command) (aws.CostAndUsageRequestType, er
 	}
 
 	filterByDimension, _ := cmd.Flags().GetString("filter-by-dimension")
-	err = ValidateFilterByDimension(filterByDimension, dimensions)
-	if err != nil {
-		return aws.CostAndUsageRequestType{}, err
-	}
+	//err = ValidateFilterByDimension(filterByDimension, dimensions)
+	//if err != nil {
+	//	return aws.CostAndUsageRequestType{}, err
+	//}
+
+	filterDimensionValue, _ := cmd.Flags().GetString("filter-by-dimension-value")
 
 	start := cmd.Flags().Lookup("start").Value.String()
 	err = ValidateStartDate(start)
@@ -73,16 +75,17 @@ func NewCostAndUsageRequest(cmd *cobra.Command) (aws.CostAndUsageRequestType, er
 	return aws.CostAndUsageRequestType{
 		Granularity: interval,
 		GroupBy:     dimensions,
-		Tag:         tag,
 		Time: aws.Time{
 			Start: start,
 			End:   end,
 		},
 		IsFilterByTagEnabled:       isFilterEnabled(filterByTag),
 		IsFilterByDimensionEnabled: isFilterDimensionEnabled(filterByDimension),
+		Tag:                        tag,
 		TagFilterValue:             filterByTag,
-		//Rates:            rates,
-		ExcludeDiscounts: excludeDiscounts,
+		DimensionFilterValue:       filterDimensionValue,
+		DimensionFilterName:        filterByDimension,
+		ExcludeDiscounts:           excludeDiscounts,
 	}, nil
 
 }

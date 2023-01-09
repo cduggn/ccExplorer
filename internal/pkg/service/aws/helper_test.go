@@ -115,6 +115,72 @@ func TestCostAndUsageFilterGenerator_FilterByTagAndDiscounts(t *testing.T) {
 	}
 }
 
+func TestCostAndUsageFilterGenerator_FilterByTagDiscountsAndExcludes(t *testing.T) {
+	cases := []struct {
+		input  CostAndUsageRequestType
+		expect *types.Expression
+	}{
+		{
+			input: CostAndUsageRequestType{
+				Granularity: "MONTHLY",
+				GroupBy:     []string{"SERVICE"},
+				Tag:         "ApplicationName",
+				Time: Time{
+					Start: "2020-01-01",
+					End:   "2020-01-01",
+				},
+				IsFilterByDimensionEnabled: true,
+				DimensionFilterName:        "SERVICE",
+				DimensionFilterValue:       "Amazon S3",
+				IsFilterByTagEnabled:       true,
+				TagFilterValue:             "MyApp",
+				Rates:                      []string{"UNBLENDED"},
+				ExcludeDiscounts:           true,
+			},
+			expect: &types.Expression{
+				And: []types.Expression{
+					{
+						Not: &types.Expression{
+							Dimensions: &types.DimensionValues{
+								Key:    "RECORD_TYPE",
+								Values: []string{"Refund", "Credit", "DiscountedUsage"},
+							},
+						},
+					},
+					{
+						Tags: &types.TagValues{
+							Key:    aws.String("ApplicationName"),
+							Values: []string{"MyApp"},
+						},
+					},
+					{
+						Dimensions: &types.DimensionValues{
+							Key:    "SERVICE",
+							Values: []string{"Amazon S3"},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, c := range cases {
+		result := CostAndUsageFilterGenerator(c.input)
+		if result.And[0].Not.Dimensions.Key != c.expect.And[0].Not.Dimensions.Key {
+			t.Errorf("CostAndUsageFilterGenerator(%v) == %v, want %v",
+				c.input, result.And[0].Not.Dimensions.Key, c.expect.And[0].Not.Dimensions.Key)
+		}
+
+		if *result.And[1].Tags.Key != *c.expect.And[1].Tags.Key {
+			t.Errorf("CostAndUsageFilterGenerator(%v) == %v, want %v",
+				c.input, result.And[1].Tags.Key, c.expect.And[1].Tags.Key)
+		}
+		if result.And[2].Dimensions.Key != c.expect.And[2].Dimensions.Key {
+			t.Errorf("CostAndUsageFilterGenerator(%v) == %v, want %v", c.input, result.And[2].Dimensions.Key, c.expect.And[2].Dimensions.Key)
+		}
+
+	}
+}
+
 func TestCostAndUsageFilterGenerator_NoFilter(t *testing.T) {
 	cases := []struct {
 		input  CostAndUsageRequestType
