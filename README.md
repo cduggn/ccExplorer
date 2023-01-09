@@ -92,7 +92,7 @@ The second command returns the cost and usage information for each specific
 S3 bucket using a custom cost allocation tag named BucketName
 
 ```bash
-cloudcost get aws -d SERVICE -t BucketName -u SERVICE="Amazon Simple Storage 
+cloudcost get aws -d SERVICE -t BucketName -u SERVICE="Amazon Simple Storage"
 
 ```
 
