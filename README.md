@@ -1,4 +1,5 @@
-# ccExplorer
+
+<h1 align="center"><code>ccExplorer</code></h1>
 
 `ccExplorer` (Cloud cost explorer) is a simple command line tool to explore the 
 cost of your cloud resources and forecasts for future costs.
@@ -7,111 +8,99 @@ use case is to surface costs based on pre-defined
 cost allocation tags. 
 This approach simplifies the process of tracking costs across multiple projects and teams.   
 
-## Installation
+<div align="center">
+  <a href="https://github.com/cduggan/ccexplorer/releases">
+    <img src="https://img.shields.io/github/downloads/cduggn/ccexplorer/total.sv" alt="downloads">
+  </a>
+</div>
+<br>
 
-Precompiled binaries are available for Linux, Mac, and Windows on the releases [page](https://github.com/cduggn/cloudcost/releases).
 
-## Usage
+Quick Start
+-----------
 
-Cost Explorer supports the `get aws` command and subcommand with the following 
-options:
+Once `ccExplorer` is installed you can run the help command to see the 
+available commands.
 
-```bash
-Command: aws
-Description: Returns cost and usage summary for the specified time period.
+```sh
+ccexplorer --help
+```
+When you invoke a command, `ccExplorer` will follow use the AWS 
+credential chain to authenticate with AWS.
 
-Prerequisites:
-- AWS credentials must be configured in ~/.aws/credentials
-- AWS region must be configured in ~/.aws/config
-- Cost Allocation Tags must exist in AWS console if you want to filter by tag (
-Note cost allocation tags can take up to 24 hours to be applied )
+If no cost allocation tags have been defined, the  `ccExplorer` can still be 
+used to 
+filter and group resources based on their 
+AWS resource types. This can be achieved by using the group by and filter 
+flags 
 
-Usage:
-  ccxplorer get aws [flags]
-  ccxplorer get aws [command]
-
-Available Commands:
-  forecast    Return cost, usage, and resoucrce information including ARN
-
-Flags:
-  -e, --endDate string                              Defaults to the present day (default "2023-01-09")
-  -c, --excludeDiscounts                            Excludes credit, refund, and discount information in the report summary. Disabled by default.
-  -u, --filterByDimensionNameValue stringToString   Filter by dimension . Example: -U SERVICE='Amazon Simple Storage Service' (default [])
-  -f, --filterByTagName string                      Results can be filtered by custom cost allocation tags. The groupByTag flag must be set with an active cost allocation tag. Once the tag is set, the filterByTagName flag can be used
-  -d, --groupByDimension strings                    Group by at most 2 dimension tags [ Dimensions: AZ, SERVICE, USAGE_TYPE ]
-  -t, --groupByTag string                           Group by cost allocation tag. Example: ApplicationName, Environment, BucketName
-  -h, --help                                        help for aws
-  -g, --reportGranularity string                    Specify the granularity of pricing information returned from GetCostAndUsage API request. Possible values include: Monthly, Daily or Hourly (default "MONTHLY")
-  -s, --startDate string                            Defaults to the start of the current month (default "2023-01-01")
+```sh
+ccexplorer get aws -d SERVICE -d OPERATION c
 ```
 
-## Cost And Usage Report 
-This command fetches the cost and usage information for the 
-authenticated 
-account.
+This will return a list of all AWS services and operations that have been
+used in the specified billing period. If no billing period is specified, the
+current calendar month will be used. Results are sorted by cost in 
+descending order and refunds, discounts and credits are excluded.
 
-#### Example 1: Results are grouped by SERVICE name and OPERATION type. 
-Refunds , 
-discounts and credits are excluded from the final pricing infotmation. 
+```sh
+ccexplorer get aws -t ApplicationName -d OPERATION -s 2022-12-10 -f "my-project"
+```
+This will return a list of all AWS operations that have been used in the 
+specified billing period for the specified project. The `-f` flag can be
+used to filter results based on the value of a cost allocation tag. If no 
+filter value is specified, all resources will be returned. Results are  
+sorted by cost in descending order.
 
-```bash
-
-cloudcost get aws -d SERVICE -d OPERATION c
-
+```sh
+ccexplorer get aws -d SERVICE -t ApplicationName -u SERVICE="Amazon Simple Storage Service"  -c
 ```
 
-#### Example 2: Results are grouped by SERVICE name and OPERATION type in descending order by cost.
+This will return a list of costs for S3 buckets that have been used in the
+specified billing period and that have been tagged with the ApplicationName
+tag. Results are sorted by cost in descending order.
 
-<sub>
-
-| RANK | DIMENSION/TAG   | DIMENSION/TAG   | METRIC NAME | NUMERIC AMOUNT | STRING AMOUNT | UNIT | GRANULARITY | START | END  |
-|---------|-----------|--------|------|------| ------|------|------|------|------|
-| 1 | Amazon Route 53   | HostedZone | UnblendedCost |  1.50000010 | 1.5  | USD | MONTHLY | 2021-12-01 | 2021-12-31 |
-| 2 | AWS Cost Explorer  | GetCostAndUsage | UnblendedCost | 0.46000010  | 0.46 | USD | MONTHLY | 2021-12-01 | 2021-12-31 |
-| 3 | Amazon Route 53  | Health-Check-HTTPS | UnblendedCost | 0.22580610|   0.23 | USD | MONTHLY | 2021-12-01 | 2021-12-31 |
-| 4 | AWS Config   | None | UnblendedCost | 0.18900010 | 0.19 | USD | MONTHLY | 2021-12-01 | 2021-12-31 |
-| 5 | Amazon Route 53   | Health-Check-HTTPS | UnblendedCost | 0.18900010 | 0.19 | USD | MONTHLY | 2021-12-01 | 2021-12-31 |
-
-</sub>
-
-#### Example 3: Using cost allocation tags to filter by project:
-
-```bash
-cloudcost get aws -t ApplicationName -d OPERATION -s 2022-12-10 -f "my-project"
+```sh
+ccexplorer get aws -d SERVICE -t ApplicationName -u SERVICE="Amazon Simple Storage Service"  -c -f "my-application"
 ```
 
-#### Example 4: Using cost allocation tags to filter S3 results :
+This will return a list of costs for the specified application that have
+been used in the specified billing period. Results are sorted by cost in
+descending order.
 
-The first command returns the cost and usage information for all S3 buckets
-
-```bash
-cloudcost get aws -d SERVICE -t ApplicationName -u SERVICE="Amazon Simple Storage Service"  -c
+```sh
+ccexplorer get aws -d SERVICE -t BucketName -u SERVICE="Amazon Simple Storage"
 ```
 
-The second command returns the cost and usage information for each specific 
-S3 bucket using a custom cost allocation tag named BucketName
-
-```bash
-cloudcost get aws -d SERVICE -t BucketName -u SERVICE="Amazon Simple Storage"
-
-```
+This will return a list of costs for S3 buckets filtered by the bucket name
+tag. Results are sorted by cost in descending order.
 
 
-## Cost Forecast
+Cost Forecast
+-------------
+
 The cost forecast command supports both wide ranging and granular forecasts.
 
-#### Example 1: Cost forecast for AWS Lambda given a specific end date:
-
-```bash 
-cloudcost get aws forecast -e 2023-01-21 -d SERVICE="AWS Lambda"
+```sh 
+ccexplorer get aws forecast -e 2023-01-21 -d SERVICE="AWS Lambda"
 ```
 
-#### Example 2: Cost forecast for S3's PutObject API. 
+This will return a forecast for the cost of AWS Lambda for the current 
+billing period and the next 12 months. The forecast is based on the current
+usage of AWS Lambda and the average cost of AWS Lambda over the last 12.
 
 
-```bash
-cloudcost get aws -d OPERATION -t ApplicationName -u OPERATION="PutObject"  -c
+```sh 
+ccexplorer get aws -d OPERATION -t ApplicationName -u OPERATION="PutObject"  -c
 ```
+
+This will return a list of costs grouped by application name for the
+PutObject operation. Results are sorted by cost in descending order.
+
+
+Installation
+------------
+Precompiled binaries are available for Linux, Mac, and Windows on the releases [page](https://github.com/cduggn/cloudcost/releases).
 
 
 ## Considerations when using Cost Explorer
