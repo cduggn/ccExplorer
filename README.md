@@ -53,8 +53,7 @@ filter value is specified, all resources will be returned. Results are
 sorted by cost in descending order.
 
 ```sh
-ccexplorer get aws -d SERVICE -t ApplicationName -u SERVICE="Amazon Simple 
-Storage Service"  -c
+ccexplorer get aws -d SERVICE -t ApplicationName -u SERVICE="Amazon Simple Storage Service"  -c
 ```
 
 This will return a list of costs for S3 buckets that have been used in the
@@ -62,8 +61,7 @@ specified billing period and that have been tagged with the ApplicationName
 tag. Results are sorted by cost in descending order.
 
 ```sh
-ccexplorer get aws -d SERVICE -t ApplicationName -u SERVICE="Amazon Simple 
-Storage Service"  -c -f "my-application"
+ccexplorer get aws -d SERVICE -t ApplicationName -u SERVICE="Amazon Simple Storage Service"  -c -f "my-application"
 ```
 
 This will return a list of costs for the specified application that have
@@ -77,7 +75,6 @@ ccexplorer get aws -d SERVICE -t BucketName -u SERVICE="Amazon Simple Storage"
 This will return a list of costs for S3 buckets filtered by the bucket name
 tag. Results are sorted by cost in descending order.
 
-```sh
 
 Cost Forecast
 -------------
@@ -93,7 +90,7 @@ billing period and the next 12 months. The forecast is based on the current
 usage of AWS Lambda and the average cost of AWS Lambda over the last 12.
 
 
-```sh
+```sh 
 ccexplorer get aws -d OPERATION -t ApplicationName -u OPERATION="PutObject"  -c
 ```
 
