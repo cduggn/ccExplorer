@@ -3,13 +3,10 @@
 
 `ccExplorer` (Cloud cost explorer) is a simple command line tool to explore the 
 cost of your cloud resources. It's not 
-designed as a replacement for the official AWS CLI. Instead of returning 
-results as JSON, it returns a human readable table with costs displayed in 
-descending order by cost.
-It is designed to be used with AWS, but could be extended to other cloud providers. It's primary 
-use case is to surface costs based on pre-defined 
-cost allocation tags. 
-This approach simplifies the process of tracking costs across multiple projects and teams.   
+designed as a replacement for the official AWS CLI and does not offer the 
+same exhaustive search option. He does however return results in a more
+human-readable format, and orders them by cost in descending order.
+It's primary use case is to surface costs based on pre-defined cost allocation tags. 
 
 
 
