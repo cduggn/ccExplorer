@@ -43,11 +43,9 @@ func CostAndUsageCommand(c *cobra.Command) *cobra.Command {
 			"Example: -U SERVICE='Amazon Simple Storage Service'")
 
 	// Optional flag to dictate the granularity of the data returned
-	c.Flags().StringVarP(&costUsageGranularity, "reportGranularity", "g",
+	c.Flags().StringVarP(&costUsageGranularity, "granularity", "g",
 		"MONTHLY",
-		"Specify the granularity of pricing information returned from"+
-			" GetCostAndUsage API request. Possible values include: Monthly, "+
-			"Daily or Hourly")
+		"Sets the Amazon Web Services cost granularity to MONTHLY or DAILY , or HOURLY . If Granularity isn't set, the response object doesn't include the Granularity , either MONTHLY or DAILY , or HOURLY")
 
 	c.Flags().BoolVarP(&costUsageWithoutDiscounts, "excludeDiscounts", "c",
 		false,
