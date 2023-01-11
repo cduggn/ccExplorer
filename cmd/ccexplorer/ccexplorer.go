@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/cduggn/cloudcost/internal/pkg/cmd"
+	"github.com/cduggn/ccexplorer/internal/pkg/cmd"
 	_ "github.com/mattn/go-sqlite3"
 )
 

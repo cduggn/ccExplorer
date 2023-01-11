@@ -2,7 +2,7 @@ package storage
 
 import (
 	"database/sql"
-	"github.com/cduggn/cloudcost/internal/pkg/logger"
+	"github.com/cduggn/ccexplorer/internal/pkg/logger"
 	_ "github.com/mattn/go-sqlite3"
 	"go.uber.org/zap"
 	"os"

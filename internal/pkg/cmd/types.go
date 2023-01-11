@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/cduggn/cloudcost/internal/pkg/storage"
+	"github.com/cduggn/ccexplorer/internal/pkg/storage"
 )
 
 type DB struct {

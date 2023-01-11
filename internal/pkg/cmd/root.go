@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/cduggn/cloudcost/internal/pkg/cmd/get"
-	"github.com/cduggn/cloudcost/internal/pkg/logger"
+	"github.com/cduggn/ccexplorer/internal/pkg/cmd/get"
+	"github.com/cduggn/ccexplorer/internal/pkg/logger"
 	"github.com/common-nighthawk/go-figure"
 	"github.com/spf13/cobra"
 	//"go.uber.org/zap"

@@ -2,8 +2,8 @@ package aws
 
 import (
 	"context"
-	"github.com/cduggn/cloudcost/internal/pkg/service/aws"
-	"github.com/cduggn/cloudcost/internal/pkg/service/display"
+	"github.com/cduggn/ccexplorer/internal/pkg/service/aws"
+	"github.com/cduggn/ccexplorer/internal/pkg/service/display"
 	"github.com/spf13/cobra"
 )
 

@@ -1,7 +1,7 @@
 package get
 
 import (
-	aws2 "github.com/cduggn/cloudcost/internal/pkg/cmd/get/aws"
+	aws2 "github.com/cduggn/ccexplorer/internal/pkg/cmd/get/aws"
 	"github.com/common-nighthawk/go-figure"
 	"github.com/spf13/cobra"
 )

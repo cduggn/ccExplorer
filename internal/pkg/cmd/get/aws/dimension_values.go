@@ -2,7 +2,7 @@ package aws
 
 import (
 	"context"
-	"github.com/cduggn/cloudcost/internal/pkg/service/aws"
+	"github.com/cduggn/ccexplorer/internal/pkg/service/aws"
 	"time"
 )
 

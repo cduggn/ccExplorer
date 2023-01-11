@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
-	"github.com/cduggn/cloudcost/internal/pkg/logger"
-	"github.com/cduggn/cloudcost/internal/pkg/storage"
+	"github.com/cduggn/ccexplorer/internal/pkg/logger"
+	"github.com/cduggn/ccexplorer/internal/pkg/storage"
 )
 
 var (

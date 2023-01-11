@@ -3,7 +3,7 @@ package aws
 import (
 	"context"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
-	"github.com/cduggn/cloudcost/internal/pkg/storage"
+	"github.com/cduggn/ccexplorer/internal/pkg/storage"
 )
 
 type AWSClient interface {

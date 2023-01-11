@@ -1,4 +1,4 @@
-module github.com/cduggn/cloudcost
+module github.com/cduggn/ccexplorer
 
 go 1.18
 

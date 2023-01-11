@@ -97,7 +97,14 @@ PutObject operation. Results are sorted by cost in descending order.
 
 Installation
 ------------
-in development
+
+From source
+    
+```sh
+git clone https://github.com/cduggn/ccExplorer.git
+cd ccExplorer
+go run .\cmd\ccexplorer\ccexplorer.go get aws -d SERVICE -d OPERATION -u SERVICE="Amazon DynamoDB"  -c
+```
 
 
 ## Considerations when using Cost Explorer
