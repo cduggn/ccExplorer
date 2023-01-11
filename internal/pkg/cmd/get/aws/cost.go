@@ -65,7 +65,7 @@ func NewCostAndUsageRequest(cmd *cobra.Command) (aws.CostAndUsageRequestType, er
 	}
 
 	excludeDiscounts, _ := cmd.Flags().GetBool("excludeDiscounts")
-	interval := cmd.Flags().Lookup("reportGranularity").Value.String()
+	interval := cmd.Flags().Lookup("granularity").Value.String()
 
 	return aws.CostAndUsageRequestType{
 		Granularity: interval,
