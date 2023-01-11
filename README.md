@@ -19,7 +19,7 @@ available commands.
 ```sh
 ccexplorer --help
 ```
-When you invoke a command, `ccExplorer` will follow use the AWS 
+When you invoke a command, `ccExplorer` will use the AWS 
 credential chain to authenticate with AWS.
 
 If no cost allocation tags have been defined, the  `ccExplorer` can still be 
