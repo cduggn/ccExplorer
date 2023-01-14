@@ -20,6 +20,7 @@ var (
 
 func init() {
 	rootCmd.AddCommand(get.AWSCostAndUsageCommand())
+	rootCmd.AddCommand(AddPresetCommands())
 }
 
 func paintRootHeader() string {

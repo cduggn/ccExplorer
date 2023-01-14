@@ -63,7 +63,8 @@ been used in the specified billing period. Results are sorted by cost in
 descending order.
 
 ```sh
-ccexplorer get aws -d SERVICE -t BucketName -u SERVICE="Amazon Simple Storage"
+ccexplorer get aws -d SERVICE -t BucketName -u SERVICE="Amazon Simple 
+Storage Service"
 ```
 
 This will return a list of costs for S3 buckets filtered by the bucket name
