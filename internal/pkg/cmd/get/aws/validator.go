@@ -45,22 +45,33 @@ func ValidateDimension(dimension []string) error {
 	return nil
 }
 
-func ValidateTag(tag string, dimension []string) error {
-	if tag != "" && len(dimension) != 1 {
+func ValidateTagFilterValue(tagFilterKey string, tag string) error {
+	if tagFilterKey == "" {
+		return nil
+	}
+	if tag == "" {
 		return ValidationError{
-			msg: "When grouping by tag, 1 dimension is allowed",
+			msg: "Tag must be specified",
 		}
 	}
 	return nil
 }
 
-func ValidateFilterBy(filterBy string, tag string) error {
-	if filterBy != "" && tag == "" {
-		return ValidationError{
-			msg: "When filtering by tag value, a tag must be specified",
+func ValidateGroupByTag(tag map[string]string) (string, error) {
+	if len(tag) == 0 {
+		return "", nil
+	}
+	if len(tag) > 1 {
+		return "", ValidationError{
+			msg: "At most 1 tag can be specified",
 		}
 	}
-	return nil
+	// extract the tag from the map
+	var tagValue string
+	for _, val := range tag {
+		tagValue = val
+	}
+	return tagValue, nil
 }
 
 //func ValidateFilterByDimension(filterByDimension string, tag string) error {

@@ -39,14 +39,17 @@ func NewCostAndUsageRequest(cmd *cobra.Command) (aws.CostAndUsageRequestType, er
 		return aws.CostAndUsageRequestType{}, err
 	}
 
-	tag := cmd.Flags().Lookup("groupByTag").Value.String()
-	err = ValidateTag(tag, dimensions)
-	if err != nil {
-		return aws.CostAndUsageRequestType{}, err
+	tagMap, _ := cmd.Flags().GetStringToString("groupByTag")
+	var tag string = ""
+	if len(tagMap) > 0 {
+		tag, err = ValidateGroupByTag(tagMap)
+		if err != nil {
+			return aws.CostAndUsageRequestType{}, err
+		}
 	}
 
-	filterByTag, _ := cmd.Flags().GetString("filterByTagName")
-	err = ValidateFilterBy(filterByTag, tag)
+	tagFilterValue, _ := cmd.Flags().GetString("filterByTagKey")
+	err = ValidateTagFilterValue(tagFilterValue, tag)
 	if err != nil {
 		return aws.CostAndUsageRequestType{}, err
 	}
@@ -76,10 +79,10 @@ func NewCostAndUsageRequest(cmd *cobra.Command) (aws.CostAndUsageRequestType, er
 			Start: start,
 			End:   end,
 		},
-		IsFilterByTagEnabled:       isFilterEnabled(filterByTag),
+		IsFilterByTagEnabled:       isFilterEnabled(tagFilterValue),
 		IsFilterByDimensionEnabled: isFilterDimensionEnabled(dimensionFilterMap),
 		Tag:                        tag,
-		TagFilterValue:             filterByTag,
+		TagFilterValue:             tagFilterValue,
 		DimensionFilter:            dimensionFilterMap,
 		ExcludeDiscounts:           excludeDiscounts,
 	}, nil

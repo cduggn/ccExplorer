@@ -3,15 +3,13 @@ package aws
 import "github.com/spf13/cobra"
 
 var (
-	costUsageGroupBy    []string
-	costUsageGroupByTag string
-	//costUsageFilterByDimension          string
-	costUsageGranularity      string
-	costUsageFilterBy         string
-	costUsageStartDate        string
-	costUsageEndDate          string
-	costUsageWithoutDiscounts bool
-	//costUsageFilterByDimensionValue     string
+	costUsageGroupBy           []string
+	costUsageGroupByTag        map[string]string
+	costUsageGranularity       string
+	costUsageFilterBy          string
+	costUsageStartDate         string
+	costUsageEndDate           string
+	costUsageWithoutDiscounts  bool
 	costUsageFilterByDimension map[string]string
 )
 
@@ -26,21 +24,25 @@ func CostAndUsageCommand(c *cobra.Command) *cobra.Command {
 		[]string{},
 		"Group by at most 2 dimension tags [ Dimensions: AZ, SERVICE, "+
 			"USAGE_TYPE ]")
-	c.Flags().StringVarP(&costUsageGroupByTag, "groupByTag", "t", "",
-		"Group by cost allocation tag. Example: ApplicationName, Environment, BucketName")
+	//c.Flags().StringVarP(&costUsageGroupByTag, "groupByTag", "t", "",
+	//	"Group by cost allocation tag. Example: ApplicationName, Environment, BucketName")
+
+	c.Flags().StringToStringVarP(&costUsageGroupByTag,
+		"groupByTag",
+		"t", nil, "Group by Cost Allocation Tag. "+
+			"Example: -t TAG='ApplicationName'")
 
 	// Optional flag used to filter data by tag value,
 	//this is only relevant when the data is grouped by tag
-	c.Flags().StringVarP(&costUsageFilterBy, "filterByTagName", "f", "",
+	c.Flags().StringVarP(&costUsageFilterBy, "filterByTagKey", "f", "",
 		"Results can be filtered by custom cost allocation tags. "+
-			"The groupByTag flag must be set with an active cost allocation"+
-			" tag. Once the tag is set, the filterByTagName flag can be used")
+			"groupByTag must also be used in conjection with this flag.")
 
 	c.Flags().StringToStringVarP(&costUsageFilterByDimension,
 		"filterByDimensionNameValue",
 		"u",
 		nil, "Filter by dimension . "+
-			"Example: -U SERVICE='Amazon Simple Storage Service'")
+			"Example: -u SERVICE='Amazon Simple Storage Service'")
 
 	// Optional flag to dictate the granularity of the data returned
 	c.Flags().StringVarP(&costUsageGranularity, "granularity", "g",

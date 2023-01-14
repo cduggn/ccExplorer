@@ -18,7 +18,7 @@ var templates = &promptui.SelectTemplates{
 {{ "Peppers:" | faint }}	{{ .Peppers }}`,
 }
 
-type UsageRequest struct {
+type PresetRequest struct {
 	Name     string
 	HeatUnit int
 	Peppers  int
@@ -31,7 +31,7 @@ func AddPresetCommands() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			prompt := promptui.Select{
 				Label: "Select an preset to use:",
-				Items: []UsageRequest{
+				Items: []PresetRequest{
 					{Name: "Bell Pepper", HeatUnit: 0, Peppers: 0},
 					{Name: "Banana Pepper", HeatUnit: 100, Peppers: 1},
 					{Name: "Poblano", HeatUnit: 1000, Peppers: 2},
