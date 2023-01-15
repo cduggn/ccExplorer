@@ -30,32 +30,32 @@ func CostAndUsageSummary(cmd *cobra.Command, args []string) error {
 
 func NewCostAndUsageRequest(cmd *cobra.Command) (aws.CostAndUsageRequestType, error) {
 
-	dimensions, err := cmd.Flags().GetStringSlice("groupByDimension")
-	if err != nil {
-		return aws.CostAndUsageRequestType{}, err
-	}
-	err = ValidateDimension(dimensions)
-	if err != nil {
-		return aws.CostAndUsageRequestType{}, err
-	}
+	groupByValue := cmd.Flags().Lookup("groupBy").Value
+	groupBy, _ := groupByValue.(*GroupBy)
 
-	tagMap, _ := cmd.Flags().GetStringToString("groupByTag")
+	var err error
+
+	//tagMap, _ := cmd.Flags().GetStringToString("groupByTag")
 	var tag string = ""
-	if len(tagMap) > 0 {
-		tag, err = ValidateGroupByTag(tagMap)
-		if err != nil {
-			return aws.CostAndUsageRequestType{}, err
-		}
+	//if len(tagMap) > 0 {
+	//	tag, err = ValidateGroupByTag(tagMap)
+	//	if err != nil {
+	//		return aws.CostAndUsageRequestType{}, err
+	//	}
+	//}
+
+	if len(groupBy.Tags) > 0 {
+		tag = groupBy.Tags[0]
 	}
 
-	tagFilterValue, _ := cmd.Flags().GetString("filterByTagKey")
+	tagFilterValue, _ := cmd.Flags().GetString("filterByTag")
 	err = ValidateTagFilterValue(tagFilterValue, tag)
 	if err != nil {
 		return aws.CostAndUsageRequestType{}, err
 	}
 
 	dimensionFilterMap, _ := cmd.Flags().GetStringToString(
-		"filterByDimensionNameValue")
+		"filterByDimension")
 
 	start := cmd.Flags().Lookup("startDate").Value.String()
 	err = ValidateStartDate(start)
@@ -74,7 +74,7 @@ func NewCostAndUsageRequest(cmd *cobra.Command) (aws.CostAndUsageRequestType, er
 
 	return aws.CostAndUsageRequestType{
 		Granularity: interval,
-		GroupBy:     dimensions,
+		GroupBy:     groupBy.Dimensions,
 		Time: aws.Time{
 			Start: start,
 			End:   end,

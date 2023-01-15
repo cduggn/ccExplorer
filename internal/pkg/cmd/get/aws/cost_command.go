@@ -3,10 +3,9 @@ package aws
 import "github.com/spf13/cobra"
 
 var (
-	costUsageGroupBy           []string
-	costUsageGroupByTag        map[string]string
+	costUsageGroupBy           GroupBy
 	costUsageGranularity       string
-	costUsageFilterBy          string
+	costUsageFilterByTag       string
 	costUsageStartDate         string
 	costUsageEndDate           string
 	costUsageWithoutDiscounts  bool
@@ -15,32 +14,18 @@ var (
 
 func CostAndUsageCommand(c *cobra.Command) *cobra.Command {
 
-	// Optional Flags used to manage start and end dates for billing
-	//information retrieval
+	c.Flags().VarP(&costUsageGroupBy, "groupBy", "b",
+		"Group by DIMENSION and/or TAG . "+
+			"Example: --groupBy dimension=SERVICE --groupBy tag=Name"+
+			"Example: --groupBy dimension=SERVICE,TAG=Name")
 
-	// Mandatory tags used to specify how data will be grouped.
-	//This also dictates the type of data that will be returned.
-	c.Flags().StringSliceVarP(&costUsageGroupBy, "groupByDimension", "d",
-		[]string{},
-		"Group by at most 2 dimension tags [ Dimensions: AZ, SERVICE, "+
-			"USAGE_TYPE ]")
-	//c.Flags().StringVarP(&costUsageGroupByTag, "groupByTag", "t", "",
-	//	"Group by cost allocation tag. Example: ApplicationName, Environment, BucketName")
-
-	c.Flags().StringToStringVarP(&costUsageGroupByTag,
-		"groupByTag",
-		"t", nil, "Group by Cost Allocation Tag. "+
-			"Example: -t TAG='ApplicationName'")
-
-	// Optional flag used to filter data by tag value,
-	//this is only relevant when the data is grouped by tag
-	c.Flags().StringVarP(&costUsageFilterBy, "filterByTagKey", "f", "",
+	c.Flags().StringVarP(&costUsageFilterByTag, "filterByTag", "t", "",
 		"Results can be filtered by custom cost allocation tags. "+
 			"groupByTag must also be used in conjection with this flag.")
 
 	c.Flags().StringToStringVarP(&costUsageFilterByDimension,
-		"filterByDimensionNameValue",
-		"u",
+		"filterByDimension",
+		"d",
 		nil, "Filter by dimension . "+
 			"Example: -u SERVICE='Amazon Simple Storage Service'")
 
@@ -49,7 +34,7 @@ func CostAndUsageCommand(c *cobra.Command) *cobra.Command {
 		"MONTHLY",
 		"Sets the Amazon Web Services cost granularity to MONTHLY or DAILY , or HOURLY . If Granularity isn't set, the response object doesn't include the Granularity , either MONTHLY or DAILY , or HOURLY")
 
-	c.Flags().BoolVarP(&costUsageWithoutDiscounts, "excludeDiscounts", "c",
+	c.Flags().BoolVarP(&costUsageWithoutDiscounts, "excludeDiscounts", "x",
 		false,
 		"Excludes credit, refund, "+
 			"and discount information in the report summary. "+
