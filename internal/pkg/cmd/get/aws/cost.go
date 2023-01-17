@@ -15,6 +15,8 @@ func CostAndUsageSummary(cmd *cobra.Command, args []string) error {
 	}
 
 	awsClient := aws.NewAPIClient()
+	//aws.RightSizingRecommendationS3(context.Background(), awsClient.Client)
+
 	usage, err := awsClient.GetCostAndUsage(context.Background(), awsClient.Client, req)
 	if err != nil {
 		return err
@@ -28,29 +30,29 @@ func CostAndUsageSummary(cmd *cobra.Command, args []string) error {
 
 func NewCostAndUsageRequest(cmd *cobra.Command) (aws.CostAndUsageRequestType, error) {
 
-	dimensions, err := cmd.Flags().GetStringSlice("groupByDimension")
-	if err != nil {
-		return aws.CostAndUsageRequestType{}, err
-	}
-	err = ValidateDimension(dimensions)
-	if err != nil {
-		return aws.CostAndUsageRequestType{}, err
+	var err error
+	groupByValue := cmd.Flags().Lookup("groupBy").Value
+	groupBy, _ := groupByValue.(*GroupBy)
+
+	var tag string = ""
+	if len(groupBy.Tags) > 0 {
+		tag = groupBy.Tags[0]
 	}
 
-	tag := cmd.Flags().Lookup("groupByTag").Value.String()
-	err = ValidateTag(tag, dimensions)
-	if err != nil {
-		return aws.CostAndUsageRequestType{}, err
+	filterByValue := cmd.Flags().Lookup("filterBy").Value
+	filterBy, _ := filterByValue.(*FilterBy)
+
+	var isFilterByTag bool
+	var tagFilter string = ""
+	if len(filterBy.Tags) > 0 {
+		isFilterByTag = true
+		tagFilter = filterBy.Tags[0]
 	}
 
-	filterByTag, _ := cmd.Flags().GetString("filterByTagName")
-	err = ValidateFilterBy(filterByTag, tag)
-	if err != nil {
-		return aws.CostAndUsageRequestType{}, err
+	var isFilterByDimension bool
+	if len(filterBy.Dimensions) > 0 {
+		isFilterByDimension = true
 	}
-
-	dimensionFilterMap, _ := cmd.Flags().GetStringToString(
-		"filterByDimensionNameValue")
 
 	start := cmd.Flags().Lookup("startDate").Value.String()
 	err = ValidateStartDate(start)
@@ -69,16 +71,16 @@ func NewCostAndUsageRequest(cmd *cobra.Command) (aws.CostAndUsageRequestType, er
 
 	return aws.CostAndUsageRequestType{
 		Granularity: interval,
-		GroupBy:     dimensions,
+		GroupBy:     groupBy.Dimensions,
 		Time: aws.Time{
 			Start: start,
 			End:   end,
 		},
-		IsFilterByTagEnabled:       isFilterEnabled(filterByTag),
-		IsFilterByDimensionEnabled: isFilterDimensionEnabled(dimensionFilterMap),
+		IsFilterByTagEnabled:       isFilterByTag,
+		IsFilterByDimensionEnabled: isFilterByDimension,
 		Tag:                        tag,
-		TagFilterValue:             filterByTag,
-		DimensionFilter:            dimensionFilterMap,
+		TagFilterValue:             tagFilter,
+		DimensionFilter:            filterBy.Dimensions,
 		ExcludeDiscounts:           excludeDiscounts,
 	}, nil
 

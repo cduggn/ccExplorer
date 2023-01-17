@@ -12,55 +12,81 @@ func (e ValidationError) Error() string {
 	return e.msg
 }
 
-func ValidateDimension(dimension []string) error {
+//func ValidateGroupByMap(groupBy map[string]string) ([]string, error) {
+//
+//	var tag map[string]string
+//
+//	for key, val := range groupBy {
+//		if val == "DIMENSION" {
+//			//dimension = map[string]string{key: val}
+//			err := ValidateGroupByDimension(val)
+//			if err != nil {
+//				return nil, err
+//			}
+//		}
+//		if val == "TAG" {
+//			tag = map[string]string{key: val}
+//			//ValidateGroupByTag(tag)
+//		} else {
+//			return nil, ValidationError{
+//				msg: "GroupBy must be one of the following: DIMENSION, TAG",
+//			}
+//		}
+//	}
+//	return nil, nil
+//}
 
-	if len(dimension) > 2 {
+func ValidateGroupByDimension(dimension string) error {
+
+	switch dimension {
+	case "AZ", "SERVICE", "USAGE_TYPE", "INSTANCE_TYPE", "LINKED_ACCOUNT", "OPERATION",
+		"PURCHASE_TYPE", "PLATFORM", "TENANCY", "RECORD_TYPE", "LEGAL_ENTITY_NAME",
+		"INVOICING_ENTITY", "DEPLOYMENT_OPTION", "DATABASE_ENGINE",
+		"CACHE_ENGINE", "INSTANCE_TYPE_FAMILY", "REGION", "BILLING_ENTITY",
+		"RESERVATION_ID", "SAVINGS_PLANS_TYPE", "SAVINGS_PLAN_ARN",
+		"OPERATING_SYSTEM":
+	default:
 		return ValidationError{
-			msg: "At most 2 dimensions are allowed. " +
-				"When grouping by tag, only 1 dimension is allowed",
+			msg: "Dimension must be one of the following: AZ, SERVICE, " +
+				"USAGE_TYPE, INSTANCE_TYPE, LINKED_ACCOUNT, OPERATION, " +
+				"PURCHASE_TYPE, PLATFORM, TENANCY, RECORD_TYPE, " +
+				"LEGAL_ENTITY_NAME, INVOICING_ENTITY, DEPLOYMENT_OPTION, " +
+				"DATABASE_ENGINE, CACHE_ENGINE, INSTANCE_TYPE_FAMILY, " +
+				"REGION, BILLING_ENTITY, RESERVATION_ID, " +
+				"SAVINGS_PLANS_TYPE, SAVINGS_PLAN_ARN, OPERATING_SYSTEM",
 		}
 	}
 
-	for _, d := range dimension {
-		switch d {
-		case "AZ", "SERVICE", "USAGE_TYPE", "INSTANCE_TYPE", "LINKED_ACCOUNT", "OPERATION",
-			"PURCHASE_TYPE", "PLATFORM", "TENANCY", "RECORD_TYPE", "LEGAL_ENTITY_NAME",
-			"INVOICING_ENTITY", "DEPLOYMENT_OPTION", "DATABASE_ENGINE",
-			"CACHE_ENGINE", "INSTANCE_TYPE_FAMILY", "REGION", "BILLING_ENTITY",
-			"RESERVATION_ID", "SAVINGS_PLANS_TYPE", "SAVINGS_PLAN_ARN",
-			"OPERATING_SYSTEM":
-			continue
-		default:
-			return ValidationError{
-				msg: "Dimension must be one of the following: AZ, SERVICE, " +
-					"USAGE_TYPE, INSTANCE_TYPE, LINKED_ACCOUNT, OPERATION, " +
-					"PURCHASE_TYPE, PLATFORM, TENANCY, RECORD_TYPE, " +
-					"LEGAL_ENTITY_NAME, INVOICING_ENTITY, DEPLOYMENT_OPTION, " +
-					"DATABASE_ENGINE, CACHE_ENGINE, INSTANCE_TYPE_FAMILY, " +
-					"REGION, BILLING_ENTITY, RESERVATION_ID, " +
-					"SAVINGS_PLANS_TYPE, SAVINGS_PLAN_ARN, OPERATING_SYSTEM",
-			}
+	return nil
+}
+
+func ValidateTagFilterValue(tagFilterKey string, tag string) error {
+	if tagFilterKey == "" {
+		return nil
+	}
+	if tag == "" {
+		return ValidationError{
+			msg: "Tag must be specified",
 		}
 	}
 	return nil
 }
 
-func ValidateTag(tag string, dimension []string) error {
-	if tag != "" && len(dimension) != 1 {
-		return ValidationError{
-			msg: "When grouping by tag, 1 dimension is allowed",
+func ValidateGroupByTag(tag map[string]string) (string, error) {
+	if len(tag) == 0 {
+		return "", nil
+	}
+	if len(tag) > 1 {
+		return "", ValidationError{
+			msg: "At most 1 tag can be specified",
 		}
 	}
-	return nil
-}
-
-func ValidateFilterBy(filterBy string, tag string) error {
-	if filterBy != "" && tag == "" {
-		return ValidationError{
-			msg: "When filtering by tag value, a tag must be specified",
-		}
+	// extract the tag from the map
+	var tagValue string
+	for _, val := range tag {
+		tagValue = val
 	}
-	return nil
+	return tagValue, nil
 }
 
 //func ValidateFilterByDimension(filterByDimension string, tag string) error {

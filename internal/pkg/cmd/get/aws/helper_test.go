@@ -138,36 +138,3 @@ func TestSubtractDays(t *testing.T) {
 		})
 	}
 }
-
-func Test_isFilterEnabled(t *testing.T) {
-	type args struct {
-		filterBy string
-	}
-	tests := []struct {
-		name string
-		args args
-		want bool
-	}{
-		{
-			name: "Empty",
-			args: args{
-				filterBy: "",
-			},
-			want: false,
-		},
-		{
-			name: "NotEmpty",
-			args: args{
-				filterBy: "foo",
-			},
-			want: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := isFilterEnabled(tt.args.filterBy); got != tt.want {
-				t.Errorf("isFilterEnabled() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
