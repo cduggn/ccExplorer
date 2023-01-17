@@ -136,8 +136,8 @@ func TestSplitByIndividualArgument(t *testing.T) {
 		},
 		{
 			name: "Valid3",
-			args: "DIMENSION=SERVICE2",
-			want: []string{"DIMENSION=SERVICE2"},
+			args: "SERVICE=AMAZON SIMPLE STORAGE SERVICE",
+			want: []string{"SERVICE=AMAZON SIMPLE STORAGE SERVICE"},
 		},
 		{
 			name: "Valid4",

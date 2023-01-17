@@ -30,32 +30,29 @@ func CostAndUsageSummary(cmd *cobra.Command, args []string) error {
 
 func NewCostAndUsageRequest(cmd *cobra.Command) (aws.CostAndUsageRequestType, error) {
 
+	var err error
 	groupByValue := cmd.Flags().Lookup("groupBy").Value
 	groupBy, _ := groupByValue.(*GroupBy)
 
-	var err error
-
-	//tagMap, _ := cmd.Flags().GetStringToString("groupByTag")
 	var tag string = ""
-	//if len(tagMap) > 0 {
-	//	tag, err = ValidateGroupByTag(tagMap)
-	//	if err != nil {
-	//		return aws.CostAndUsageRequestType{}, err
-	//	}
-	//}
-
 	if len(groupBy.Tags) > 0 {
 		tag = groupBy.Tags[0]
 	}
 
-	tagFilterValue, _ := cmd.Flags().GetString("filterByTag")
-	err = ValidateTagFilterValue(tagFilterValue, tag)
-	if err != nil {
-		return aws.CostAndUsageRequestType{}, err
+	filterByValue := cmd.Flags().Lookup("filterBy").Value
+	filterBy, _ := filterByValue.(*FilterBy)
+
+	var isFilterByTag bool
+	var tagFilter string = ""
+	if len(filterBy.Tags) > 0 {
+		isFilterByTag = true
+		tagFilter = filterBy.Tags[0]
 	}
 
-	dimensionFilterMap, _ := cmd.Flags().GetStringToString(
-		"filterByDimension")
+	var isFilterByDimension bool
+	if len(filterBy.Dimensions) > 0 {
+		isFilterByDimension = true
+	}
 
 	start := cmd.Flags().Lookup("startDate").Value.String()
 	err = ValidateStartDate(start)
@@ -79,11 +76,11 @@ func NewCostAndUsageRequest(cmd *cobra.Command) (aws.CostAndUsageRequestType, er
 			Start: start,
 			End:   end,
 		},
-		IsFilterByTagEnabled:       isFilterEnabled(tagFilterValue),
-		IsFilterByDimensionEnabled: isFilterDimensionEnabled(dimensionFilterMap),
+		IsFilterByTagEnabled:       isFilterByTag,
+		IsFilterByDimensionEnabled: isFilterByDimension,
 		Tag:                        tag,
-		TagFilterValue:             tagFilterValue,
-		DimensionFilter:            dimensionFilterMap,
+		TagFilterValue:             tagFilter,
+		DimensionFilter:            filterBy.Dimensions,
 		ExcludeDiscounts:           excludeDiscounts,
 	}, nil
 

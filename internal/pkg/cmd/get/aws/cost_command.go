@@ -3,38 +3,32 @@ package aws
 import "github.com/spf13/cobra"
 
 var (
-	costUsageGroupBy           GroupBy
-	costUsageGranularity       string
-	costUsageFilterByTag       string
-	costUsageStartDate         string
-	costUsageEndDate           string
-	costUsageWithoutDiscounts  bool
-	costUsageFilterByDimension map[string]string
+	costUsageGroupBy          GroupBy
+	costUsageGranularity      string
+	costUsageStartDate        string
+	costUsageEndDate          string
+	costUsageWithoutDiscounts bool
 )
 
 func CostAndUsageCommand(c *cobra.Command) *cobra.Command {
 
-	c.Flags().VarP(&costUsageGroupBy, "groupBy", "b",
+	c.Flags().VarP(&costUsageGroupBy, "groupBy", "g",
 		"Group by DIMENSION and/or TAG . "+
 			"Example: --groupBy dimension=SERVICE --groupBy tag=Name"+
 			"Example: --groupBy dimension=SERVICE,TAG=Name")
 
-	c.Flags().StringVarP(&costUsageFilterByTag, "filterByTag", "t", "",
-		"Results can be filtered by custom cost allocation tags. "+
-			"groupByTag must also be used in conjection with this flag.")
-
-	c.Flags().StringToStringVarP(&costUsageFilterByDimension,
-		"filterByDimension",
-		"d",
-		nil, "Filter by dimension . "+
-			"Example: -u SERVICE='Amazon Simple Storage Service'")
+	costUsageFilterBy := NewFilterBy()
+	c.Flags().VarP(&costUsageFilterBy, "filterBy", "f",
+		"Filter by DIMENSION and/or TAG . "+
+			"Example: --filterBy dimension=SERVICE --filterBy tag=Name"+
+			"Example: --filterBy dimension=SERVICE,TAG=Name")
 
 	// Optional flag to dictate the granularity of the data returned
-	c.Flags().StringVarP(&costUsageGranularity, "granularity", "g",
+	c.Flags().StringVarP(&costUsageGranularity, "granularity", "m",
 		"MONTHLY",
 		"Sets the Amazon Web Services cost granularity to MONTHLY or DAILY , or HOURLY . If Granularity isn't set, the response object doesn't include the Granularity , either MONTHLY or DAILY , or HOURLY")
 
-	c.Flags().BoolVarP(&costUsageWithoutDiscounts, "excludeDiscounts", "x",
+	c.Flags().BoolVarP(&costUsageWithoutDiscounts, "excludeDiscounts", "l",
 		false,
 		"Excludes credit, refund, "+
 			"and discount information in the report summary. "+

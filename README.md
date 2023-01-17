@@ -29,7 +29,7 @@ AWS resource types. This can be achieved by using the group by and filter
 flags 
 
 ```sh
-ccexplorer get aws -b DIMENSION=SERVICE,DIMENSION=OPERATION -x
+ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -l
 ```
 
 This will return a list of all AWS services and operations that have been
@@ -38,7 +38,7 @@ current calendar month will be used. Results are sorted by cost in
 descending order and refunds, discounts and credits are excluded.
 
 ```sh
-ccexplorer get aws -b TAG=ApplicationName,DIMENSION=OPERATION -s 2022-12-10 -t "my-project"
+ccexplorer get aws -g TAG=ApplicationName,DIMENSION=OPERATION -s 2022-12-10 -f TAG="my-project"
 ```
 This will return a list of all AWS operations that have been used in the 
 specified billing period for the specified project. The `-f` flag can be
@@ -47,7 +47,7 @@ filter value is specified, all resources will be returned. Results are
 sorted by cost in descending order.
 
 ```sh
-ccexplorer get aws -b DIMENSION=SERVICE,TAG=ApplicationName -d SERVICE="Amazon Simple Storage Service"  -x
+ccexplorer get aws -g DIMENSION=SERVICE,TAG=ApplicationName -f SERVICE="Amazon Simple Storage Service"  -l
 ```
 
 This will return a list of costs for S3 buckets that have been used in the
@@ -55,7 +55,7 @@ specified billing period and that have been tagged with the ApplicationName
 tag. Results are sorted by cost in descending order.
 
 ```sh
-ccexplorer get aws -b DIMENSION=SERVICE,TAG=ApplicationName -d SERVICE="Amazon Simple Storage Service"  -x -t "my-application"
+ccexplorer get aws -g DIMENSION=SERVICE,TAG=ApplicationName -f SERVICE="Amazon Simple Storage Service"  -l -f TAG="my-application"
 ```
 
 This will return a list of costs for the specified application that have
@@ -63,33 +63,11 @@ been used in the specified billing period. Results are sorted by cost in
 descending order.
 
 ```sh
-ccexplorer get aws -b DIMENSION=SERVICE,TAG=BucketName -d SERVICE="Amazon Simple Storage Service"
+ccexplorer get aws -g DIMENSION=SERVICE,TAG=BucketName -f SERVICE="Amazon Simple Storage Service"
 ```
 
 This will return a list of costs for S3 buckets filtered by the bucket name
 tag. Results are sorted by cost in descending order.
-
-
-Cost Forecast
--------------
-
-The cost forecast command supports both wide ranging and granular forecasts.
-
-```sh 
-ccexplorer get aws forecast -e 2023-01-21 -d SERVICE="AWS Lambda"
-```
-
-This will return a forecast for the cost of AWS Lambda for the current 
-billing period and the next 12 months. The forecast is based on the current
-usage of AWS Lambda and the average cost of AWS Lambda over the last 12.
-
-
-```sh 
-ccexplorer get aws -d OPERATION -t ApplicationName -u OPERATION="PutObject"  -c
-```
-
-This will return a list of costs grouped by application name for the
-PutObject operation. Results are sorted by cost in descending order.
 
 
 Installation

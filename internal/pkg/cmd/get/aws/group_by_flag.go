@@ -92,7 +92,7 @@ func splitByIndividualArgument(value string) []string {
 	if strings.Contains(value, ",") {
 		args = strings.Split(value, ",")
 	} else {
-		args = strings.Split(value, " ")
+		args = []string{value}
 	}
 	return args
 }
