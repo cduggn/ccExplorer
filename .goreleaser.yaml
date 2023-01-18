@@ -5,8 +5,8 @@ before:
     # you may remove this if you don't need go generate
     - go generate ./...
 builds:
-  - main: ./cmd/cloudcost
-    binary: cloudcost
+  - main: ./cmd/ccexplorer
+    binary: ccexplorer
     env:
       - CGO_ENABLED=0
     goos:
