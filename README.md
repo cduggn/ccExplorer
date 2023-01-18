@@ -4,7 +4,7 @@
 `ccExplorer` (Cloud cost explorer) is a simple command line tool to explore the 
 cost of your cloud resources. It's not 
 designed as a replacement for the official AWS CLI and does not offer the 
-same exhaustive search option. He does however return results in a more
+same exhaustive search option. It does however return results in a more
 human-readable format, and orders them by cost in descending order.
 It's primary use case is to surface costs based on pre-defined cost allocation tags. 
 
@@ -77,7 +77,7 @@ From source
     
 ```sh
 git clone https://github.com/cduggn/ccExplorer.git
-cd ccExplorer
+cd ccExplorer 
 go run .\cmd\ccexplorer\ccexplorer.go get aws -d SERVICE -d OPERATION -u SERVICE="Amazon DynamoDB"  -c
 ```
 
@@ -87,5 +87,5 @@ go run .\cmd\ccexplorer\ccexplorer.go get aws -d SERVICE -d OPERATION -u SERVICE
 - Cost Explorer accesses data for the last 12 months.
 - Cost Explorer charges per paginated request.
 - The AWS SDK uses the default credentials provider chain.
-- Credits and refunds are automatically applied to Cost Explorer results. e`.
+- Credits and refunds are automatically applied to Cost Explorer results.`.
 - Cost Explorer API calls can be tracked using CloudTrail. Requests are issued against us-east-1.
