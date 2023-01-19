@@ -12,7 +12,7 @@ import (
 
 var (
 	rootCmd = &cobra.Command{
-		Use:   "ccxplorer",
+		Use:   "ccexplorer",
 		Short: "A CLI tool to explore cloud costs and usage",
 		Long:  paintRootHeader(),
 	}

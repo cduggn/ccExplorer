@@ -73,14 +73,33 @@ tag. Results are sorted by cost in descending order.
 Installation
 ------------
 
-From source
-    
+Build from source or download the latest release from the [releases page](https://github.com/cduggn/ccExplorer/releases). 
+
+### Run 
+
+#### From source: 
+
 ```sh
 git clone https://github.com/cduggn/ccExplorer.git
 cd ccExplorer 
 go run .\cmd\ccexplorer\ccexplorer.go get aws -d SERVICE -d OPERATION -u SERVICE="Amazon DynamoDB"  -c
 ```
 
+#### From`docker`:
+
+```sh
+# download
+
+docker pull cdugga/ccexplorer:0.1.0
+
+# run requires AWS Access key and region to be set
+
+docker run \
+  -e AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID> \
+  -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
+  -e AWS_REGION=<AWS-REGION> \
+  cdugga/ccexplorer:0.1.0 get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE -l 
+```
 
 ## Considerations when using Cost Explorer
 
