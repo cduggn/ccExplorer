@@ -1,10 +1,8 @@
-# dockerfile for golang CLI app ccExplorer with root command in ./cmd/ccExplorer
-
-# Start from the latest golang base image
-FROM golang:latest
+# Build stage
+FROM golang:latest as build-stage
 
 # Add Maintainer Info
-LABEL maintainer="Sergey Kuznetsov <"
+LABEL maintainer="Colin Duggan <duggan.colin@gmail.com>"
 
 # Set the Current Working Directory inside the container
 WORKDIR /app
@@ -19,15 +17,16 @@ RUN go mod download
 COPY . .
 
 # Build the Go app
-RUN go build -o ccexplorer ./cmd/ccexplorer
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o ccexplorer ./cmd/ccexplorer
 
-# Expose port 8080 to the outside world
-EXPOSE 8080
+# Run stage
+FROM alpine:latest
+
+# Set the Current Working Directory inside the container
+WORKDIR /app
+
+# Copy the binary from build-stage
+COPY --from=build-stage /app/ccexplorer .
 
 # Command to run the executable
 ENTRYPOINT ["./ccexplorer"]
-
-
-
-
-
