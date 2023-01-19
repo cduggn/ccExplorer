@@ -17,10 +17,10 @@ RUN go mod download
 COPY . .
 
 # Build the Go app
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o ccexplorer ./cmd/ccexplorer
+RUN GOOS=linux go build -o ccexplorer ./cmd/ccexplorer
 
 # Run stage
-FROM alpine:latest
+FROM golang:alpine
 
 # Set the Current Working Directory inside the container
 WORKDIR /app
