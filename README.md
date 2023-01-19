@@ -108,6 +108,3 @@ docker run \
 - The AWS SDK uses the default credentials provider chain.
 - Credits and refunds are automatically applied to Cost Explorer results.`.
 - Cost Explorer API calls can be tracked using CloudTrail. Requests are issued against us-east-1.
-
-
-secret=123456789
