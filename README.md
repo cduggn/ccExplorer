@@ -2,6 +2,17 @@
 
 <h1 align="center"><code>ccExplorer</code></h1>
 
+<div align="center">
+<a href="https://github.com/cduggn/ccExplorer/actions/workflows" 
+alt="goreleaser status">
+<img src="https://github.com/cduggn/ccExplorer/actions/workflows/release.yml/badge.svg">
+</a>
+<a href="https://github.com/cduggn/ccExplorer/actions/workflows" 
+alt="CodeQL status">
+<img src="https://github.com/cduggn/ccExplorer/actions/workflows/codeql.yml/badge.svg">
+</a>
+</div>
+
 `ccExplorer` (Cloud cost explorer) is a simple command line tool to explore the 
 cost of your cloud resources. It's not 
 designed as a replacement for the official AWS CLI and does not offer the 
