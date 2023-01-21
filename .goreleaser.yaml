@@ -17,10 +17,6 @@ builds:
       - amd64
       - arm64
       - arm
-    dockers:
-      registry: docker.io
-      repository: cdugga/ccexplorer
-      push: true
 
 release:
   prerelease: auto
@@ -28,6 +24,10 @@ release:
 universal_binaries:
   - replace: true
 
+dockers:
+  registry: docker.io
+  repository: cdugga/ccexplorer
+  push: true
 
 brews:
   -
