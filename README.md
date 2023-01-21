@@ -1,6 +1,5 @@
 ###### ccExplorer is in Alpha
 
-
 <h1 align="center"><code>ccExplorer</code></h1>
 
 `ccExplorer` (Cloud cost explorer) is a simple command line tool to explore the 
