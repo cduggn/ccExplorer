@@ -24,9 +24,9 @@ release:
 universal_binaries:
   - replace: true
 
-dockers:
-  - image_templates: ["cdugga/ccexplorer:{{ .Tag }}"]
-    dockerfile: Dockerfile
+#dockers:
+#  - image_templates: ["cdugga/ccexplorer:{{ .Tag }}"]
+#    dockerfile: Dockerfile
 
 brews:
   -
