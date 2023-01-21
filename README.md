@@ -2,6 +2,7 @@
 
 <h1 align="center"><code>ccExplorer</code></h1>
 
+<hr>
 <div align="center">
 <a href="https://github.com/cduggn/ccExplorer/actions" 
 alt="goreleaser status">
