@@ -47,8 +47,3 @@ changelog:
     exclude:
       - '^docs:'
       - '^test:'
-
-#dockers:
-#  - image_templates:
-#      - 'cdugga/ccexplorer:{{ .Tag }}'
-#    dockerfile: Dockerfile
