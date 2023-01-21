@@ -3,14 +3,20 @@
 <h1 align="center"><code>ccExplorer</code></h1>
 
 <div align="center">
-<a href="https://github.com/cduggn/ccExplorer/actions/workflows" 
+<a href="https://github.com/cduggn/ccExplorer/actions" 
 alt="goreleaser status">
 <img src="https://github.com/cduggn/ccExplorer/actions/workflows/release.yml/badge.svg">
 </a>
-<a href="https://github.com/cduggn/ccExplorer/actions/workflows" 
+<a href="https://github.com/cduggn/ccExplorer/actions" 
 alt="CodeQL status">
 <img src="https://github.com/cduggn/ccExplorer/actions/workflows/codeql.yml/badge.svg">
 </a>
+<a href="https://github.com/cduggn/ccExplorer/releases" 
+alt="release status">
+<img src="https://img.shields.io/github/v/release/cduggn/ccExplorer">
+</a>
+
+
 </div>
 
 `ccExplorer` (Cloud cost explorer) is a simple command line tool to explore the 
