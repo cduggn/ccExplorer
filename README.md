@@ -9,8 +9,6 @@ same exhaustive search option. It does however return results in a more
 human-readable format, and orders them by cost in descending order.
 It's primary use case is to surface costs based on pre-defined cost allocation tags. 
 
-
-
 Quick Start
 -----------
 
@@ -77,6 +75,13 @@ Installation
 Build from source or download the latest release from the [releases page](https://github.com/cduggn/ccExplorer/releases). 
 
 ### Run 
+
+#### From Homebrew
+
+```sh
+brew tap cduggn/ccExplorer
+brew install ccExplorer
+```
 
 #### From source: 
 
