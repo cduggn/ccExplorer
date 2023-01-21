@@ -25,9 +25,8 @@ universal_binaries:
   - replace: true
 
 dockers:
-  -
-   image_templates:
-   - "cdugga/ccexplorer:{{ .Tag }}"
+  - image_templates: ["cdugga/ccexplorer:{{ .Tag }}"]
+    dockerfile: Dockerfile
 
 brews:
   -
