@@ -25,9 +25,8 @@ universal_binaries:
   - replace: true
 
 dockers:
-  registry: docker.io
-  repository: cdugga/ccexplorer
-  push: true
+  - image_templates:
+    - "cdugga/ccexplorer:{{ .Tag }}"
 
 brews:
   -
