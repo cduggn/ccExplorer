@@ -24,6 +24,11 @@ release:
 universal_binaries:
   - replace: true
 
+dockers:
+  - image_templates:
+      - 'cdugga/ccexplorer:{{ .Tag }}'
+    dockerfile: Dockerfile-goreleaser
+
 brews:
   -
     name: cduggn
