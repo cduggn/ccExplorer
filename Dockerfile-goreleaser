@@ -1,4 +1,6 @@
 FROM alpine:latest
+
+ADD ccexplorer /
+
 ENTRYPOINT ["./ccexplorer"]
-COPY dist/ccExplorer_linux_amd64_v1/ccexplorer /
 
