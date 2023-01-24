@@ -5,6 +5,7 @@ before:
 
 builds:
   - main: ./cmd/ccexplorer
+    id: all
     binary: ccexplorer
     env:
       - CGO_ENABLED=0
@@ -34,6 +35,13 @@ brews:
     commit_author:
       name: cduggn
       email: duggan.colin@gmail.com
+
+dockers:
+  - image_templates:
+      - 'ghcr.io/cduggn/ccexplorer:{{ .Tag }}'
+    dockerfile: Dockerfile-goreleaser
+    goos: linux
+    goarch: amd64
 
 checksum:
   name_template: 'checksums.txt'

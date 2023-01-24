@@ -1,0 +1,6 @@
+FROM alpine:latest
+
+ADD ccexplorer /
+
+ENTRYPOINT ["./ccexplorer"]
+
