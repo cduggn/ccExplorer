@@ -123,7 +123,7 @@ go run .\cmd\ccexplorer\ccexplorer.go get aws -d SERVICE -d OPERATION -u SERVICE
 ```sh
 # download
 
-docker pull ghcr.io/cduggn/ccexplorer:v0.1.18
+docker pull ghcr.io/cduggn/ccexplorer:v0.1.1-rc1
 
 # run requires AWS Access key and region to be set
 
@@ -131,7 +131,8 @@ docker run \
   -e AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID> \
   -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
   -e AWS_REGION=<AWS-REGION> \
-  ghcr.io/cduggn/ccexplorer:v0.1.18 get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE -l 
+  ghcr.io/cduggn/ccexplorer:v0.1.1-rc1 get aws -g DIMENSION=OPERATION,
+  DIMENSION=SERVICE -l 
 ```
 
 ## Considerations when using Cost Explorer
