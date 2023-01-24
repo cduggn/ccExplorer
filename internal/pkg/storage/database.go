@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"github.com/cduggn/ccexplorer/internal/pkg/logger"
 	_ "github.com/mattn/go-sqlite3"
-	"go.uber.org/zap"
 	"os"
 )
 
@@ -54,7 +53,7 @@ func (c *CostDataStorage) New(dbName string) error {
 }
 
 // return 0 if creation was a success,
-//return 1 if file already exists or return -1 if an error occured
+// return 1 if file already exists or return -1 if an error occured
 func (c *CostDataStorage) CreateFile(dbName string) (int, error) {
 	if _, err := os.Stat(dbName); os.IsNotExist(err) {
 		file, err := os.Create(dbName)
@@ -87,12 +86,12 @@ func (c *CostDataStorage) createCostDataTable() (int, error) {
 			msg: err.Error(),
 		}
 	}
-	logger.Info("Table created", zap.String("table", "cloudCostData"))
+	//logger.Info("Table created", zap.String("table", "cloudCostData"))
 	return 0, nil
 }
 
 // return error and -1 if insert was not successful,
-//return 0 if insert was successful
+// return 0 if insert was successful
 func (c *CostDataStorage) Insert(data CostDataInsert) (int, error) {
 
 	stmt, err := c.SQLite.Prepare(insertStmt)

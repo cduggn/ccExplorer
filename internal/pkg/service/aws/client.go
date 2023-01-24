@@ -18,7 +18,7 @@ func init() {
 	connectionManager = DatabaseManager{}
 	err := connectionManager.newDBClient()
 	if err != nil {
-		logger.Error(err.Error())
+		//logger.Error(err.Error())
 	}
 
 	awsAPIClient = &APIClient{}
@@ -40,7 +40,7 @@ func (c *DatabaseManager) newDBClient() error {
 			msg: "unable to create database client, " + err.Error(),
 		}
 	}
-	logger.Info("database connection established")
+	//logger.Info("database connection established")
 	return nil
 }
 
@@ -52,6 +52,6 @@ func (c *APIClient) newAWSClient() error {
 		}
 	}
 	c.Client = costexplorer.NewFromConfig(cfg)
-	logger.Info("aws cost explorer client created")
+	//logger.Info("aws cost explorer client created")
 	return nil
 }
