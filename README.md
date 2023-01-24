@@ -39,6 +39,15 @@ ccexplorer --help
 When you invoke a command, `ccExplorer` will use the AWS 
 credential chain to authenticate with AWS.
 
+#### S3 Costs
+
+Retrieve costs for S3 Operations including PutObject,GetObject,ReachAcl,
+StandardStorage
+
+```sh
+ccexplorer get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE -s 2022-04-04  -f SERVICE="Amazon Simple Storage Service"
+```
+
 If no cost allocation tags have been defined, the  `ccExplorer` can still be 
 used to 
 filter and group resources based on their 
@@ -114,7 +123,7 @@ go run .\cmd\ccexplorer\ccexplorer.go get aws -d SERVICE -d OPERATION -u SERVICE
 ```sh
 # download
 
-docker pull cdugga/ccexplorer:0.1.0
+docker pull ghcr.io/cduggn/ccexplorer:v0.1.18
 
 # run requires AWS Access key and region to be set
 
@@ -122,7 +131,7 @@ docker run \
   -e AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID> \
   -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
   -e AWS_REGION=<AWS-REGION> \
-  cdugga/ccexplorer:0.1.0 get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE -l 
+  ghcr.io/cduggn/ccexplorer:v0.1.18 get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE -l 
 ```
 
 ## Considerations when using Cost Explorer
