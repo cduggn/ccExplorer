@@ -39,10 +39,9 @@ brews:
 dockers:
   - image_templates:
       - 'ghcr.io/cduggn/ccexplorer:{{ .Tag }}'
-    dockerfile: Dockerfile-goreleaser
+    dockerfile: Dockerfile-releaser
     goos: linux
     goarch: amd64
-
 
 checksum:
   name_template: 'checksums.txt'
