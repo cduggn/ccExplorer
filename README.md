@@ -54,15 +54,15 @@ go run .\cmd\ccexplorer\ccexplorer.go get aws -d SERVICE -d OPERATION -u SERVICE
 ```sh
 # download
 
-docker pull ghcr.io/cduggn/ccexplorer:v0.1.1-rc1
+docker pull ghcr.io/cduggn/ccexplorer:v0.1.1-rc4
 
 # Container requires AWS Access key, secret, and region
 
-docker run \
+docker run -it \
   -e AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID> \
   -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
   -e AWS_REGION=<AWS-REGION> \
-  ghcr.io/cduggn/ccexplorer:v0.1.1-rc3 get aws -g DIMENSION=OPERATION,
+  ghcr.io/cduggn/ccexplorer:v0.1.1-rc4 get aws -g DIMENSION=OPERATION,
   DIMENSION=SERVICE -l 
   
 ```
@@ -78,6 +78,18 @@ ccexplorer --help
 ```
 When you invoke a command, `ccExplorer` will use the AWS 
 credential chain to authenticate with AWS.
+
+Presets are the most common way to use `ccExplorer`. Presets are a set of 
+pre-defined filters and groupings that can be used to quickly get a 
+sense of the cost of your cloud resources. 
+
+```sh
+ccexplorer aws-presets
+```
+
+
+
+```sh
 
 #### S3 Costs
 

@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/cduggn/ccexplorer/internal/pkg/cmd"
+	"github.com/cduggn/ccexplorer/internal/commands"
 	_ "github.com/mattn/go-sqlite3"
 )
 
 func main() {
-	cmd.Execute()
+	commands.Execute()
 }
