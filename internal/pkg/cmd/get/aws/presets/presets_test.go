@@ -27,6 +27,7 @@ func TestGeneratePresetQuery(t *testing.T) {
 					FilterType:        "SERVICE",
 					FilterByDimension: true,
 					FilterByTag:       true,
+					ExcludeDiscounts:  true,
 				},
 			},
 			want: aws.CostAndUsageRequestType{
@@ -41,7 +42,8 @@ func TestGeneratePresetQuery(t *testing.T) {
 					Start: aws2.DefaultStartDate(aws2.DayOfCurrentMonth, aws2.SubtractDays),
 					End:   aws2.DefaultEndDate(aws2.Format),
 				},
-				Granularity: "MONTHLY",
+				Granularity:      "MONTHLY",
+				ExcludeDiscounts: true,
 			},
 			wantErr: false,
 		},

@@ -75,7 +75,8 @@ func GeneratePresetQuery(p PresetParams) (aws.CostAndUsageRequestType, error) {
 			Start: aws2.DefaultStartDate(aws2.DayOfCurrentMonth, aws2.SubtractDays),
 			End:   aws2.DefaultEndDate(aws2.Format),
 		},
-		Granularity: "MONTHLY",
+		Granularity:      "MONTHLY",
+		ExcludeDiscounts: p.ExcludeDiscounts,
 	}, nil
 }
 
@@ -89,6 +90,7 @@ func AWSPresets() []PresetParams {
 			Filter:            map[string]string{"SERVICE": "Amazon Simple Storage Service"},
 			FilterByTag:       false,
 			FilterByDimension: true,
+			ExcludeDiscounts:  true,
 		},
 		{
 			Alias:             "S3 costs grouped by USAGE_TYPE",
@@ -97,6 +99,7 @@ func AWSPresets() []PresetParams {
 			Filter:            map[string]string{"SERVICE": "Amazon Simple Storage Service"},
 			FilterByTag:       false,
 			FilterByDimension: true,
+			ExcludeDiscounts:  true,
 		},
 		{
 			Alias:             "S3 costs grouped by LINKED_ACCOUNT",
@@ -105,6 +108,25 @@ func AWSPresets() []PresetParams {
 			Filter:            map[string]string{"SERVICE": "Amazon Simple Storage Service"},
 			FilterByTag:       false,
 			FilterByDimension: true,
+			ExcludeDiscounts:  true,
+		},
+		{
+			Alias:             "DynamoDB costs grouped by OPERATION",
+			Dimension:         []string{"SERVICE", "OPERATION"},
+			Tag:               "Name",
+			Filter:            map[string]string{"SERVICE": "Amazon DynamoDB"},
+			FilterByTag:       false,
+			FilterByDimension: true,
+			ExcludeDiscounts:  true,
+		},
+		{
+			Alias:             "DynamoDB costs grouped by USAGE_TYPE",
+			Dimension:         []string{"SERVICE", "USAGE_TYPE"},
+			Tag:               "Name",
+			Filter:            map[string]string{"SERVICE": "Amazon DynamoDB"},
+			FilterByTag:       false,
+			FilterByDimension: true,
+			ExcludeDiscounts:  true,
 		},
 	}
 	return p

@@ -21,4 +21,5 @@ type PresetParams struct {
 	FilterType        string
 	FilterByDimension bool
 	FilterByTag       bool
+	ExcludeDiscounts  bool
 }
