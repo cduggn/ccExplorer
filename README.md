@@ -27,6 +27,46 @@ same exhaustive search option. It does however return results in a more
 human-readable format, and orders them by cost in descending order.
 It's primary use case is to surface costs based on pre-defined cost allocation tags. 
 
+Installation
+------------
+
+Build from source or download the latest release from the [releases page](https://github.com/cduggn/ccExplorer/releases).
+
+### Run
+
+#### From Homebrew
+
+```sh
+brew tap cduggn/ccExplorer
+brew install ccExplorer
+```
+
+#### From source:
+
+```sh
+git clone https://github.com/cduggn/ccExplorer.git
+cd ccExplorer 
+go run .\cmd\ccexplorer\ccexplorer.go get aws -d SERVICE -d OPERATION -u SERVICE="Amazon DynamoDB"  -c
+```
+
+#### From`docker`:
+
+```sh
+# download
+
+docker pull ghcr.io/cduggn/ccexplorer:v0.1.1-rc1
+
+# Container requires AWS Access key, secret, and region
+
+docker run \
+  -e AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID> \
+  -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
+  -e AWS_REGION=<AWS-REGION> \
+  ghcr.io/cduggn/ccexplorer:v0.1.1-rc3 get aws -g DIMENSION=OPERATION,
+  DIMENSION=SERVICE -l 
+  
+```
+
 Quick Start
 -----------
 
@@ -96,44 +136,7 @@ This will return a list of costs for S3 buckets filtered by the bucket name
 tag. Results are sorted by cost in descending order.
 
 
-Installation
-------------
 
-Build from source or download the latest release from the [releases page](https://github.com/cduggn/ccExplorer/releases). 
-
-### Run 
-
-#### From Homebrew
-
-```sh
-brew tap cduggn/ccExplorer
-brew install ccExplorer
-```
-
-#### From source: 
-
-```sh
-git clone https://github.com/cduggn/ccExplorer.git
-cd ccExplorer 
-go run .\cmd\ccexplorer\ccexplorer.go get aws -d SERVICE -d OPERATION -u SERVICE="Amazon DynamoDB"  -c
-```
-
-#### From`docker`:
-
-```sh
-# download
-
-docker pull ghcr.io/cduggn/ccexplorer:v0.1.1-rc1
-
-# run requires AWS Access key and region to be set
-
-docker run \
-  -e AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID> \
-  -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
-  -e AWS_REGION=<AWS-REGION> \
-  ghcr.io/cduggn/ccexplorer:v0.1.1-rc1 get aws -g DIMENSION=OPERATION,
-  DIMENSION=SERVICE -l 
-```
 
 ## Considerations when using Cost Explorer
 
