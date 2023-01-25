@@ -37,24 +37,6 @@ func AddAWSPresetCommands() *cobra.Command {
 			}
 
 			query := presets[selected]
-
-			//prompt := promptui.Select{
-			//	Label:     "Select a preset:",
-			//	Items:     PresetList(),
-			//	Templates: templates,
-			//}
-			//
-			//val, result, err := prompt.Run()
-			//if err != nil {
-			//	err := PresetError{
-			//		msg: fmt.Sprintf("Prompt failed %v\n", err.Error()),
-			//	}
-			//	fmt.Print(err)
-			//}
-			//fmt.Printf("You choose %q, %v\n", result, val)
-			//presets := prompt.Items.([]PresetParams)
-			//selected := presets[val]
-			//
 			apiRequest, err := GeneratePresetQuery(query)
 			if err != nil {
 				err := PresetError{
