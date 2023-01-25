@@ -21,6 +21,7 @@ var templates = &promptui.SelectTemplates{
 {{ "FilterByDimension:" | faint }}	{{
 .FilterByDimension }}
 {{ "FilterByTag:" | faint }}	{{ .FilterByTag }}
+{{ "Command Syntax:" | faint }}	{{ .CommandSyntax }}
 `,
 }
 
@@ -31,7 +32,7 @@ func AddAWSPresetCommands() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			prompt := promptui.Select{
 				Label:     "Select a preset:",
-				Items:     AWSPresets(),
+				Items:     PresetList(),
 				Templates: templates,
 			}
 
@@ -78,56 +79,4 @@ func GeneratePresetQuery(p PresetParams) (aws.CostAndUsageRequestType, error) {
 		Granularity:      "MONTHLY",
 		ExcludeDiscounts: p.ExcludeDiscounts,
 	}, nil
-}
-
-func AWSPresets() []PresetParams {
-
-	p := []PresetParams{
-		{
-			Alias:             "S3 costs grouped by OPERATION",
-			Dimension:         []string{"SERVICE", "OPERATION"},
-			Tag:               "",
-			Filter:            map[string]string{"SERVICE": "Amazon Simple Storage Service"},
-			FilterByTag:       false,
-			FilterByDimension: true,
-			ExcludeDiscounts:  true,
-		},
-		{
-			Alias:             "S3 costs grouped by USAGE_TYPE",
-			Dimension:         []string{"SERVICE", "USAGE_TYPE"},
-			Tag:               "Name",
-			Filter:            map[string]string{"SERVICE": "Amazon Simple Storage Service"},
-			FilterByTag:       false,
-			FilterByDimension: true,
-			ExcludeDiscounts:  true,
-		},
-		{
-			Alias:             "S3 costs grouped by LINKED_ACCOUNT",
-			Dimension:         []string{"SERVICE", "LINKED_ACCOUNT"},
-			Tag:               "Name",
-			Filter:            map[string]string{"SERVICE": "Amazon Simple Storage Service"},
-			FilterByTag:       false,
-			FilterByDimension: true,
-			ExcludeDiscounts:  true,
-		},
-		{
-			Alias:             "DynamoDB costs grouped by OPERATION",
-			Dimension:         []string{"SERVICE", "OPERATION"},
-			Tag:               "Name",
-			Filter:            map[string]string{"SERVICE": "Amazon DynamoDB"},
-			FilterByTag:       false,
-			FilterByDimension: true,
-			ExcludeDiscounts:  true,
-		},
-		{
-			Alias:             "DynamoDB costs grouped by USAGE_TYPE",
-			Dimension:         []string{"SERVICE", "USAGE_TYPE"},
-			Tag:               "Name",
-			Filter:            map[string]string{"SERVICE": "Amazon DynamoDB"},
-			FilterByTag:       false,
-			FilterByDimension: true,
-			ExcludeDiscounts:  true,
-		},
-	}
-	return p
 }
