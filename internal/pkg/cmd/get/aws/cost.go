@@ -14,15 +14,23 @@ func CostAndUsageSummary(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	err = ExecuteCostCommand(req)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func ExecuteCostCommand(q aws.CostAndUsageRequestType) error {
 	awsClient := aws.NewAPIClient()
-	usage, err := awsClient.GetCostAndUsage(context.Background(), awsClient.Client, req)
+	usage, err := awsClient.GetCostAndUsage(context.Background(),
+		awsClient.Client, q)
 	if err != nil {
 		return err
 	}
 
-	report := display.CurateCostAndUsageReport(usage, req.Granularity)
+	report := display.CurateCostAndUsageReport(usage, q.Granularity)
 	display.PrintCostAndUsageReport(display.SortServicesByMetricAmount, report)
-
 	return nil
 }
 

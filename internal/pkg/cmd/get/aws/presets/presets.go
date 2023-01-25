@@ -45,47 +45,26 @@ func AddAWSPresetCommands() *cobra.Command {
 			presets := prompt.Items.([]PresetParams)
 			selected := presets[val]
 
-			fmt.Printf("You chose here %+v", selected)
+			apiRequest, err := GeneratePresetQuery(selected)
+			if err != nil {
+				err := PresetError{
+					msg: fmt.Sprintf("Error generating preset query %v\n", err),
+				}
+				panic(err)
+			}
+
+			err = aws2.ExecuteCostCommand(apiRequest)
+			if err != nil {
+				err := PresetError{
+					msg: fmt.Sprintf("Error executing preset query %v\n", err),
+				}
+				panic(err)
+			}
+
+			//fmt.Printf("You chose here %+v", selected)
 		},
 	}
 }
-
-func AWSPresets() []PresetParams {
-
-	p := []PresetParams{
-		{
-			Alias:             "S3 Operation Costs",
-			Dimension:         []string{"SERVICE", "OPERATION"},
-			Tag:               "",
-			Filter:            map[string]string{"SERVICE": "Amazon Simple Storage Service"},
-			FilterByTag:       false,
-			FilterByDimension: false,
-		},
-		{
-			Alias:             "S3 Operation Costs by Tag",
-			Dimension:         []string{"SERVICE", "USAGE_TYPE"},
-			Tag:               "Name",
-			Filter:            map[string]string{"SERVICE": "Amazon Simple Storage Service"},
-			FilterByTag:       true,
-			FilterByDimension: false,
-		},
-	}
-	return p
-}
-
-//return []Preset{
-//{Name: "S3 Operation Costs", ID: 1},
-//{Name: "DynamoDB Operation Costs", ID: 2},
-//{Name: "Linked Accounts Costs", ID: 3},
-////{Name: "AWS Cost Explorer", ID: 4},
-////{Name: "AWS Cost Explorer", ID: 5},
-////{Name: "AWS Cost Explorer", ID: 6},
-////{Name: "AWS Cost Explorer", ID: 7},
-////{Name: "AWS Cost Explorer", ID: 8},
-////{Name: "AWS Cost Explorer", ID: 9},
-////{Name: "AWS Cost Explorer", ID: 10},
-//}
-//}
 
 func GeneratePresetQuery(p PresetParams) (aws.CostAndUsageRequestType, error) {
 	return aws.CostAndUsageRequestType{
@@ -99,4 +78,35 @@ func GeneratePresetQuery(p PresetParams) (aws.CostAndUsageRequestType, error) {
 		},
 		Granularity: "MONTHLY",
 	}, nil
+}
+
+func AWSPresets() []PresetParams {
+
+	p := []PresetParams{
+		{
+			Alias:             "S3 costs grouped by OPERATION",
+			Dimension:         []string{"SERVICE", "OPERATION"},
+			Tag:               "",
+			Filter:            map[string]string{"SERVICE": "Amazon Simple Storage Service"},
+			FilterByTag:       false,
+			FilterByDimension: true,
+		},
+		{
+			Alias:             "S3 costs grouped by USAGE_TYPE",
+			Dimension:         []string{"SERVICE", "USAGE_TYPE"},
+			Tag:               "Name",
+			Filter:            map[string]string{"SERVICE": "Amazon Simple Storage Service"},
+			FilterByTag:       false,
+			FilterByDimension: true,
+		},
+		{
+			Alias:             "S3 costs grouped by LINKED_ACCOUNT",
+			Dimension:         []string{"SERVICE", "LINKED_ACCOUNT"},
+			Tag:               "Name",
+			Filter:            map[string]string{"SERVICE": "Amazon Simple Storage Service"},
+			FilterByTag:       false,
+			FilterByDimension: true,
+		},
+	}
+	return p
 }
