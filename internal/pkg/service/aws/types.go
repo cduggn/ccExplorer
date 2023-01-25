@@ -84,6 +84,7 @@ type CostAndUsageRequestType struct {
 	DimensionFilter            map[string]string
 	ExcludeDiscounts           bool
 	Alias                      string
+	Rates                      []string
 }
 
 type CostAndUsageRequestWithResourcesType struct {

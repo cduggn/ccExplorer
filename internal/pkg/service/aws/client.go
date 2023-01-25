@@ -18,7 +18,7 @@ func init() {
 	connectionManager = DatabaseManager{}
 	err := connectionManager.newDBClient()
 	if err != nil {
-		//logger.Error(err.Error())
+		logger.Error(err.Error())
 	}
 
 	awsAPIClient = &APIClient{}

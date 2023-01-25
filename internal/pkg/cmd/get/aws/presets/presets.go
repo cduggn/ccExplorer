@@ -61,7 +61,6 @@ func AddAWSPresetCommands() *cobra.Command {
 				panic(err)
 			}
 
-			//fmt.Printf("You chose here %+v", selected)
 		},
 	}
 }
