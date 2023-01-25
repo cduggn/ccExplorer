@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/cduggn/ccexplorer/internal/pkg/cmd/get"
+	"github.com/cduggn/ccexplorer/internal/pkg/cmd/get/aws/presets"
 	"github.com/cduggn/ccexplorer/internal/pkg/logger"
 	"github.com/common-nighthawk/go-figure"
 	"github.com/spf13/cobra"
@@ -20,11 +21,11 @@ var (
 
 func init() {
 	rootCmd.AddCommand(get.AWSCostAndUsageCommand())
-	rootCmd.AddCommand(AddPresetCommands())
+	rootCmd.AddCommand(presets.AddAWSPresetCommands())
 }
 
 func paintRootHeader() string {
-	myFigure := figure.NewFigure("ccXplorer", "thin", true)
+	myFigure := figure.NewFigure("ccExplorer", "thin", true)
 	return myFigure.String()
 }
 

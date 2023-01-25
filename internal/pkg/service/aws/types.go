@@ -76,17 +76,14 @@ type GetCostForecastReport struct {
 type CostAndUsageRequestType struct {
 	Granularity                string
 	GroupBy                    []string
-	DimensionTag               string
 	Tag                        string
 	Time                       Time
 	IsFilterByTagEnabled       bool
 	IsFilterByDimensionEnabled bool
 	TagFilterValue             string
-	//DimensionFilterName        string
-	//DimensionFilterValue       string
-	DimensionFilter  map[string]string
-	Rates            []string
-	ExcludeDiscounts bool
+	DimensionFilter            map[string]string
+	ExcludeDiscounts           bool
+	Alias                      string
 }
 
 type CostAndUsageRequestWithResourcesType struct {
@@ -104,4 +101,43 @@ type CostAndUsageRequestWithResourcesType struct {
 type GetDimensionValuesRequest struct {
 	Dimension string
 	Time      Time
+}
+
+func (c CostAndUsageRequestType) Equals(c2 CostAndUsageRequestType) bool {
+	if c.Granularity != c2.Granularity {
+		return false
+	}
+	if c.Tag != c2.Tag {
+		return false
+	}
+	if c.Time.Start != c2.Time.Start {
+		return false
+	}
+	if c.Time.End != c2.Time.End {
+		return false
+	}
+	if c.IsFilterByTagEnabled != c2.IsFilterByTagEnabled {
+		return false
+	}
+	if c.IsFilterByDimensionEnabled != c2.IsFilterByDimensionEnabled {
+		return false
+	}
+	if c.TagFilterValue != c2.TagFilterValue {
+		return false
+	}
+	if len(c.DimensionFilter) != len(c2.DimensionFilter) {
+		return false
+	}
+	for k, v := range c.DimensionFilter {
+		if c2.DimensionFilter[k] != v {
+			return false
+		}
+	}
+	if c.ExcludeDiscounts != c2.ExcludeDiscounts {
+		return false
+	}
+	if c.Alias != c2.Alias {
+		return false
+	}
+	return true
 }

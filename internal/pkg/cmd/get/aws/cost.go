@@ -15,8 +15,6 @@ func CostAndUsageSummary(cmd *cobra.Command, args []string) error {
 	}
 
 	awsClient := aws.NewAPIClient()
-	//aws.RightSizingRecommendationS3(context.Background(), awsClient.Client)
-
 	usage, err := awsClient.GetCostAndUsage(context.Background(), awsClient.Client, req)
 	if err != nil {
 		return err

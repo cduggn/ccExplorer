@@ -89,25 +89,6 @@ func ValidateGroupByTag(tag map[string]string) (string, error) {
 	return tagValue, nil
 }
 
-//func ValidateFilterByDimension(filterByDimension string, tag string) error {
-//	if filterByDimension != "" && tag == "" {
-//		return ValidationError{
-//			msg: "When filtering by dimension value, a dimension must be specified",
-//		}
-//	}
-//	return nil
-//}
-//
-//func ValidateFilterByDimensionValue(filterByDimensionValue string,
-//	tag string) error {
-//	if filterByDimensionValue != "" && tag == "" {
-//		return ValidationError{
-//			msg: "When filtering by dimension, a value must be specified",
-//		}
-//	}
-//	return nil
-//}
-
 func ValidateStartDate(startDate string) error {
 	if startDate == "" {
 		return ValidationError{
