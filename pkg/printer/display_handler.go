@@ -6,6 +6,7 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 	"os"
 	"strconv"
+	"strings"
 )
 
 var tableDivider = table.Row{"-", "-", "-",
@@ -56,25 +57,26 @@ func PrintCostAndUsageReport(s func(r map[int]Service) []Service,
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.AppendHeader(table.Row{"Rank", "Dimension/Tag", "Dimension/Tag",
-		"Metric Name", "Numeric Amount", "String Amount", "Unit",
+		"Metric Name", "Numeric Amount", "String Amount",
+		"Unit",
 		"Granularity",
 		"Start",
 		"End"})
 	var total float64
 	for index, m := range sortedServices {
+
 		for _, v := range m.Metrics {
 
 			if index%10 == 0 {
 				t.AppendRow(tableDivider)
-
 			}
 			if v.Unit == "USD" {
-				// add to total
-				//total.Add(&total, &v.NumericAmount)
 				total += v.NumericAmount
 			}
+
 			tempRow := table.Row{index, m.Keys[0], ReturnIfPresent(m.Keys),
-				v.Name, fmt.Sprintf("%f10", v.NumericAmount), v.Amount, v.Unit,
+				v.Name, fmt.Sprintf("%f10", v.NumericAmount), v.Amount,
+				v.Unit,
 				r.Granularity,
 				m.Start, m.End}
 			t.AppendRow(tempRow)
@@ -82,27 +84,35 @@ func PrintCostAndUsageReport(s func(r map[int]Service) []Service,
 		}
 	}
 	totalHeaderRow := table.Row{"", "", "", "", "", "", "", "", "", ""}
-	totalRow := table.Row{"", "", "", "", "TOTAL COST", total, "", "", "", ""}
+	totalRow := table.Row{"", "", "", "", "TOTAL COST", total, "", "", "",
+		""}
 	t.AppendRow(totalHeaderRow)
 	t.AppendRow(totalRow)
 	t.Render()
 }
 
-func PrintGetCostForecastReport(r *costexplorer.GetCostForecastOutput) {
+func PrintGetCostForecastReport(r *costexplorer.GetCostForecastOutput,
+	dimensions []string) {
+	filteredBy := strings.Join(dimensions, " | ")
+
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
-	t.AppendHeader(table.Row{"Mean Value", "PredictionIntervalLowerBound",
-		"PredictionIntervalUpperBound", "Start", "End", "Unit", "Total"})
+
+	t.AppendHeader(table.Row{"Start", "End", "Mean Value",
+		"Prediction Interval LowerBound",
+		"Prediction Interval UpperBound", "Unit", "Total"})
+
 	for _, v := range r.ForecastResultsByTime {
 
-		tempRow := table.Row{*v.MeanValue, *v.PredictionIntervalUpperBound,
-			*v.PredictionIntervalLowerBound, *v.TimePeriod.Start,
-			*v.TimePeriod.End}
+		tempRow := table.Row{*v.TimePeriod.Start,
+			*v.TimePeriod.End, *v.MeanValue, *v.PredictionIntervalUpperBound,
+			*v.PredictionIntervalLowerBound}
 		t.AppendRow(tempRow)
 	}
 
-	totalRow := table.Row{"", "", "", "", "", *r.Total.Unit, *r.Total.Amount}
-	t.AppendRow(totalRow)
+	t.AppendSeparator()
+	t.AppendRow(table.Row{"FilteredBy", filteredBy, "", "", "", *r.Total.Unit,
+		*r.Total.Amount})
 	t.Render()
 }
 

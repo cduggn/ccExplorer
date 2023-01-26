@@ -119,6 +119,10 @@ func CostForecastFilterGenerator(req GetCostForecastRequest) *types.
 	var expList []types.Expression
 	var exp types.Expression
 
+	if req.Filter.Dimensions == nil && req.Filter.Tags == nil {
+		return nil
+	}
+
 	var isMultiFilter bool
 	if len(req.Filter.Dimensions) > 1 {
 		isMultiFilter = true
@@ -159,4 +163,32 @@ func CostAndUsageGroupByGenerator(req CostAndUsageRequestType) []types.GroupDefi
 		return groupByDimension(req.GroupBy)
 	}
 
+}
+
+func ExtractForecastFilters(d map[string]string) Filter {
+
+	if len(d) == 0 {
+		return Filter{}
+	}
+
+	dimensions := CreateForecastDimensionFilter(d)
+
+	return Filter{
+		Dimensions: dimensions,
+	}
+}
+
+func CreateForecastDimensionFilter(m map[string]string) []Dimension {
+
+	if len(m) == 0 {
+		return nil
+	}
+	var dimensions []Dimension
+	for k, v := range m {
+		dimensions = append(dimensions, Dimension{
+			Key:   k,
+			Value: []string{v},
+		})
+	}
+	return dimensions
 }
