@@ -29,36 +29,39 @@ It's primary use case is to surface costs based on pre-defined cost allocation t
 
 Installation
 ------------
+<hr>
 
 Build from source or download the latest release from the [releases page](https://github.com/cduggn/ccExplorer/releases).
 
-### Run
+#### From `Homebrew`
 
-#### From Homebrew
+```console
+$ brew tap cduggn/ccExplorer
 
-```sh
-brew tap cduggn/ccExplorer
-brew install ccExplorer
+$ brew install ccExplorer
 ```
 
-#### From source:
+#### From `source`:
 
-```sh
-git clone https://github.com/cduggn/ccExplorer.git
-cd ccExplorer 
-go run .\cmd\ccexplorer\ccexplorer.go get aws -d SERVICE -d OPERATION -u SERVICE="Amazon DynamoDB"  -c
+```console
+$ git clone https://github.com/cduggn/ccExplorer.git
+
+$ cd ccExplorer 
+
+$ go run .\cmd\ccexplorer\ccexplorer.go get aws -g DIMENSION=SERVICE,
+DIMENSION=OPERATION -f SERVICE="Amazon DynamoDB"  -l
 ```
 
 #### From`docker`:
 
-```sh
+```console
 # download
 
-docker pull ghcr.io/cduggn/ccexplorer:v0.1.1-rc4
+$ docker pull ghcr.io/cduggn/ccexplorer:v0.1.1-rc4
 
 # Container requires AWS Access key, secret, and region
 
-docker run -it \
+$ docker run -it \
   -e AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID> \
   -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
   -e AWS_REGION=<AWS-REGION> \
@@ -69,12 +72,13 @@ docker run -it \
 
 Quick Start
 -----------
+<hr>
 
 Once `ccExplorer` is installed you can run the help command to see the 
 available commands.
 
-```sh
-ccexplorer --help
+```console
+$ ccexplorer --help
 ```
 When you invoke a command, `ccExplorer` will use the AWS 
 credential chain to authenticate with AWS.
@@ -83,77 +87,78 @@ Presets are the most common way to use `ccExplorer`. Presets are a set of
 pre-defined filters and groupings that can be used to quickly get a 
 sense of the cost of your cloud resources. 
 
-```sh
-ccexplorer aws-presets
+```console
+$ ccexplorer aws-presets
 ```
 
+#### Sample queries
 
+```console
 
-```sh
+# Costs grouped by LINKED_ACCOUNT 
+$ ccexplorer get aws -g DIMENSION=LINKED_ACCOUNT
 
-#### S3 Costs
+# Costs grouped by CommittedThroughput operation and SERVICE
+$ ccexplorer get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE -s 2022-10-10 -f OPERATION="CommittedThroughput" -l
 
-Retrieve costs for S3 Operations including PutObject,GetObject,ReachAcl,
-StandardStorage
+# Costs grouped by CommittedThroughput and LINKED_ACCOUNT
+$ ccexplorer get aws -g DIMENSION=OPERATION,DIMENSION=LINKED_ACCOUNT  -s 2022-10-10 -f OPERATION="CommittedThroughput" -l
 
-```sh
-ccexplorer get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE -s 2022-04-04  -f SERVICE="Amazon Simple Storage Service"
+# DynamodDB costs grouped by OPERATION
+$ ccexplorer get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE -s 2022-10-10 -f SERVICE="Amazon DynamoDB" -l
+
+# All service costs grouped by SERVICE
+$ ccexplorer get aws -g DIMENSION=SERVICE -s 2022-10-10
+
+# All service costs grouped by SERVICE and OPERATION
+$ ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -s 2022-10- -l
+
+# S3 costs grouped by OPERATION 
+$ ccexplorer get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE -s 2022-04-04  -f SERVICE="Amazon Simple Storage Service" -l
+
+# Costs grpuped by ApplicationName Cost Allocation Tag
+$ ccexplorer get aws -g TAG=ApplicationName,DIMENSION=OPERATION -s 2022-12-10 -l
+
+# Costs grpuped by ApplicationName Cost Allocation Tag and filtered by specific name
+$ ccexplorer get aws -g TAG=ApplicationName,DIMENSION=OPERATION -s 2022-12-10 -f TAG="my-project" -l
+
+# S3 costs grouped by SERVICE dimension and ApplicationName Cost Allocation Tag
+$ ccexplorer get aws -g DIMENSION=SERVICE,TAG=ApplicationName -f SERVICE="Amazon Simple Storage Service"  -l
+
+# S3 costs grouped by SERVICE dimension and ApplicationName Cost Allocation Tag and filtered by specific name
+$ ccexplorer get aws -g DIMENSION=SERVICE,TAG=ApplicationName -f SERVICE="Amazon Simple Storage Service"  -l -f TAG="my-application"
+
+# S3 costs grouped by SERVICE dimension and BucketName Cost Allocation Tag
+$ ccexplorer get aws -g DIMENSION=SERVICE,TAG=BucketName -f SERVICE="Amazon Simple Storage Service" -l
+
+# S3 costs grouped by SERVICE dimension and BucketName Cost Allocation Tag and filterred by specific name
+$ ccexplorer get aws -g DIMENSION=OPERATION,TAG=BucketName -f SERVICE="Amazon Simple Storage Service" -l -f TAG="my-bucket"
+
+# Costs groupedby OPERATION dimension and ApplicationName Cost Allocation Tag and filtered by PutObject operation
+ccexplorer get aws -g TAG=ApplicationName,DIMENSION=OPERATION -s 2022-12-10 -f OPERATION="PutObject" -l
+
 ```
 
+#### Default settings
 If no cost allocation tags have been defined, the  `ccExplorer` can still be 
-used to 
-filter and group resources based on their 
+used to filter and group resources based on their 
 AWS resource types. This can be achieved by using the group by and filter 
 flags 
 
-```sh
-ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -l
-```
-
-This will return a list of all AWS services and operations that have been
-used in the specified billing period. If no billing period is specified, the
-current calendar month will be used. Results are sorted by cost in 
-descending order and refunds, discounts and credits are excluded.
-
-```sh
-ccexplorer get aws -g TAG=ApplicationName,DIMENSION=OPERATION -s 2022-12-10 -f TAG="my-project"
-```
-This will return a list of all AWS operations that have been used in the 
-specified billing period for the specified project. The `-f` flag can be
-used to filter results based on the value of a cost allocation tag. If no 
-filter value is specified, all resources will be returned. Results are  
-sorted by cost in descending order.
-
-```sh
-ccexplorer get aws -g DIMENSION=SERVICE,TAG=ApplicationName -f SERVICE="Amazon Simple Storage Service"  -l
-```
-
-This will return a list of costs for S3 buckets that have been used in the
-specified billing period and that have been tagged with the ApplicationName
-tag. Results are sorted by cost in descending order.
-
-```sh
-ccexplorer get aws -g DIMENSION=SERVICE,TAG=ApplicationName -f SERVICE="Amazon Simple Storage Service"  -l -f TAG="my-application"
-```
-
-This will return a list of costs for the specified application that have
-been used in the specified billing period. Results are sorted by cost in
+- If no billing period is specified, the
+current calendar month will be used. 
+- Results are sorted by cost in 
 descending order.
-
-```sh
-ccexplorer get aws -g DIMENSION=SERVICE,TAG=BucketName -f SERVICE="Amazon Simple Storage Service"
-```
-
-This will return a list of costs for S3 buckets filtered by the bucket name
-tag. Results are sorted by cost in descending order.
+- Refunds, discounts and credits are applied automatically. The `-l` flag 
+  should be used to exclude this behavior.
 
 
-
-
-## Considerations when using Cost Explorer
+## Additional Information
+<hr>
 
 - Cost Explorer accesses data for the last 12 months.
 - Cost Explorer charges per paginated request.
 - The AWS SDK uses the default credentials provider chain.
-- Credits and refunds are automatically applied to Cost Explorer results.`.
-- Cost Explorer API calls can be tracked using CloudTrail. Requests are issued against us-east-1.
+- Credits and refunds are automatically applied to Cost Explorer results.
+- Cost Explorer API calls can be tracked using CloudTrail. 
+- Requests are issued against the `us-east-1` region.
