@@ -17,15 +17,19 @@ var (
 		}
 		return groups
 	}
-	groupByTag = func(tag string) []types.GroupDefinition {
-		return []types.GroupDefinition{
-			{
+	groupByTag = func(tag []string) []types.GroupDefinition {
+
+		var groups []types.GroupDefinition
+		for _, t := range tag {
+			groups = append(groups, types.GroupDefinition{
 				Type: types.GroupDefinitionTypeTag,
-				Key:  aws.String(tag),
-			},
+				Key:  aws.String(t),
+			})
 		}
+		return groups
 	}
-	groupByTagAndDimension = func(tag string, dimensions []string) []types.GroupDefinition {
+	groupByTagAndDimension = func(tag []string, dimensions []string) []types.
+				GroupDefinition {
 		var groups []types.GroupDefinition
 		for _, d := range dimensions {
 			groups = append(groups, types.GroupDefinition{
@@ -33,10 +37,13 @@ var (
 				Key:  aws.String(d),
 			})
 		}
-		groups = append(groups, types.GroupDefinition{
-			Type: types.GroupDefinitionTypeTag,
-			Key:  aws.String(tag),
-		})
+		for _, t := range tag {
+			groups = append(groups, types.GroupDefinition{
+				Type: types.GroupDefinitionTypeTag,
+				Key:  aws.String(t),
+			})
+		}
+
 		return groups
 	}
 	filterCredits = func() *types.Expression {
@@ -49,10 +56,13 @@ var (
 			},
 		}
 	}
-	filterByTag = func(tag string, value string) *types.Expression {
+	filterByTag = func(tag []string, value string) *types.Expression {
+		if len(tag) == 0 || tag[0] == "" {
+			return &types.Expression{}
+		}
 		return &types.Expression{
 			Tags: &types.TagValues{
-				Key:    aws.String(tag),
+				Key:    aws.String(tag[0]),
 				Values: []string{value},
 			},
 		}
@@ -84,7 +94,7 @@ func CostAndUsageFilterGenerator(req CostAndUsageRequestType) *types.
 		filters = append(filters, *filterCredits())
 	}
 	if req.IsFilterByTagEnabled {
-		filters = append(filters, *filterByTag(req.Tag, req.TagFilterValue))
+		filters = append(filters, *filterByTag(req.GroupByTag, req.TagFilterValue))
 	}
 	if req.IsFilterByDimensionEnabled {
 		for key, value := range req.DimensionFilter {
@@ -141,18 +151,12 @@ func CostForecastFilterGenerator(req GetCostForecastRequest) *types.
 }
 
 func CostAndUsageGroupByGenerator(req CostAndUsageRequestType) []types.GroupDefinition {
-	if req.Tag != "" && len(req.GroupBy) == 1 {
-		return groupByTagAndDimension(req.Tag, req.GroupBy)
-	} else if req.Tag != "" {
-		return groupByTag(req.Tag)
+	if len(req.GroupByTag) == 1 && len(req.GroupBy) == 1 {
+		return groupByTagAndDimension(req.GroupByTag, req.GroupBy)
+	} else if len(req.GroupByTag) >= 1 {
+		return groupByTag(req.GroupByTag)
 	} else {
 		return groupByDimension(req.GroupBy)
 	}
 
-	//if len(req.DimensionSubFilterName) > 0 {
-	//	// extract key value from map index 0
-	//	for k, v := range req.DimensionSubFilterName {
-	//		filters = append(filters, *filterByDimension(k, v))
-	//	}
-	//}
 }

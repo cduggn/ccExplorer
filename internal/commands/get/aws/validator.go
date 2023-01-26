@@ -60,35 +60,6 @@ func ValidateGroupByDimension(dimension string) error {
 	return nil
 }
 
-func ValidateTagFilterValue(tagFilterKey string, tag string) error {
-	if tagFilterKey == "" {
-		return nil
-	}
-	if tag == "" {
-		return ValidationError{
-			msg: "Tag must be specified",
-		}
-	}
-	return nil
-}
-
-func ValidateGroupByTag(tag map[string]string) (string, error) {
-	if len(tag) == 0 {
-		return "", nil
-	}
-	if len(tag) > 1 {
-		return "", ValidationError{
-			msg: "At most 1 tag can be specified",
-		}
-	}
-	// extract the tag from the map
-	var tagValue string
-	for _, val := range tag {
-		tagValue = val
-	}
-	return tagValue, nil
-}
-
 func ValidateStartDate(startDate string) error {
 	if startDate == "" {
 		return ValidationError{

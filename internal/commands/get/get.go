@@ -12,7 +12,7 @@ const (
   ccexplorer get aws -g DIMENSION=LINKED_ACCOUNT
   
   # Costs grouped by CommittedThroughput operation and SERVICE
-  ccexplorer get aws -g DIMENSION=OPERATION, DIMENSION=SERVICE -s 2022-10-10 -f OPERATION="CommittedThroughput" -l
+  ccexplorer get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE -s 2022-10-10 -f OPERATION="CommittedThroughput" -l
 
   # Costs grouped by CommittedThroughput and LINKED_ACCOUNT
   ccexplorer get aws -g DIMENSION=OPERATION,DIMENSION=LINKED_ACCOUNT  -s 2022-10-10 -f OPERATION="CommittedThroughput" -l

@@ -16,33 +16,29 @@ var (
 func CostAndUsageCommand(c *cobra.Command) *cobra.Command {
 
 	c.Flags().VarP(&costUsageGroupBy, "groupBy", "g",
-		"Group by DIMENSION and/or TAG . "+
-			"Example: --groupBy dimension=SERVICE --groupBy tag=Name"+
-			"Example: --groupBy dimension=SERVICE,TAG=Name")
+		"Group by DIMENSION and/or TAG ")
 
 	costUsageFilterBy := NewFilterBy()
 	c.Flags().VarP(&costUsageFilterBy, "filterBy", "f",
-		"Filter by DIMENSION and/or TAG . "+
-			"Example: --filterBy dimension=SERVICE --filterBy tag=Name"+
-			"Example: --filterBy dimension=SERVICE,TAG=Name")
+		"Filter by DIMENSION and/or TAG")
 
 	// Optional flag to dictate the granularity of the data returned
 	c.Flags().StringVarP(&costUsageGranularity, "granularity", "m",
 		"MONTHLY",
-		"Sets the Amazon Web Services cost granularity to MONTHLY or DAILY , or HOURLY . If Granularity isn't set, the response object doesn't include the Granularity , either MONTHLY or DAILY , or HOURLY")
+		"Valid values: DAILY, MONTHLY, "+
+			"HOURLY. (default: MONTHLY)")
 
 	c.Flags().BoolVarP(&costUsageWithoutDiscounts, "excludeDiscounts", "l",
 		false,
-		"Excludes credit, refund, "+
-			"and discount information in the report summary. "+
-			"Disabled by default.")
+		"Exclude credit, refunds, "+
+			"and discounts (default is to include)")
 
 	c.Flags().StringVarP(&costUsageStartDate, "startDate", "s",
 		helpers.DefaultStartDate(helpers.DayOfCurrentMonth, helpers.SubtractDays),
-		"Defaults to the start of the current month")
+		"End date (defaults to the start of the current month)")
 	c.Flags().StringVarP(&costUsageEndDate, "endDate", "e",
 		helpers.DefaultEndDate(helpers.Format),
-		"Defaults to the present day")
+		"Start date *(defaults to the present day)")
 
 	return c
 }
