@@ -25,6 +25,39 @@ func TestToSlice(t *testing.T) {
 	assert.Equal(t, slice, []string{"value"})
 }
 
+func TestCostAndUsageFilterGenerator_FilterByTagEmptyArray(t *testing.T) {
+	cases := []struct {
+		input  CostAndUsageRequestType
+		expect *types.Expression
+	}{
+		{
+			input: CostAndUsageRequestType{
+				Granularity: "MONTHLY",
+				GroupBy:     []string{"SERVICE"},
+				GroupByTag:  []string{""},
+				Time: Time{
+					Start: "2020-01-01",
+					End:   "2020-01-01",
+				},
+				IsFilterByTagEnabled: true,
+				TagFilterValue:       "",
+				Rates:                []string{"UNBLENDED"},
+				ExcludeDiscounts:     false,
+			},
+			expect: &types.Expression{
+				Tags: nil,
+			},
+		},
+	}
+	for _, c := range cases {
+		result := CostAndUsageFilterGenerator(c.input)
+		if result.Tags != c.expect.Tags {
+			t.Errorf("CostAndUsageFilterGenerator(%v) == %v, want %v",
+				c.input, result.Tags.Key, c.expect.Tags.Key)
+		}
+	}
+}
+
 func TestCostAndUsageFilterGenerator_FilterByTag(t *testing.T) {
 	cases := []struct {
 		input  CostAndUsageRequestType
@@ -34,7 +67,7 @@ func TestCostAndUsageFilterGenerator_FilterByTag(t *testing.T) {
 			input: CostAndUsageRequestType{
 				Granularity: "MONTHLY",
 				GroupBy:     []string{"SERVICE"},
-				Tag:         "ApplicationName",
+				GroupByTag:  []string{"ApplicationName"},
 				Time: Time{
 					Start: "2020-01-01",
 					End:   "2020-01-01",
@@ -70,7 +103,7 @@ func TestCostAndUsageFilterGenerator_FilterByTagAndDiscounts(t *testing.T) {
 			input: CostAndUsageRequestType{
 				Granularity: "MONTHLY",
 				GroupBy:     []string{"SERVICE"},
-				Tag:         "ApplicationName",
+				GroupByTag:  []string{"ApplicationName"},
 				Time: Time{
 					Start: "2020-01-01",
 					End:   "2020-01-01",
@@ -124,7 +157,7 @@ func TestCostAndUsageFilterGenerator_FilterByTagDiscountsAndExcludes(t *testing.
 			input: CostAndUsageRequestType{
 				Granularity: "MONTHLY",
 				GroupBy:     []string{"SERVICE"},
-				Tag:         "ApplicationName",
+				GroupByTag:  []string{"ApplicationName"},
 				Time: Time{
 					Start: "2020-01-01",
 					End:   "2020-01-01",
@@ -191,7 +224,7 @@ func TestCostAndUsageFilterGenerator_NoFilter(t *testing.T) {
 			input: CostAndUsageRequestType{
 				Granularity: "MONTHLY",
 				GroupBy:     []string{"SERVICE"},
-				Tag:         "",
+				GroupByTag:  []string{},
 				Time: Time{
 					Start: "2020-01-01",
 					End:   "2020-01-01",
@@ -223,7 +256,7 @@ func TestCostAndUsageFilterGenerator_FilterByDiscount(t *testing.T) {
 			input: CostAndUsageRequestType{
 				Granularity: "MONTHLY",
 				GroupBy:     []string{"SERVICE"},
-				Tag:         "",
+				GroupByTag:  []string{},
 				Time: Time{
 					Start: "2020-01-01",
 					End:   "2020-01-01",
@@ -364,7 +397,7 @@ func TestCostAndUsageGroupByGenerator_SingleDimension(t *testing.T) {
 			input: CostAndUsageRequestType{
 				Granularity: "MONTHLY",
 				GroupBy:     []string{"SERVICE"},
-				Tag:         "",
+				GroupByTag:  []string{},
 				Time: Time{
 					Start: "2020-01-01",
 					End:   "2020-01-01",
@@ -400,7 +433,7 @@ func TestCostAndUsageGroupByGenerator_MultiDimension(t *testing.T) {
 			input: CostAndUsageRequestType{
 				Granularity: "MONTHLY",
 				GroupBy:     []string{"SERVICE", "RECORD_TYPE"},
-				Tag:         "",
+				GroupByTag:  []string{},
 				Time: Time{
 					Start: "2020-01-01",
 					End:   "2020-01-01",
@@ -444,7 +477,7 @@ func TestCostAndUsageGroupByGenerator_ByTag(t *testing.T) {
 			input: CostAndUsageRequestType{
 				Granularity: "MONTHLY",
 				GroupBy:     []string{"OPERATION"},
-				Tag:         "ApplicationName",
+				GroupByTag:  []string{"ApplicationName"},
 				Time: Time{
 					Start: "2020-01-01",
 					End:   "2020-01-01",
@@ -484,7 +517,7 @@ func TestCostAndUsageGroupByGenerator_ByTagAndDimesion(t *testing.T) {
 			input: CostAndUsageRequestType{
 				Granularity: "MONTHLY",
 				GroupBy:     []string{"SERVICE"},
-				Tag:         "ApplicationName",
+				GroupByTag:  []string{"ApplicationName"},
 				Time: Time{
 					Start: "2020-01-01",
 					End:   "2020-01-01",

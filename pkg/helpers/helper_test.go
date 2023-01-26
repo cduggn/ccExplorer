@@ -138,3 +138,22 @@ func TestSubtractDays(t *testing.T) {
 		})
 	}
 }
+
+func TestLastDayOfMonth(t *testing.T) {
+	tests := []struct {
+		name string
+		want string
+	}{
+		{
+			name: "LastDayOfMonth",
+			want: time.Now().AddDate(0, 1, -1).Format("2006-01-02"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := LastDayOfMonth(); got != tt.want {
+				t.Errorf("LastDayOfMonth() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

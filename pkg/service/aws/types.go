@@ -76,7 +76,7 @@ type GetCostForecastReport struct {
 type CostAndUsageRequestType struct {
 	Granularity                string
 	GroupBy                    []string
-	Tag                        string
+	GroupByTag                 []string
 	Time                       Time
 	IsFilterByTagEnabled       bool
 	IsFilterByDimensionEnabled bool
@@ -104,17 +104,15 @@ type GetDimensionValuesRequest struct {
 	Time      Time
 }
 
+func (t Time) Equals(other Time) bool {
+	return t.Start == other.Start && t.End == other.End
+}
+
 func (c CostAndUsageRequestType) Equals(c2 CostAndUsageRequestType) bool {
 	if c.Granularity != c2.Granularity {
 		return false
 	}
-	if c.Tag != c2.Tag {
-		return false
-	}
-	if c.Time.Start != c2.Time.Start {
-		return false
-	}
-	if c.Time.End != c2.Time.End {
+	if !c.Time.Equals(c2.Time) {
 		return false
 	}
 	if c.IsFilterByTagEnabled != c2.IsFilterByTagEnabled {
@@ -130,7 +128,7 @@ func (c CostAndUsageRequestType) Equals(c2 CostAndUsageRequestType) bool {
 		return false
 	}
 	for k, v := range c.DimensionFilter {
-		if c2.DimensionFilter[k] != v {
+		if v2, ok := c2.DimensionFilter[k]; !ok || v != v2 {
 			return false
 		}
 	}
@@ -139,6 +137,14 @@ func (c CostAndUsageRequestType) Equals(c2 CostAndUsageRequestType) bool {
 	}
 	if c.Alias != c2.Alias {
 		return false
+	}
+	if len(c.Rates) != len(c2.Rates) {
+		return false
+	}
+	for i, v := range c.Rates {
+		if v2 := c2.Rates[i]; v != v2 {
+			return false
+		}
 	}
 	return true
 }

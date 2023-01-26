@@ -10,7 +10,7 @@ func PresetList() []PresetParams {
 			FilterByTag:       false,
 			FilterByDimension: false,
 			ExcludeDiscounts:  true,
-			CommandSyntax: "[ get aws -g DIMENSION=SERVICE," +
+			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
 				"DIMENSION=LINKED_ACCOUNT -l ]",
 		},
 		{
@@ -21,7 +21,7 @@ func PresetList() []PresetParams {
 			FilterByTag:       false,
 			FilterByDimension: false,
 			ExcludeDiscounts:  true,
-			CommandSyntax: "[ get aws -g DIMENSION=SERVICE," +
+			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
 				"DIMENSION=USAGE_TYPE -l ]",
 		},
 		{
@@ -32,7 +32,7 @@ func PresetList() []PresetParams {
 			FilterByTag:       false,
 			FilterByDimension: false,
 			ExcludeDiscounts:  true,
-			CommandSyntax: "[ get aws -g DIMENSION=SERVICE," +
+			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
 				"DIMENSION=OPERATION -l ]",
 		},
 		{
@@ -43,7 +43,7 @@ func PresetList() []PresetParams {
 			FilterByTag:       false,
 			FilterByDimension: true,
 			ExcludeDiscounts:  true,
-			CommandSyntax: "[ get aws -g DIMENSION=SERVICE," +
+			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
 				"DIMENSION=OPERATION -f SERVICE=\"Amazon Simple Storage" +
 				" Service\"]",
 		},
@@ -55,7 +55,7 @@ func PresetList() []PresetParams {
 			FilterByTag:       false,
 			FilterByDimension: true,
 			ExcludeDiscounts:  true,
-			CommandSyntax: "[ get aws -g DIMENSION=SERVICE," +
+			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
 				"DIMENSION=USAGE_TYPE -f SERVICE=\"Amazon Simple Storage" +
 				" Service\" -l ]",
 		},
@@ -67,7 +67,7 @@ func PresetList() []PresetParams {
 			FilterByTag:       false,
 			FilterByDimension: true,
 			ExcludeDiscounts:  true,
-			CommandSyntax: "[ get aws -g DIMENSION=SERVICE," +
+			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
 				"DIMENSION=LINKED_ACCOUNT -f SERVICE=\"Amazon Simple Storage" +
 				" Service\" -l ]",
 		},
@@ -79,7 +79,7 @@ func PresetList() []PresetParams {
 			FilterByTag:       false,
 			FilterByDimension: true,
 			ExcludeDiscounts:  true,
-			CommandSyntax: "[ get aws -g DIMENSION=SERVICE," +
+			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
 				"DIMENSION=OPERATION -f SERVICE=\"Amazon DynamoDB\" -l ]",
 		},
 		{
@@ -90,7 +90,7 @@ func PresetList() []PresetParams {
 			FilterByTag:       false,
 			FilterByDimension: true,
 			ExcludeDiscounts:  true,
-			CommandSyntax: "[ get aws -g DIMENSION=SERVICE," +
+			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
 				"DIMENSION=USAGE_TYPE -f SERVICE=\"Amazon DynamoDB\" -l ]",
 		},
 		{
@@ -101,7 +101,7 @@ func PresetList() []PresetParams {
 			FilterByTag:       false,
 			FilterByDimension: true,
 			ExcludeDiscounts:  true,
-			CommandSyntax: "[ get aws -g DIMENSION=SERVICE," +
+			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
 				"DIMENSION=LINKED_ACCOUNT -f SERVICE=\"Amazon DynamoDB\" -l ]",
 		},
 	}

@@ -12,7 +12,7 @@ import (
 func AddAWSPresetCommands() *cobra.Command {
 	return &cobra.Command{
 		Use:   "aws-presets",
-		Short: "Load preset queries",
+		Short: "Preset AWS queries",
 		Run: func(cmd *cobra.Command, args []string) {
 
 			var presets = PresetList()
@@ -44,6 +44,8 @@ func AddAWSPresetCommands() *cobra.Command {
 				}
 				fmt.Print(err)
 			}
+
+			fmt.Printf("Executing %v\n", query.CommandSyntax)
 
 			err = aws3.ExecuteCostCommand(apiRequest)
 			if err != nil {

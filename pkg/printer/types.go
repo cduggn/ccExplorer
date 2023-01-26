@@ -22,6 +22,7 @@ type Metrics struct {
 	Amount        string
 	NumericAmount float64
 	Unit          string
+	UsageQuantity float64
 }
 
 func (c CostAndUsageReport) Len() int {

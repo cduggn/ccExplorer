@@ -11,6 +11,9 @@ var (
 	metrics = []string{"UNBLENDED_COST"}
 )
 
+//"BLENDED_COST", "AMORTIZED_COST", "NET_UNBLENDED_COST",
+//"NET_AMORTIZED_COST", "USAGE_QUANTITY", "NORMALIZED_USAGE_AMOUNT","USAGE_QUANTITY"
+
 type GetCostAndUsageAPI interface {
 	GetCostAndUsage(ctx context.Context, params *costexplorer.GetCostAndUsageInput,
 		optFns ...func(*costexplorer.Options)) (*costexplorer.GetCostAndUsageOutput, error)
