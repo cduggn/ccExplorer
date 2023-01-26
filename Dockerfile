@@ -1,5 +1,5 @@
 # Build stage
-FROM golang:latest as build-stage
+FROM  golang:1.19.5-alpine3.17 as build-stage
 
 # Add Maintainer Info
 LABEL maintainer="Colin Duggan <duggan.colin@gmail.com>"
@@ -17,13 +17,11 @@ RUN go mod download
 COPY . .
 
 # Build the Go app
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o ccexplorer ./cmd/ccexplorer
+RUN CGO_ENABLED=0 GOOS=linux go build -a -o ccexplorer \
+    ./cmd/ccexplorer
 
 # Run stage
-FROM alpine:latest as run-stage
-
-# Set the Current Working Directory inside the container
-WORKDIR /app
+FROM alpine:3.17 as run-stage
 
 # Copy the binary from build-stage
 COPY --from=build-stage /app/ccexplorer .

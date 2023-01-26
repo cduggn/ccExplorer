@@ -27,8 +27,8 @@ universal_binaries:
 
 brews:
   -
-    name: cduggn
-    homepage: "https://github.com/cduggn/ccExplorer"
+    name: ccexplorer
+    homepage: "https://github.com/cduggn/ccexplorer"
     tap:
       owner: cduggn
       name: homebrew-cduggn
@@ -42,6 +42,7 @@ dockers:
     dockerfile: Dockerfile-releaser
     goos: linux
     goarch: amd64
+
 
 checksum:
   name_template: 'checksums.txt'
