@@ -28,7 +28,7 @@ universal_binaries:
 brews:
   -
     name: cduggn
-    homepage: "https://github.com/cduggn/ccExplorer"
+    homepage: "https://github.com/cduggn/ccexplorer"
     tap:
       owner: cduggn
       name: homebrew-cduggn
