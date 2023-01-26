@@ -8,7 +8,7 @@ builds:
     id: all
     binary: ccexplorer
     env:
-      - CGO_ENABLED=1
+      - CGO_ENABLED=0
     goos:
       - linux
       - windows

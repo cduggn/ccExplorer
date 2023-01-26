@@ -29,7 +29,7 @@ Note cost allocation tags can take up to 24 hours to be applied )`,
 	forecast = &cobra.Command{
 		Use: "forecast",
 		Short: "Return cost, usage, " +
-			"and resoucrce information including ARN",
+			"and resource information including ARN",
 		RunE: aws.CostForecast,
 	}
 )

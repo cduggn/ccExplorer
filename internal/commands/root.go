@@ -6,8 +6,6 @@ import (
 	"github.com/cduggn/ccexplorer/pkg/logger"
 	"github.com/common-nighthawk/go-figure"
 	"github.com/spf13/cobra"
-	//"go.uber.org/zap"
-	//"go.uber.org/zap/zapcore"
 	"os"
 )
 
