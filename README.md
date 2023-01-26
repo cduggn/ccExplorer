@@ -36,7 +36,7 @@ Build from source or download the latest release from the [releases page](https:
 #### From `Homebrew`
 
 ```console
-$ brew tap cduggn/ccExplorer
+$ brew tap cduggn/cduggn
 
 $ brew install ccExplorer
 ```
