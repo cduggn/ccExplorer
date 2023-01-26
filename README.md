@@ -137,6 +137,9 @@ $ ccexplorer get aws -g DIMENSION=OPERATION,TAG=BucketName -f SERVICE="Amazon Si
 # Costs groupedby OPERATION dimension and ApplicationName Cost Allocation Tag and filtered by PutObject operation
 ccexplorer get aws -g TAG=ApplicationName,DIMENSION=OPERATION -s 2022-12-10 -f OPERATION="PutObject" -l
 
+# Costs grouped by GetCostAndUsage operation and LINKED_ACCOUNT dimension
+$ ccexplorer get aws -g DIMENSION=OPERATION,DIMENSION=LINKED_ACCOUNT -s 2022-12-10 -f OPERATION="GetCostAndUsage" -l
+
 ```
 
 #### Default settings
