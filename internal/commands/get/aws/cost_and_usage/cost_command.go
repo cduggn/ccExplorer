@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	costUsageGroupBy          custom_flags.GroupBy
+	costUsageGroupBy          custom_flags.DimensionAndTagFlag
 	costUsageGranularity      string
 	costUsageStartDate        string
 	costUsageEndDate          string

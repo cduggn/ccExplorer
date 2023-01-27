@@ -5,18 +5,18 @@ import (
 	"strings"
 )
 
-func (e FilterByFlagError) Error() string {
+func (e DimensionAndTagFilterFlagError) Error() string {
 	return e.msg
 }
 
-func NewFilterBy() FilterBy {
-	return FilterBy{
+func NewFilterBy() DimensionAndTagFilterFlag {
+	return DimensionAndTagFilterFlag{
 		Dimensions: make(map[string]string),
 		Tags:       make([]string, 0),
 	}
 }
 
-func (f *FilterBy) Set(value string) error {
+func (f *DimensionAndTagFilterFlag) Set(value string) error {
 
 	args := SplitCommaSeparatedString(value)
 
@@ -37,7 +37,7 @@ func (f *FilterBy) Set(value string) error {
 		case "TAG":
 			f.Tags = append(f.Tags, parts[1])
 		default:
-			return FilterByFlagError{
+			return DimensionAndTagFilterFlagError{
 				msg: fmt.Sprintf("invalid groupBy type selected: %s", value),
 			}
 		}
@@ -45,11 +45,11 @@ func (f *FilterBy) Set(value string) error {
 	return nil
 }
 
-func (f *FilterByType) Value() FilterByType {
-	return FilterByType(*f)
+func (f *DimensionAndTagFilterFlagType) Value() DimensionAndTagFilterFlagType {
+	return DimensionAndTagFilterFlagType(*f)
 }
 
-func (f *FilterByType) Equals(other FilterByType) bool {
+func (f *DimensionAndTagFilterFlagType) Equals(other DimensionAndTagFilterFlagType) bool {
 	if len(f.Dimensions) != len(other.Dimensions) {
 		return false
 	}
@@ -70,14 +70,14 @@ func (f *FilterByType) Equals(other FilterByType) bool {
 
 }
 
-func (f *FilterBy) Type() string {
+func (f *DimensionAndTagFilterFlag) Type() string {
 	return "FilterBy"
 }
 
-func (f *FilterBy) String() string {
+func (f *DimensionAndTagFilterFlag) String() string {
 	return fmt.Sprintf("%v", *f)
 }
 
-func (f *FilterBy) Value() FilterBy {
+func (f *DimensionAndTagFilterFlag) Value() DimensionAndTagFilterFlag {
 	return *f
 }

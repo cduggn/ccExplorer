@@ -56,40 +56,40 @@ func TestGroupBySetMethod_ARGParsing(t *testing.T) {
 	tests := []struct {
 		name string
 		args string
-		want GroupBy
+		want DimensionAndTagFlag
 	}{
 		{
 			name: "Valid1",
 			args: "dimension=REGION",
-			want: GroupBy{
+			want: DimensionAndTagFlag{
 				Dimensions: []string{"REGION"},
 			},
 		},
 		{
 			name: "Valid2",
 			args: "tag=ApplicationName1",
-			want: GroupBy{
+			want: DimensionAndTagFlag{
 				Tags: []string{"ApplicationName1"},
 			},
 		},
 		{
 			name: "Valid3",
 			args: "DIMENSION=REGION",
-			want: GroupBy{
+			want: DimensionAndTagFlag{
 				Dimensions: []string{"REGION"},
 			},
 		},
 		{
 			name: "Valid4",
 			args: "TAG=ApplicationName2",
-			want: GroupBy{
+			want: DimensionAndTagFlag{
 				Tags: []string{"ApplicationName2"},
 			},
 		},
 		{
 			name: "Valid5",
 			args: "TAG=ApplicationName2,Dimension=REGION",
-			want: GroupBy{
+			want: DimensionAndTagFlag{
 				Tags:       []string{"ApplicationName2"},
 				Dimensions: []string{"REGION"},
 			},
@@ -97,7 +97,7 @@ func TestGroupBySetMethod_ARGParsing(t *testing.T) {
 		{
 			name: "Valid5",
 			args: "TAG=ApplicationName2,Dimension=REGION,DIMEnsion=DATABASE_ENGINE",
-			want: GroupBy{
+			want: DimensionAndTagFlag{
 				Tags:       []string{"ApplicationName2"},
 				Dimensions: []string{"REGION", "DATABASE_ENGINE"},
 			},
@@ -105,7 +105,7 @@ func TestGroupBySetMethod_ARGParsing(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		var got GroupBy
+		var got DimensionAndTagFlag
 		t.Run(tt.name, func(t *testing.T) {
 			if err := got.Set(tt.args); err != nil {
 				t.Errorf("GroupByFlag.Set() error = %v", err)

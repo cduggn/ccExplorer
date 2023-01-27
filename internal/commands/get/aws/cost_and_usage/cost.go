@@ -41,7 +41,7 @@ func synthesizeRequest(cmd *cobra.Command) (aws2.CostAndUsageRequestType, error)
 
 	// groupBY dimensions and tags
 	groupByValues := cmd.Flags().Lookup("groupBy").Value
-	groupBy, _ := groupByValues.(*custom_flags.GroupBy)
+	groupBy, _ := groupByValues.(*custom_flags.DimensionAndTagFlag)
 
 	// groupBy TAGs
 	var groupByTag []string
@@ -51,7 +51,7 @@ func synthesizeRequest(cmd *cobra.Command) (aws2.CostAndUsageRequestType, error)
 
 	// filterBY dimensions and tags
 	filterByValues := cmd.Flags().Lookup("filterBy").Value
-	filterBy, _ := filterByValues.(*custom_flags.FilterBy)
+	filterBy, _ := filterByValues.(*custom_flags.DimensionAndTagFilterFlag)
 
 	// check if filter TAGs are set
 	var isFilterByTag bool

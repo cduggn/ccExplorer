@@ -6,14 +6,14 @@ import (
 )
 
 var (
-	groupByFlag GroupBy
+	groupByFlag DimensionAndTagFlag
 )
 
-func (e GroupByFlagError) Error() string {
+func (e DimensionAndTagFlagError) Error() string {
 	return e.msg
 }
 
-func (f *GroupBy) Set(value string) error {
+func (f *DimensionAndTagFlag) Set(value string) error {
 
 	args := SplitCommaSeparatedString(value)
 
@@ -27,7 +27,7 @@ func (f *GroupBy) Set(value string) error {
 		case "DIMENSION":
 
 			if ok := IsValidDimension(parts[1]); !ok {
-				return GroupByFlagError{
+				return DimensionAndTagFlagError{
 					msg: fmt.Sprintf("Invalid dimension: %s . "+
 						"Must be one of %s", parts[1], DIMENSIONS),
 				}
@@ -37,7 +37,7 @@ func (f *GroupBy) Set(value string) error {
 		case "TAG":
 			f.Tags = append(f.Tags, parts[1])
 		default:
-			return GroupByFlagError{
+			return DimensionAndTagFlagError{
 				msg: fmt.Sprintf("invalid groupBy type selected: %s must be"+
 					" one of: %s ",
 					value, validTypes),
@@ -48,15 +48,15 @@ func (f *GroupBy) Set(value string) error {
 	return nil
 }
 
-func (f *GroupByType) String() string {
+func (f *DimensionAndTagFlagType) String() string {
 	return fmt.Sprintf("%v", *f)
 }
 
-func (f *GroupByType) Value() GroupByType {
-	return GroupByType(*f)
+func (f *DimensionAndTagFlagType) Value() DimensionAndTagFlagType {
+	return DimensionAndTagFlagType(*f)
 }
 
-func (f *GroupByType) Equals(other GroupByType) bool {
+func (f *DimensionAndTagFlagType) Equals(other DimensionAndTagFlagType) bool {
 	if len(f.Dimensions) != len(other.Dimensions) {
 		return false
 	}
@@ -76,14 +76,14 @@ func (f *GroupByType) Equals(other GroupByType) bool {
 	return true
 }
 
-func (f *GroupBy) Type() string {
+func (f *DimensionAndTagFlag) Type() string {
 	return "GroupBy"
 }
 
-func (f *GroupBy) String() string {
+func (f *DimensionAndTagFlag) String() string {
 	return fmt.Sprintf("%v", *f)
 }
 
-func (f *GroupBy) Value() GroupBy {
+func (f *DimensionAndTagFlag) Value() DimensionAndTagFlag {
 	return *f
 }

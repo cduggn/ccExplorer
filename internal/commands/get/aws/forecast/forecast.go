@@ -2,55 +2,94 @@ package forecast
 
 import (
 	"context"
+	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/cduggn/ccexplorer/internal/commands/get/aws/custom_flags"
 	"github.com/cduggn/ccexplorer/pkg/printer"
 	aws2 "github.com/cduggn/ccexplorer/pkg/service/aws"
 	"github.com/spf13/cobra"
 )
 
+type CommandLineInput struct {
+	FilterByValues          aws2.Filter
+	Granularity             string
+	PredictionIntervalLevel int32
+	Start                   string
+	End                     string
+}
+
 func CostForecastRunCmd(cmd *cobra.Command, args []string) error {
 
-	apiClient := aws2.NewAPIClient()
-
-	req, err := synthesizeRequest(cmd)
-	if err != nil {
-		return err
-	}
-	res, err := apiClient.GetCostForecast(context.TODO(), apiClient.Client, req)
+	userInput := handleCommandLineInput(cmd)
+	req, err := synthesizeRequest(userInput)
 	if err != nil {
 		return err
 	}
 
-	var dimensions []string
-	for _, d := range req.Filter.Dimensions {
-		dimensions = append(dimensions, d.Key)
+	res, err := execute(req)
+	if err != nil {
+		return err
 	}
-	printer.PrintGetCostForecastReport(res, dimensions)
+
+	printData := prepareResponseForRendering(res)
+	filters := filterList(req)
+	printData.Filters = filters
+
+	printer.PrintGetCostForecastReport(printData, filters)
 	return nil
 }
 
-func synthesizeRequest(cmd *cobra.Command) (aws2.
-	GetCostForecastRequest, error) {
+func prepareResponseForRendering(res *costexplorer.GetCostForecastOutput) printer.ForecastPrintData {
+	return printer.ForecastPrintData{
+		Forecast: res,
+	}
+}
+
+func execute(r aws2.GetCostForecastRequest) (*costexplorer.GetCostForecastOutput, error) {
+	apiClient := aws2.NewAPIClient()
+	res, err := apiClient.GetCostForecast(context.TODO(), apiClient.Client, r)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func handleCommandLineInput(cmd *cobra.Command) CommandLineInput {
 
 	filterByValues := cmd.Flags().Lookup("filterBy").Value
-	filterBy, _ := filterByValues.(*custom_flags.ForecastFilterBy)
-
 	granularity, _ := cmd.Flags().GetString("granularity")
-
 	predictionIntervalLevel, _ := cmd.Flags().GetInt32("predictionIntervalLevel")
 
-	start := cmd.Flags().Lookup("start").Value.String()
+	filterFlag := filterByValues.(*custom_flags.DimensionFilterByFlag)
+	dimensions := aws2.ExtractForecastFilters(filterFlag.Dimensions)
 
-	end := cmd.Flags().Lookup("end").Value.String()
+	return CommandLineInput{
+		FilterByValues:          dimensions,
+		Granularity:             granularity,
+		PredictionIntervalLevel: predictionIntervalLevel,
+		Start:                   cmd.Flags().Lookup("start").Value.String(),
+		End:                     cmd.Flags().Lookup("end").Value.String(),
+	}
+}
+
+func filterList(r aws2.GetCostForecastRequest) []string {
+	var dimensions []string
+	for _, d := range r.Filter.Dimensions {
+		dimensions = append(dimensions, d.Key)
+	}
+	return dimensions
+}
+
+func synthesizeRequest(input CommandLineInput) (aws2.GetCostForecastRequest,
+	error) {
 
 	return aws2.GetCostForecastRequest{
-		Granularity:             granularity,
+		Granularity:             input.Granularity,
 		Metric:                  "UNBLENDED_COST",
-		PredictionIntervalLevel: predictionIntervalLevel,
+		PredictionIntervalLevel: input.PredictionIntervalLevel,
 		Time: aws2.Time{
-			Start: start,
-			End:   end,
+			Start: input.Start,
+			End:   input.End,
 		},
-		Filter: aws2.ExtractForecastFilters(filterBy.Dimensions),
+		Filter: input.FilterByValues,
 	}, nil
 }

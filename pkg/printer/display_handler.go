@@ -91,7 +91,7 @@ func PrintCostAndUsageReport(s func(r map[int]Service) []Service,
 	t.Render()
 }
 
-func PrintGetCostForecastReport(r *costexplorer.GetCostForecastOutput,
+func PrintGetCostForecastReport(r ForecastPrintData,
 	dimensions []string) {
 	filteredBy := strings.Join(dimensions, " | ")
 
@@ -102,7 +102,7 @@ func PrintGetCostForecastReport(r *costexplorer.GetCostForecastOutput,
 		"Prediction Interval LowerBound",
 		"Prediction Interval UpperBound", "Unit", "Total"})
 
-	for _, v := range r.ForecastResultsByTime {
+	for _, v := range r.Forecast.ForecastResultsByTime {
 
 		tempRow := table.Row{*v.TimePeriod.Start,
 			*v.TimePeriod.End, *v.MeanValue, *v.PredictionIntervalUpperBound,
@@ -111,8 +111,9 @@ func PrintGetCostForecastReport(r *costexplorer.GetCostForecastOutput,
 	}
 
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"FilteredBy", filteredBy, "", "", "", *r.Total.Unit,
-		*r.Total.Amount})
+	t.AppendRow(table.Row{"FilteredBy", filteredBy, "", "", "",
+		*r.Forecast.Total.Unit,
+		*r.Forecast.Total.Amount})
 	t.Render()
 }
 

@@ -25,6 +25,10 @@ var (
 	validTypes = "DIMENSION, TAG"
 )
 
+func (e FlagError) Error() string {
+	return e.msg
+}
+
 func IsValidDimension(d string) bool {
 	if _, ok := validDimensions[strings.ToUpper(d)]; !ok {
 		return false
@@ -45,7 +49,7 @@ func SplitCommaSeparatedString(value string) []string {
 func SplitNameValuePair(value string) ([]string, error) {
 	parts := strings.Split(value, "=")
 	if len(parts) != 2 {
-		return nil, GroupByFlagError{
+		return nil, FlagError{
 			msg: fmt.Sprintf("invalid group by flag: %s", value),
 		}
 	}

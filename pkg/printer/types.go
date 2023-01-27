@@ -1,6 +1,9 @@
 package printer
 
-import "sort"
+import (
+	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
+	"sort"
+)
 
 type CostAndUsageReport struct {
 	Services    map[int]Service
@@ -23,6 +26,11 @@ type Metrics struct {
 	NumericAmount float64
 	Unit          string
 	UsageQuantity float64
+}
+
+type ForecastPrintData struct {
+	Forecast *costexplorer.GetCostForecastOutput
+	Filters  []string
 }
 
 func (c CostAndUsageReport) Len() int {

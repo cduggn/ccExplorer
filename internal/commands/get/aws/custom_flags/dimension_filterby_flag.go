@@ -5,17 +5,17 @@ import (
 	"strings"
 )
 
-func (e ForecastFilterError) Error() string {
+func (e DimensionFilterByFlagError) Error() string {
 	return e.msg
 }
 
-func NewForecastFilterBy() ForecastFilterBy {
-	return ForecastFilterBy{
+func NewForecastFilterBy() DimensionFilterByFlag {
+	return DimensionFilterByFlag{
 		Dimensions: make(map[string]string),
 	}
 }
 
-func (f *ForecastFilterBy) Set(value string) error {
+func (f *DimensionFilterByFlag) Set(value string) error {
 
 	args := SplitCommaSeparatedString(value)
 
@@ -34,7 +34,7 @@ func (f *ForecastFilterBy) Set(value string) error {
 			"OPERATING_SYSTEM":
 			f.Dimensions[parts[0]] = parts[1]
 		default:
-			return ForecastFilterError{
+			return DimensionFilterByFlagError{
 				msg: fmt.Sprintf("invalid groupBy type selected: %s", value),
 			}
 		}
@@ -43,11 +43,11 @@ func (f *ForecastFilterBy) Set(value string) error {
 	return nil
 }
 
-func (f *ForecastFilterByType) Value() ForecastFilterByType {
-	return ForecastFilterByType(*f)
+func (f *DimensionFilterByFlagType) Value() DimensionFilterByFlagType {
+	return DimensionFilterByFlagType(*f)
 }
 
-func (f *ForecastFilterByType) Equals(other ForecastFilterByType) bool {
+func (f *DimensionFilterByFlagType) Equals(other DimensionFilterByFlagType) bool {
 	if len(f.Dimensions) != len(other.Dimensions) {
 		return false
 	}
@@ -60,14 +60,14 @@ func (f *ForecastFilterByType) Equals(other ForecastFilterByType) bool {
 
 }
 
-func (f *ForecastFilterBy) Type() string {
+func (f *DimensionFilterByFlag) Type() string {
 	return "FilterBy"
 }
 
-func (f *ForecastFilterBy) String() string {
+func (f *DimensionFilterByFlag) String() string {
 	return fmt.Sprintf("%v", *f)
 }
 
-func (f *ForecastFilterBy) Value() ForecastFilterBy {
+func (f *DimensionFilterByFlag) Value() DimensionFilterByFlag {
 	return *f
 }

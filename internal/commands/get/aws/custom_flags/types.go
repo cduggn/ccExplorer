@@ -1,33 +1,37 @@
 package custom_flags
 
-type GroupByFlagError struct {
+type FlagError struct {
 	msg string
 }
 
-type GroupBy GroupByType
+type DimensionAndTagFlagError struct {
+	msg string
+}
 
-type GroupByType struct {
+type DimensionAndTagFlag DimensionAndTagFlagType
+
+type DimensionAndTagFlagType struct {
 	Dimensions []string
 	Tags       []string
 }
 
-type FilterByFlagError struct {
+type DimensionAndTagFilterFlagError struct {
 	msg string
 }
 
-type FilterBy FilterByType
+type DimensionAndTagFilterFlag DimensionAndTagFilterFlagType
 
-type FilterByType struct {
+type DimensionAndTagFilterFlagType struct {
 	Dimensions map[string]string
 	Tags       []string
 }
 
-type ForecastFilterError struct {
+type DimensionFilterByFlagError struct {
 	msg string
 }
 
-type ForecastFilterByType struct {
+type DimensionFilterByFlagType struct {
 	Dimensions map[string]string
 }
 
-type ForecastFilterBy ForecastFilterByType
+type DimensionFilterByFlag DimensionFilterByFlagType
