@@ -1,23 +1,12 @@
-package aws
+package custom_flags
 
 import (
 	"fmt"
 	"strings"
 )
 
-type FilterByFlagError struct {
-	msg string
-}
-
 func (e FilterByFlagError) Error() string {
 	return e.msg
-}
-
-type FilterBy FilterByType
-
-type FilterByType struct {
-	Dimensions map[string]string
-	Tags       []string
 }
 
 func NewFilterBy() FilterBy {
@@ -25,6 +14,35 @@ func NewFilterBy() FilterBy {
 		Dimensions: make(map[string]string),
 		Tags:       make([]string, 0),
 	}
+}
+
+func (f *FilterBy) Set(value string) error {
+
+	args := SplitCommaSeparatedString(value)
+
+	for _, arg := range args {
+
+		parts, err := SplitNameValuePair(arg)
+		if err != nil {
+			return err
+		}
+		switch strings.ToUpper(parts[0]) {
+		case "AZ", "SERVICE", "USAGE_TYPE", "INSTANCE_TYPE", "LINKED_ACCOUNT", "OPERATION",
+			"PURCHASE_TYPE", "PLATFORM", "TENANCY", "RECORD_TYPE", "LEGAL_ENTITY_NAME",
+			"INVOICING_ENTITY", "DEPLOYMENT_OPTION", "DATABASE_ENGINE",
+			"CACHE_ENGINE", "INSTANCE_TYPE_FAMILY", "REGION", "BILLING_ENTITY",
+			"RESERVATION_ID", "SAVINGS_PLANS_TYPE", "SAVINGS_PLAN_ARN",
+			"OPERATING_SYSTEM":
+			f.Dimensions[parts[0]] = parts[1]
+		case "TAG":
+			f.Tags = append(f.Tags, parts[1])
+		default:
+			return FilterByFlagError{
+				msg: fmt.Sprintf("invalid groupBy type selected: %s", value),
+			}
+		}
+	}
+	return nil
 }
 
 func (f *FilterByType) Value() FilterByType {
@@ -50,36 +68,6 @@ func (f *FilterByType) Equals(other FilterByType) bool {
 	}
 	return true
 
-}
-
-func (f *FilterBy) Set(value string) error {
-
-	args := splitByIndividualArgument(value)
-
-	for _, arg := range args {
-
-		parts, err := splitIndividualArgument(arg)
-		if err != nil {
-			return err
-		}
-		switch strings.ToUpper(parts[0]) {
-		case "AZ", "SERVICE", "USAGE_TYPE", "INSTANCE_TYPE", "LINKED_ACCOUNT", "OPERATION",
-			"PURCHASE_TYPE", "PLATFORM", "TENANCY", "RECORD_TYPE", "LEGAL_ENTITY_NAME",
-			"INVOICING_ENTITY", "DEPLOYMENT_OPTION", "DATABASE_ENGINE",
-			"CACHE_ENGINE", "INSTANCE_TYPE_FAMILY", "REGION", "BILLING_ENTITY",
-			"RESERVATION_ID", "SAVINGS_PLANS_TYPE", "SAVINGS_PLAN_ARN",
-			"OPERATING_SYSTEM":
-			f.Dimensions[parts[0]] = parts[1]
-		case "TAG":
-			f.Tags = append(f.Tags, parts[1])
-		default:
-			return FilterByFlagError{
-				msg: fmt.Sprintf("invalid groupBy type selected: %s", value),
-			}
-		}
-	}
-
-	return nil
 }
 
 func (f *FilterBy) Type() string {

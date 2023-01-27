@@ -1,12 +1,13 @@
-package aws
+package cost_and_usage
 
 import (
+	"github.com/cduggn/ccexplorer/internal/commands/get/aws/custom_flags"
 	"github.com/cduggn/ccexplorer/pkg/helpers"
 	"github.com/spf13/cobra"
 )
 
 var (
-	costUsageGroupBy          GroupBy
+	costUsageGroupBy          custom_flags.GroupBy
 	costUsageGranularity      string
 	costUsageStartDate        string
 	costUsageEndDate          string
@@ -18,7 +19,7 @@ func CostAndUsageCommand(c *cobra.Command) *cobra.Command {
 	c.Flags().VarP(&costUsageGroupBy, "groupBy", "g",
 		"Group by DIMENSION and/or TAG ")
 
-	costUsageFilterBy := NewFilterBy()
+	costUsageFilterBy := custom_flags.NewFilterBy()
 	c.Flags().VarP(&costUsageFilterBy, "filterBy", "f",
 		"Filter by DIMENSION and/or TAG")
 

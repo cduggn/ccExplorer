@@ -1,6 +1,7 @@
-package aws
+package forecast
 
 import (
+	"github.com/cduggn/ccexplorer/internal/commands/get/aws/custom_flags"
 	"github.com/cduggn/ccexplorer/pkg/helpers"
 	"github.com/spf13/cobra"
 	"time"
@@ -15,7 +16,7 @@ var (
 
 func ForecastCommand(c *cobra.Command) *cobra.Command {
 
-	forecastFilterBy := NewForecastFilterBy()
+	forecastFilterBy := custom_flags.NewForecastFilterBy()
 	c.Flags().VarP(&forecastFilterBy, "filterBy", "f",
 		"Filter by DIMENSION  (default: none)")
 

@@ -3,7 +3,7 @@ package aws_presets
 import (
 	"fmt"
 	"github.com/AlecAivazis/survey/v2"
-	aws3 "github.com/cduggn/ccexplorer/internal/commands/get/aws"
+	aws3 "github.com/cduggn/ccexplorer/internal/commands/get/aws/cost_and_usage"
 	aws2 "github.com/cduggn/ccexplorer/pkg/helpers"
 	"github.com/cduggn/ccexplorer/pkg/service/aws"
 	"github.com/spf13/cobra"

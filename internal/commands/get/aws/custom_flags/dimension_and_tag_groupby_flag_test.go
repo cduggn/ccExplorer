@@ -1,4 +1,4 @@
-package aws
+package custom_flags
 
 import (
 	"reflect"
@@ -45,7 +45,7 @@ func TestGroupBySetMethod_ARGValidation(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := grouppByFlag.Set(tt.args); (err != nil) != tt.wantErr {
+			if err := groupByFlag.Set(tt.args); (err != nil) != tt.wantErr {
 				t.Errorf("GroupByFlag.Set() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -60,9 +60,9 @@ func TestGroupBySetMethod_ARGParsing(t *testing.T) {
 	}{
 		{
 			name: "Valid1",
-			args: "dimension=SERVICE1",
+			args: "dimension=REGION",
 			want: GroupBy{
-				Dimensions: []string{"SERVICE1"},
+				Dimensions: []string{"REGION"},
 			},
 		},
 		{
@@ -74,9 +74,9 @@ func TestGroupBySetMethod_ARGParsing(t *testing.T) {
 		},
 		{
 			name: "Valid3",
-			args: "DIMENSION=SERVICE2",
+			args: "DIMENSION=REGION",
 			want: GroupBy{
-				Dimensions: []string{"SERVICE2"},
+				Dimensions: []string{"REGION"},
 			},
 		},
 		{
@@ -88,18 +88,18 @@ func TestGroupBySetMethod_ARGParsing(t *testing.T) {
 		},
 		{
 			name: "Valid5",
-			args: "TAG=ApplicationName2,Dimension=SERVICE2",
+			args: "TAG=ApplicationName2,Dimension=REGION",
 			want: GroupBy{
 				Tags:       []string{"ApplicationName2"},
-				Dimensions: []string{"SERVICE2"},
+				Dimensions: []string{"REGION"},
 			},
 		},
 		{
 			name: "Valid5",
-			args: "TAG=ApplicationName2,Dimension=SERVICE2,DIMEnsion=SERVICE3",
+			args: "TAG=ApplicationName2,Dimension=REGION,DIMEnsion=DATABASE_ENGINE",
 			want: GroupBy{
 				Tags:       []string{"ApplicationName2"},
-				Dimensions: []string{"SERVICE2", "SERVICE3"},
+				Dimensions: []string{"REGION", "DATABASE_ENGINE"},
 			},
 		},
 	}
@@ -111,7 +111,7 @@ func TestGroupBySetMethod_ARGParsing(t *testing.T) {
 				t.Errorf("GroupByFlag.Set() error = %v", err)
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GroupByFlag.Set() got = %v, want %v", grouppByFlag,
+				t.Errorf("GroupByFlag.Set() got = %v, want %v", groupByFlag,
 					tt.want)
 			}
 		})
@@ -158,7 +158,7 @@ func TestSplitByIndividualArgument(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := splitByIndividualArgument(tt.args); !reflect.DeepEqual(got, tt.want) {
+			if got := SplitCommaSeparatedString(tt.args); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("splitByIndividualArgument() = %v, want %v", got, tt.want)
 			}
 		})
@@ -194,7 +194,7 @@ func TestSplitIndividualArgument(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := splitIndividualArgument(tt.args.value)
+			got, err := SplitNameValuePair(tt.args.value)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("splitIndividualArgument() error = %v, wantErr %v", err, tt.wantErr)
 				return

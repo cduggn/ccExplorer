@@ -1,4 +1,4 @@
-package aws
+package dimension_values
 
 import (
 	"context"

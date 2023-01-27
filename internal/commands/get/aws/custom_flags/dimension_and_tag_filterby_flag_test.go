@@ -1,4 +1,4 @@
-package aws
+package custom_flags
 
 import (
 	"reflect"

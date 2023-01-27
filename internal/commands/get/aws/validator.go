@@ -5,36 +5,12 @@ import (
 )
 
 type ValidationError struct {
-	msg string
+	Message string
 }
 
 func (e ValidationError) Error() string {
-	return e.msg
+	return e.Message
 }
-
-//func ValidateGroupByMap(groupBy map[string]string) ([]string, error) {
-//
-//	var tag map[string]string
-//
-//	for key, val := range groupBy {
-//		if val == "DIMENSION" {
-//			//dimension = map[string]string{key: val}
-//			err := ValidateGroupByDimension(val)
-//			if err != nil {
-//				return nil, err
-//			}
-//		}
-//		if val == "TAG" {
-//			tag = map[string]string{key: val}
-//			//ValidateGroupByTag(tag)
-//		} else {
-//			return nil, ValidationError{
-//				msg: "GroupBy must be one of the following: DIMENSION, TAG",
-//			}
-//		}
-//	}
-//	return nil, nil
-//}
 
 func ValidateGroupByDimension(dimension string) error {
 
@@ -47,7 +23,7 @@ func ValidateGroupByDimension(dimension string) error {
 		"OPERATING_SYSTEM":
 	default:
 		return ValidationError{
-			msg: "Dimension must be one of the following: AZ, SERVICE, " +
+			Message: "Dimension must be one of the following: AZ, SERVICE, " +
 				"USAGE_TYPE, INSTANCE_TYPE, LINKED_ACCOUNT, OPERATION, " +
 				"PURCHASE_TYPE, PLATFORM, TENANCY, RECORD_TYPE, " +
 				"LEGAL_ENTITY_NAME, INVOICING_ENTITY, DEPLOYMENT_OPTION, " +
@@ -63,7 +39,7 @@ func ValidateGroupByDimension(dimension string) error {
 func ValidateStartDate(startDate string) error {
 	if startDate == "" {
 		return ValidationError{
-			msg: "Start date must be specified",
+			Message: "Start date must be specified",
 		}
 	}
 
@@ -71,7 +47,7 @@ func ValidateStartDate(startDate string) error {
 	today := time.Now()
 	if start.After(today) {
 		return ValidationError{
-			msg: "Start date must be before today's date",
+			Message: "Start date must be before today's date",
 		}
 	}
 
@@ -81,7 +57,7 @@ func ValidateStartDate(startDate string) error {
 func ValidateEndDate(endDate, startDate string) error {
 	if endDate == "" {
 		return ValidationError{
-			msg: "End date must be specified",
+			Message: "End date must be specified",
 		}
 	}
 
@@ -89,14 +65,14 @@ func ValidateEndDate(endDate, startDate string) error {
 	today := time.Now()
 	if end.After(today) {
 		return ValidationError{
-			msg: "End date must be before today's date",
+			Message: "End date must be before today's date",
 		}
 	}
 
 	start, _ := time.Parse("2006-01-02", startDate)
 	if end.Before(start) {
 		return ValidationError{
-			msg: "End date must not be before start date",
+			Message: "End date must not be before start date",
 		}
 	}
 

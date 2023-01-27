@@ -1,22 +1,12 @@
-package aws
+package custom_flags
 
 import (
 	"fmt"
 	"strings"
 )
 
-type ForecastFilterError struct {
-	msg string
-}
-
 func (e ForecastFilterError) Error() string {
 	return e.msg
-}
-
-type ForecastFilterBy ForecastFilterByType
-
-type ForecastFilterByType struct {
-	Dimensions map[string]string
 }
 
 func NewForecastFilterBy() ForecastFilterBy {
@@ -25,30 +15,13 @@ func NewForecastFilterBy() ForecastFilterBy {
 	}
 }
 
-func (f *ForecastFilterByType) Value() ForecastFilterByType {
-	return ForecastFilterByType(*f)
-}
-
-func (f *ForecastFilterByType) Equals(other ForecastFilterByType) bool {
-	if len(f.Dimensions) != len(other.Dimensions) {
-		return false
-	}
-	for i := range f.Dimensions {
-		if f.Dimensions[i] != other.Dimensions[i] {
-			return false
-		}
-	}
-	return true
-
-}
-
 func (f *ForecastFilterBy) Set(value string) error {
 
-	args := splitByIndividualArgument(value)
+	args := SplitCommaSeparatedString(value)
 
 	for _, arg := range args {
 
-		parts, err := splitIndividualArgument(arg)
+		parts, err := SplitNameValuePair(arg)
 		if err != nil {
 			return err
 		}
@@ -68,6 +41,23 @@ func (f *ForecastFilterBy) Set(value string) error {
 	}
 
 	return nil
+}
+
+func (f *ForecastFilterByType) Value() ForecastFilterByType {
+	return ForecastFilterByType(*f)
+}
+
+func (f *ForecastFilterByType) Equals(other ForecastFilterByType) bool {
+	if len(f.Dimensions) != len(other.Dimensions) {
+		return false
+	}
+	for i := range f.Dimensions {
+		if f.Dimensions[i] != other.Dimensions[i] {
+			return false
+		}
+	}
+	return true
+
 }
 
 func (f *ForecastFilterBy) Type() string {

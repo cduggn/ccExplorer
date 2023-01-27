@@ -1,17 +1,18 @@
-package aws
+package forecast
 
 import (
 	"context"
+	"github.com/cduggn/ccexplorer/internal/commands/get/aws/custom_flags"
 	"github.com/cduggn/ccexplorer/pkg/printer"
 	aws2 "github.com/cduggn/ccexplorer/pkg/service/aws"
 	"github.com/spf13/cobra"
 )
 
-func CostForecast(cmd *cobra.Command, args []string) error {
+func CostForecastRunCmd(cmd *cobra.Command, args []string) error {
 
 	apiClient := aws2.NewAPIClient()
 
-	req, err := NewGetCostForecastRequestType(cmd)
+	req, err := synthesizeRequest(cmd)
 	if err != nil {
 		return err
 	}
@@ -28,10 +29,11 @@ func CostForecast(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func NewGetCostForecastRequestType(cmd *cobra.Command) (aws2.GetCostForecastRequest, error) {
+func synthesizeRequest(cmd *cobra.Command) (aws2.
+	GetCostForecastRequest, error) {
 
 	filterByValues := cmd.Flags().Lookup("filterBy").Value
-	filterBy, _ := filterByValues.(*ForecastFilterBy)
+	filterBy, _ := filterByValues.(*custom_flags.ForecastFilterBy)
 
 	granularity, _ := cmd.Flags().GetString("granularity")
 
