@@ -1,4 +1,4 @@
-package aws
+package custom_flags
 
 import (
 	"reflect"
@@ -17,14 +17,14 @@ func TestFilterBy_Set(t *testing.T) {
 		name   string
 		fields fields
 		args   args
-		want   FilterBy
+		want   DimensionAndTagFilterFlag
 	}{
 		{
 			name: "Valid1",
 			args: args{
 				value: "SERVICE=Amazon Simple Storage Service,TAG=ApplicationName",
 			},
-			want: FilterBy{
+			want: DimensionAndTagFilterFlag{
 				Dimensions: map[string]string{
 					"SERVICE": "Amazon Simple Storage Service",
 				},
@@ -38,7 +38,7 @@ func TestFilterBy_Set(t *testing.T) {
 					"SERVICE=Amazon Simple Storage Service," +
 					"TAG=ApplicationName1",
 			},
-			want: FilterBy{
+			want: DimensionAndTagFilterFlag{
 				Dimensions: map[string]string{
 					"OPERATION": "PUTOBJECT",
 					"SERVICE":   "Amazon Simple Storage Service",

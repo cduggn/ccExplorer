@@ -2,7 +2,6 @@ package printer
 
 import (
 	"fmt"
-	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"os"
 	"strconv"
@@ -14,15 +13,15 @@ var tableDivider = table.Row{"-", "-", "-",
 	"-",
 	"-", ""}
 
-func CurateCostAndUsageReport(output *costexplorer.GetCostAndUsageOutput,
-	granularity string) CostAndUsageReport {
+func CurateCostAndUsageReport(
+	d CostAndUsageReportPrintData) CostAndUsageReport {
 
 	c := CostAndUsageReport{
 		Services:    make(map[int]Service),
-		Granularity: granularity,
+		Granularity: d.Granularity,
 	}
 	count := 0
-	for _, v := range output.ResultsByTime {
+	for _, v := range d.Report.ResultsByTime {
 		c.Start = *v.TimePeriod.Start
 		c.End = *v.TimePeriod.End
 		for _, g := range v.Groups {
@@ -91,7 +90,7 @@ func PrintCostAndUsageReport(s func(r map[int]Service) []Service,
 	t.Render()
 }
 
-func PrintGetCostForecastReport(r *costexplorer.GetCostForecastOutput,
+func PrintGetCostForecastReport(r ForecastPrintData,
 	dimensions []string) {
 	filteredBy := strings.Join(dimensions, " | ")
 
@@ -102,7 +101,7 @@ func PrintGetCostForecastReport(r *costexplorer.GetCostForecastOutput,
 		"Prediction Interval LowerBound",
 		"Prediction Interval UpperBound", "Unit", "Total"})
 
-	for _, v := range r.ForecastResultsByTime {
+	for _, v := range r.Forecast.ForecastResultsByTime {
 
 		tempRow := table.Row{*v.TimePeriod.Start,
 			*v.TimePeriod.End, *v.MeanValue, *v.PredictionIntervalUpperBound,
@@ -111,8 +110,9 @@ func PrintGetCostForecastReport(r *costexplorer.GetCostForecastOutput,
 	}
 
 	t.AppendSeparator()
-	t.AppendRow(table.Row{"FilteredBy", filteredBy, "", "", "", *r.Total.Unit,
-		*r.Total.Amount})
+	t.AppendRow(table.Row{"FilteredBy", filteredBy, "", "", "",
+		*r.Forecast.Total.Unit,
+		*r.Forecast.Total.Amount})
 	t.Render()
 }
 

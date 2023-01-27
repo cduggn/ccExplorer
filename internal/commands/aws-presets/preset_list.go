@@ -10,6 +10,8 @@ func PresetList() []PresetParams {
 			FilterByTag:       false,
 			FilterByDimension: false,
 			ExcludeDiscounts:  true,
+			Description: []string{"(Dimension=SERVICE",
+				"Dimension=LINKED_ACCOUNT)"},
 			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
 				"DIMENSION=LINKED_ACCOUNT -l ]",
 		},
@@ -21,6 +23,8 @@ func PresetList() []PresetParams {
 			FilterByTag:       false,
 			FilterByDimension: false,
 			ExcludeDiscounts:  true,
+			Description: []string{"(Dimension=SERVICE",
+				"Dimension=USAGE_TYPE)"},
 			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
 				"DIMENSION=USAGE_TYPE -l ]",
 		},
@@ -32,6 +36,8 @@ func PresetList() []PresetParams {
 			FilterByTag:       false,
 			FilterByDimension: false,
 			ExcludeDiscounts:  true,
+			Description: []string{"(Dimension=SERVICE",
+				"Dimension=OPERATION)"},
 			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
 				"DIMENSION=OPERATION -l ]",
 		},
@@ -43,6 +49,8 @@ func PresetList() []PresetParams {
 			FilterByTag:       false,
 			FilterByDimension: true,
 			ExcludeDiscounts:  true,
+			Description: []string{"(Dimension=SERVICE",
+				"Dimension=OPERATION)"},
 			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
 				"DIMENSION=OPERATION -f SERVICE=\"Amazon Simple Storage" +
 				" Service\"]",
@@ -55,6 +63,8 @@ func PresetList() []PresetParams {
 			FilterByTag:       false,
 			FilterByDimension: true,
 			ExcludeDiscounts:  true,
+			Description: []string{"(Dimension=SERVICE",
+				"Dimension=USAGE_TYPE)"},
 			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
 				"DIMENSION=USAGE_TYPE -f SERVICE=\"Amazon Simple Storage" +
 				" Service\" -l ]",
@@ -67,6 +77,8 @@ func PresetList() []PresetParams {
 			FilterByTag:       false,
 			FilterByDimension: true,
 			ExcludeDiscounts:  true,
+			Description: []string{"(Dimension=SERVICE",
+				"Dimension=LINKED_ACCOUNT)"},
 			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
 				"DIMENSION=LINKED_ACCOUNT -f SERVICE=\"Amazon Simple Storage" +
 				" Service\" -l ]",
@@ -79,6 +91,8 @@ func PresetList() []PresetParams {
 			FilterByTag:       false,
 			FilterByDimension: true,
 			ExcludeDiscounts:  true,
+			Description: []string{"(Dimension=SERVICE",
+				"Dimension=OPERATION)"},
 			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
 				"DIMENSION=OPERATION -f SERVICE=\"Amazon DynamoDB\" -l ]",
 		},
@@ -90,6 +104,8 @@ func PresetList() []PresetParams {
 			FilterByTag:       false,
 			FilterByDimension: true,
 			ExcludeDiscounts:  true,
+			Description: []string{"(Dimension=SERVICE",
+				"Dimension=USAGE_TYPE)"},
 			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
 				"DIMENSION=USAGE_TYPE -f SERVICE=\"Amazon DynamoDB\" -l ]",
 		},
@@ -101,8 +117,23 @@ func PresetList() []PresetParams {
 			FilterByTag:       false,
 			FilterByDimension: true,
 			ExcludeDiscounts:  true,
+			Description: []string{"(Dimension=SERVICE",
+				"Dimension=LINKED_ACCOUNT)"},
 			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
 				"DIMENSION=LINKED_ACCOUNT -f SERVICE=\"Amazon DynamoDB\" -l ]",
+		},
+		{
+			Alias:             "Costs grouped by GetCostAndUsage OPERATION",
+			Dimension:         []string{"SERVICE", "OPERATION"},
+			Tag:               "Name",
+			Filter:            map[string]string{"OPERATION": "GetCostAndUsage"},
+			FilterByTag:       false,
+			FilterByDimension: true,
+			ExcludeDiscounts:  true,
+			Description: []string{"(Dimension=SERVICE",
+				"Dimension=LINKED_ACCOUNT)"},
+			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
+				"DIMENSION=OPERATION -f OPERATION=\"GetCostAndUsage\" -l ]",
 		},
 	}
 	return p
