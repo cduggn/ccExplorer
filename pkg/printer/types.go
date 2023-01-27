@@ -33,6 +33,11 @@ type ForecastPrintData struct {
 	Filters  []string
 }
 
+type CostAndUsageReportPrintData struct {
+	Report      *costexplorer.GetCostAndUsageOutput
+	Granularity string
+}
+
 func (c CostAndUsageReport) Len() int {
 	return len(c.Services)
 }

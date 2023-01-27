@@ -9,14 +9,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type CommandLineInput struct {
-	FilterByValues          aws2.Filter
-	Granularity             string
-	PredictionIntervalLevel int32
-	Start                   string
-	End                     string
-}
-
 func CostForecastRunCmd(cmd *cobra.Command, args []string) error {
 
 	userInput := handleCommandLineInput(cmd)

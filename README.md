@@ -57,7 +57,7 @@ DIMENSION=OPERATION -f SERVICE="Amazon DynamoDB"  -l
 ```console
 # download
 
-$ docker pull ghcr.io/cduggn/ccexplorer:v0.1.1-rc7
+$ docker pull ghcr.io/cduggn/ccexplorer:v0.1.3
 
 # Container requires AWS Access key, secret, and region
 
@@ -65,7 +65,7 @@ $ docker run -it \
   -e AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID> \
   -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
   -e AWS_REGION=<AWS-REGION> \
-  ghcr.io/cduggn/ccexplorer:v0.1.1-rc7 get aws -g DIMENSION=OPERATION,
+  ghcr.io/cduggn/ccexplorer:v0.1.3 get aws -g DIMENSION=OPERATION,
   DIMENSION=SERVICE -l 
   
 ```
@@ -148,13 +148,14 @@ used to filter and group resources based on their
 AWS resource types. This can be achieved by using the group by and filter 
 flags 
 
-- If no billing period is specified, the
-current calendar month will be used. 
-- Results are sorted by cost in 
-descending order.
+- If no billing period is specified, thecurrent calendar month will be used. 
+- Results are sorted by cost in descending order.
 - Refunds, discounts and credits are applied automatically. The `-l` flag 
   should be used to exclude this behavior.
-
+- When filtering by cost allocation tags (`-f TAG="my-tag"`) a tag must also 
+  be specified in the group by flag (`-g TAG=ApplicationName`). This 
+  instructs the `ccExplorer` to filter by `ApplicationName=my-tag` .
+  
 
 ## Additional Information
 <hr>

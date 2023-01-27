@@ -122,6 +122,19 @@ func PresetList() []PresetParams {
 			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
 				"DIMENSION=LINKED_ACCOUNT -f SERVICE=\"Amazon DynamoDB\" -l ]",
 		},
+		{
+			Alias:             "Costs grouped by GetCostAndUsage OPERATION",
+			Dimension:         []string{"SERVICE", "OPERATION"},
+			Tag:               "Name",
+			Filter:            map[string]string{"OPERATION": "GetCostAndUsage"},
+			FilterByTag:       false,
+			FilterByDimension: true,
+			ExcludeDiscounts:  true,
+			Description: []string{"(Dimension=SERVICE",
+				"Dimension=LINKED_ACCOUNT)"},
+			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
+				"DIMENSION=OPERATION -f OPERATION=\"GetCostAndUsage\" -l ]",
+		},
 	}
 	return p
 }

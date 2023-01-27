@@ -2,6 +2,7 @@ package cost_and_usage
 
 import (
 	"context"
+	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/cduggn/ccexplorer/internal/commands/get/aws"
 	"github.com/cduggn/ccexplorer/internal/commands/get/aws/custom_flags"
 	"github.com/cduggn/ccexplorer/pkg/printer"
@@ -10,32 +11,22 @@ import (
 )
 
 func CostAndUsageRunCmd(cmd *cobra.Command, args []string) error {
+	userInput, err := handleCommandLineInput(cmd)
+	if err != nil {
+		return err
+	}
 
-	req, err := synthesizeRequest(cmd)
+	req := synthesizeRequest(userInput)
+
+	err = execute(req)
 	if err != nil {
 		return err
 	}
-	err = ExecuteCostCommand(req)
-	if err != nil {
-		return err
-	}
+
 	return nil
 }
 
-func ExecuteCostCommand(q aws2.CostAndUsageRequestType) error {
-	awsClient := aws2.NewAPIClient()
-	usage, err := awsClient.GetCostAndUsage(context.Background(),
-		awsClient.Client, q)
-	if err != nil {
-		return err
-	}
-
-	report := printer.CurateCostAndUsageReport(usage, q.Granularity)
-	printer.PrintCostAndUsageReport(printer.SortServicesByMetricAmount, report)
-	return nil
-}
-
-func synthesizeRequest(cmd *cobra.Command) (aws2.CostAndUsageRequestType, error) {
+func handleCommandLineInput(cmd *cobra.Command) (CommandLineInput, error) {
 
 	var err error
 
@@ -58,7 +49,7 @@ func synthesizeRequest(cmd *cobra.Command) (aws2.CostAndUsageRequestType, error)
 	var tagFilterValue = ""
 	// ( currently only supports one tag )
 	if len(filterBy.Tags) > 1 {
-		return aws2.CostAndUsageRequestType{}, aws.ValidationError{
+		return CommandLineInput{}, aws.ValidationError{
 			Message: "Currently only supports one TAG filter",
 		}
 	} else if len(filterBy.Tags) == 1 {
@@ -69,7 +60,7 @@ func synthesizeRequest(cmd *cobra.Command) (aws2.CostAndUsageRequestType, error)
 	// check if filter DIMENSIONS are set
 	var isFilterByDimension bool
 	if len(filterBy.Dimensions) > 2 {
-		return aws2.CostAndUsageRequestType{}, aws.ValidationError{
+		return CommandLineInput{}, aws.ValidationError{
 			Message: "Currently only supports two DIMENSION filter",
 		}
 	} else if len(filterBy.Dimensions) > 0 {
@@ -80,14 +71,14 @@ func synthesizeRequest(cmd *cobra.Command) (aws2.CostAndUsageRequestType, error)
 	start := cmd.Flags().Lookup("startDate").Value.String()
 	err = aws.ValidateStartDate(start)
 	if err != nil {
-		return aws2.CostAndUsageRequestType{}, err
+		return CommandLineInput{}, err
 	}
 
 	// get end time
 	end := cmd.Flags().Lookup("endDate").Value.String()
 	err = aws.ValidateEndDate(end, start)
 	if err != nil {
-		return aws2.CostAndUsageRequestType{}, err
+		return CommandLineInput{}, err
 	}
 
 	// check if exclude tag is set
@@ -96,19 +87,65 @@ func synthesizeRequest(cmd *cobra.Command) (aws2.CostAndUsageRequestType, error)
 	// get granularity
 	interval := cmd.Flags().Lookup("granularity").Value.String()
 
-	return aws2.CostAndUsageRequestType{
-		Granularity: interval,
-		GroupBy:     groupBy.Dimensions,
-		Time: aws2.Time{
-			Start: start,
-			End:   end,
-		},
-		IsFilterByTagEnabled:       isFilterByTag,
-		IsFilterByDimensionEnabled: isFilterByDimension,
-		GroupByTag:                 groupByTag,
-		TagFilterValue:             tagFilterValue,
-		DimensionFilter:            filterBy.Dimensions,
-		ExcludeDiscounts:           excludeDiscounts,
+	return CommandLineInput{
+		GroupByValues:       groupBy,
+		GroupByTag:          groupByTag,
+		FilterByValues:      filterBy,
+		IsFilterByTag:       isFilterByTag,
+		TagFilterValue:      tagFilterValue,
+		IsFilterByDimension: isFilterByDimension,
+		Start:               start,
+		End:                 end,
+		ExcludeDiscounts:    excludeDiscounts,
+		Interval:            interval,
 	}, nil
 
+}
+
+func synthesizeRequest(input CommandLineInput) aws2.CostAndUsageRequestType {
+
+	return aws2.CostAndUsageRequestType{
+		Granularity: input.Interval,
+		GroupBy:     input.GroupByValues.Dimensions,
+		Time: aws2.Time{
+			Start: input.Start,
+			End:   input.End,
+		},
+		IsFilterByTagEnabled:       input.IsFilterByTag,
+		IsFilterByDimensionEnabled: input.IsFilterByDimension,
+		GroupByTag:                 input.GroupByTag,
+		TagFilterValue:             input.TagFilterValue,
+		DimensionFilter:            input.FilterByValues.Dimensions,
+		ExcludeDiscounts:           input.ExcludeDiscounts,
+	}
+}
+
+func ExecutePreset(q aws2.CostAndUsageRequestType) error {
+	err := execute(q)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func execute(q aws2.CostAndUsageRequestType) error {
+	awsClient := aws2.NewAPIClient()
+	costAndUsage, err := awsClient.GetCostAndUsage(context.Background(), awsClient.Client, q)
+	if err != nil {
+		return err
+	}
+
+	printData := prepareResponseForRendering(costAndUsage)
+	printData.Granularity = q.Granularity
+
+	report := printer.CurateCostAndUsageReport(printData)
+	printer.PrintCostAndUsageReport(printer.SortServicesByMetricAmount, report)
+
+	return nil
+}
+
+func prepareResponseForRendering(r *costexplorer.GetCostAndUsageOutput) printer.CostAndUsageReportPrintData {
+	return printer.CostAndUsageReportPrintData{
+		Report: r,
+	}
 }

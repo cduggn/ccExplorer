@@ -2,7 +2,6 @@ package printer
 
 import (
 	"fmt"
-	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"os"
 	"strconv"
@@ -14,15 +13,15 @@ var tableDivider = table.Row{"-", "-", "-",
 	"-",
 	"-", ""}
 
-func CurateCostAndUsageReport(output *costexplorer.GetCostAndUsageOutput,
-	granularity string) CostAndUsageReport {
+func CurateCostAndUsageReport(
+	d CostAndUsageReportPrintData) CostAndUsageReport {
 
 	c := CostAndUsageReport{
 		Services:    make(map[int]Service),
-		Granularity: granularity,
+		Granularity: d.Granularity,
 	}
 	count := 0
-	for _, v := range output.ResultsByTime {
+	for _, v := range d.Report.ResultsByTime {
 		c.Start = *v.TimePeriod.Start
 		c.End = *v.TimePeriod.End
 		for _, g := range v.Groups {

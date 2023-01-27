@@ -98,12 +98,13 @@ func DisplaySynthesizedQuery(p PresetParams) {
 
 func execute(q aws.CostAndUsageRequestType) error {
 
-	err := aws3.ExecuteCostCommand(q)
+	err := aws3.ExecutePreset(q)
 	if err != nil {
 		err := PresetError{
 			msg: fmt.Sprintf("Error executing preset query %v\n", err),
 		}
 		return err
 	}
+
 	return nil
 }

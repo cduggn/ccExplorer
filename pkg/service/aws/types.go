@@ -11,8 +11,6 @@ type AWSClient interface {
 		req CostAndUsageRequestType) (
 		*costexplorer.GetCostAndUsageOutput,
 		error)
-	GetDimensionValues(ctx context.Context, api GetDimensionValuesAPI,
-		d GetDimensionValuesRequest) ([]string, error)
 	GetCostForecast(ctx context.Context,
 		api GetCostForecastAPI, req GetCostForecastRequest) (
 		*costexplorer.GetCostForecastOutput, error)
