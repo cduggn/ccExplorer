@@ -9,57 +9,73 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func (e PresetError) Error() string {
+	return e.msg
+}
+
 func AddAWSPresetCommands() *cobra.Command {
 	return &cobra.Command{
-		Use:   "aws-presets",
-		Short: "Preset AWS queries",
-		Run: func(cmd *cobra.Command, args []string) {
-
-			var presets = PresetList()
-
-			queries := make([]string, len(presets))
-			for i, preset := range presets {
-				queries[i] = preset.Alias
-			}
-
-			selected := 0
-			var prompt = &survey.Select{
-				Message: "Choose a preset:",
-				Options: queries,
-				Description: func(value string, index int) string {
-					return presets[index].CommandSyntax
-				},
-			}
-			err := survey.AskOne(prompt, &selected)
-			if err != nil {
-				fmt.Println(err.Error())
-				return
-			}
-
-			query := presets[selected]
-			apiRequest, err := GeneratePresetQuery(query)
-			if err != nil {
-				err := PresetError{
-					msg: fmt.Sprintf("Error generating preset query %v\n", err),
-				}
-				fmt.Print(err)
-			}
-
-			fmt.Printf("Executing %v\n", query.CommandSyntax)
-
-			err = aws3.ExecuteCostCommand(apiRequest)
-			if err != nil {
-				err := PresetError{
-					msg: fmt.Sprintf("Error executing preset query %v\n", err),
-				}
-				fmt.Print(err)
-			}
-
-		},
+		Use:   "run-query",
+		Short: "Predefined AWS Cost and Usage queries",
+		Run:   runCommand,
 	}
 }
 
-func GeneratePresetQuery(p PresetParams) (aws.CostAndUsageRequestType, error) {
+func runCommand(cmd *cobra.Command, args []string) {
+	var presets = PresetList()
+	optionsNameList := PromptQueryList(presets)
+
+	var prompt = Prompt(optionsNameList)
+
+	selection := 0
+	err := survey.AskOne(prompt, &selection)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+	selectedOption := Selected(presets, selection)
+	apiRequest, err := SynthesizeQuery(selectedOption)
+	if err != nil {
+		err := PresetError{
+			msg: fmt.Sprintf("Error synthesizing query %v\n",
+				err),
+		}
+		fmt.Print(err)
+	}
+
+	DisplaySynthesizedQuery(selectedOption)
+
+	err = execute(apiRequest)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+}
+
+func PromptQueryList(p []PresetParams) []string {
+	queries := make([]string, len(p))
+	for i, preset := range p {
+		queries[i] = preset.Alias
+	}
+	return queries
+}
+
+func Prompt(o []string) *survey.Select {
+	return &survey.Select{
+		Message: "Choose a query to execute:",
+		Options: o,
+		//Description: func(value string, index int) string {
+		//	return strings.Join(presets[index].Description, ",")
+		//},
+	}
+}
+
+func Selected(p []PresetParams, s int) PresetParams {
+	return p[s]
+}
+
+func SynthesizeQuery(p PresetParams) (aws.CostAndUsageRequestType,
+	error) {
 	return aws.CostAndUsageRequestType{
 		GroupBy:                    p.Dimension,
 		DimensionFilter:            p.Filter,
@@ -72,4 +88,22 @@ func GeneratePresetQuery(p PresetParams) (aws.CostAndUsageRequestType, error) {
 		Granularity:      "MONTHLY",
 		ExcludeDiscounts: p.ExcludeDiscounts,
 	}, nil
+}
+
+func DisplaySynthesizedQuery(p PresetParams) {
+	fmt.Println("")
+	fmt.Printf("Synthesized Query: %v \n", p.CommandSyntax)
+	fmt.Println("")
+}
+
+func execute(q aws.CostAndUsageRequestType) error {
+
+	err := aws3.ExecuteCostCommand(q)
+	if err != nil {
+		err := PresetError{
+			msg: fmt.Sprintf("Error executing preset query %v\n", err),
+		}
+		return err
+	}
+	return nil
 }

@@ -4,15 +4,6 @@ type PresetError struct {
 	msg string
 }
 
-func (e PresetError) Error() string {
-	return e.msg
-}
-
-type Preset struct {
-	Name string
-	ID   int
-}
-
 type PresetParams struct {
 	Alias             string
 	Dimension         []string
@@ -23,4 +14,5 @@ type PresetParams struct {
 	FilterByTag       bool
 	ExcludeDiscounts  bool
 	CommandSyntax     string
+	Description       []string
 }

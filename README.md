@@ -83,12 +83,12 @@ $ ccexplorer --help
 When you invoke a command, `ccExplorer` will use the AWS 
 credential chain to authenticate with AWS.
 
-Presets are the most common way to use `ccExplorer`. Presets are a set of 
-pre-defined filters and groupings that can be used to quickly get a 
+Presets are the most common way to use `ccExplorer`. Presets are a 
+set of pre-defined cost and usage queries that can be used to quickly get a 
 sense of the cost of your cloud resources. 
 
 ```console
-$ ccexplorer aws-presets
+$ ccexplorer run-query
 ```
 
 #### Sample queries
