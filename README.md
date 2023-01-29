@@ -140,6 +140,19 @@ ccexplorer get aws -g TAG=ApplicationName,DIMENSION=OPERATION -s 2022-12-10 -f O
 # Costs grouped by GetCostAndUsage operation and LINKED_ACCOUNT dimension
 $ ccexplorer get aws -g DIMENSION=OPERATION,DIMENSION=LINKED_ACCOUNT -s 2022-12-10 -f OPERATION="GetCostAndUsage" -l
 
+# Costs grouped by HOUR and by SERVICE and OPERATION DIMENSIONS
+$ ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -l -e 2023-01-27T15:04:05Z -s 2023-01-26T15:04:05Z -m HOURLY
+
+# Costs grouped by DAY and by SERVICE and OPERATION DIMEBSIONS
+$ ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -l -e 2023-01-27 -s 2023-01-26 -m DAILY
+
+# Costs exported in CSV format
+$ ccexplorer get aws -g DIMENSION=LINKED_ACCOUNT,DIMENSION=OPERATION -l -m DAILY -p csv
+
+# Costs exported to stdout
+$ ccexplorer get aws -g DIMENSION=LINKED_ACCOUNT,DIMENSION=OPERATION -l -m DAILY -p stdout
+
+
 ```
 
 #### Default settings
@@ -155,6 +168,9 @@ flags
 - When filtering by cost allocation tags (`-f TAG="my-tag"`) a tag must also 
   be specified in the group by flag (`-g TAG=ApplicationName`). This 
   instructs the `ccExplorer` to filter by `ApplicationName=my-tag` .
+- Hourly results can be returned by using the `-s` and `-e` flags and 
+  providing an ISO 8601 formatted date and time for example `-s 
+  2022-10-10T00:00:00Z -e 2022-10-10T23:59:59Z`. 
   
 
 ## Additional Information

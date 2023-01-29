@@ -21,5 +21,5 @@ dist/
 *config
 *credentials
 
-
+*.csv
 dist/

@@ -2,8 +2,45 @@ package printer
 
 import (
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
+	"github.com/jedib0t/go-pretty/v6/table"
 	"sort"
 )
+
+type PrintWriterType int
+
+const (
+	Stdout PrintWriterType = iota
+	CSV
+	Chart
+)
+
+type PrinterError struct {
+	msg string
+}
+
+func (e PrinterError) Error() string {
+	return e.msg
+}
+
+type Printer interface {
+	Print(interface{}, interface{})
+}
+type StdoutPrinter struct {
+	Variant string
+}
+
+type CsvPrinter struct {
+	Variant string
+}
+
+type ChartPrinter struct {
+	Variant string
+}
+
+type CostAndUsage struct {
+	Rows  []table.Row
+	Total float64
+}
 
 type CostAndUsageReport struct {
 	Services    map[int]Service

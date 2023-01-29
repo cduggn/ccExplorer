@@ -85,8 +85,9 @@ func SynthesizeQuery(p PresetParams) (aws.CostAndUsageRequestType,
 			Start: aws2.DefaultStartDate(aws2.DayOfCurrentMonth, aws2.SubtractDays),
 			End:   aws2.DefaultEndDate(aws2.Format),
 		},
-		Granularity:      "MONTHLY",
+		Granularity:      p.Granularity,
 		ExcludeDiscounts: p.ExcludeDiscounts,
+		PrintFormat:      p.PrintFormat,
 	}, nil
 }
 

@@ -83,6 +83,7 @@ type CostAndUsageRequestType struct {
 	ExcludeDiscounts           bool
 	Alias                      string
 	Rates                      []string
+	PrintFormat                string
 }
 
 type CostAndUsageRequestWithResourcesType struct {

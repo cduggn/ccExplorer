@@ -25,6 +25,15 @@ const (
 
   # Costs grpuped by ApplicationName Cost Allocation Tag
   ccexplorer get aws -g TAG=ApplicationName,DIMENSION=OPERATION -s 2022-12-10 -l
+ 
+  # Costs grouped by HOUR by SERVICE and OPERATION
+  ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -l -e 2023-01-27T15:04:05Z -s 2023-01-26T15:04:05Z -m HOURLY
+
+  # Costs grouped by DAY by SERVICE and OPERATION
+  ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -l -e 2023-01-27 -s 2023-01-26 -m DAILY
+
+  # Costs grouped by DAY by SERVICE and OPERATION and printed to CSV
+  ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -l -e 2023-01-27 -s 2023-01-26 -m DAILY -p csv
 `
 	forecastExamples = `
   # Service forecast for the next 30 days

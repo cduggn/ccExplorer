@@ -132,3 +132,113 @@ func TestSortServicesByMetricAmount(t *testing.T) {
 		}
 	}
 }
+
+func TestConvertServiceToSlice(t *testing.T) {
+	type args struct {
+		services    Service
+		granularity string
+	}
+
+	cases := []struct {
+		input  args
+		expect [][]string
+	}{
+		{
+			input: args{
+				granularity: "DAILY",
+				services: Service{
+					Name: "Amazon EC2",
+					Keys: []string{"Amazon EC2", "CommittedThroughput"},
+					Metrics: []Metrics{
+						{
+							Name:          "UNBLENDED",
+							Amount:        "0.0000147",
+							NumericAmount: 0.0000147,
+							Unit:          "USD",
+						},
+						{
+							Name:          "BLENDED",
+							Amount:        "0.0000147",
+							NumericAmount: 0.0000147,
+							Unit:          "USD",
+						},
+					},
+					Start: "2019-01-01",
+					End:   "2019-01-31",
+				},
+			},
+			expect: [][]string{
+
+				{
+					"Amazon EC2", "CommittedThroughput", "UNBLENDED", "DAILY", "2019-01-01",
+					"2019-01-31", "0.0000147", "USD",
+				},
+				{
+					"Amazon EC2", "CommittedThroughput", "BLENDED", "DAILY",
+					"2019-01-01",
+					"2019-01-31", "0.0000147", "USD",
+				},
+			},
+		},
+	}
+	for _, c := range cases {
+		result := ConvertServiceToSlice(c.input.services, "DAILY")
+		if !reflect.DeepEqual(result, c.expect) {
+			t.Errorf("expected %v, got %v", c.expect, result)
+		}
+	}
+
+}
+
+func TestCostAndUsageToCSV(t *testing.T) {
+
+	type args struct {
+		CostAndUsage CostAndUsageReport
+		SortFunc     func(map[int]Service) []Service
+	}
+
+	cases := []struct {
+		input  args
+		expect bool
+	}{
+		{
+			input: args{
+				CostAndUsage: CostAndUsageReport{
+					Granularity: "DAILY",
+					Services: map[int]Service{
+						0: {
+							Keys: []string{"Amazon Simple Storage Service",
+								"PutObject"},
+
+							Metrics: []Metrics{
+								{
+									Name:          "UNBLENDED",
+									Amount:        "0.0000147",
+									NumericAmount: 0.0000147,
+									Unit:          "USD",
+								},
+								{
+									Name:          "BLENDED",
+									Amount:        "0.0000147",
+									NumericAmount: 0.0000147,
+									Unit:          "USD",
+								},
+							},
+							Start: "2019-01-01",
+							End:   "2019-01-31",
+						},
+					},
+				},
+				SortFunc: SortServicesByMetricAmount,
+			},
+			expect: true,
+		},
+	}
+	for _, c := range cases {
+		err := CostAndUsageToCSV(c.input.SortFunc, c.input.CostAndUsage)
+		if err != nil {
+			t.Errorf("Failed writing to CSV %v, got error %v", c.expect, err)
+		}
+	}
+
+}

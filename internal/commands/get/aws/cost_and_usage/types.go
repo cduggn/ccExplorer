@@ -13,4 +13,5 @@ type CommandLineInput struct {
 	End                 string
 	ExcludeDiscounts    bool
 	Interval            string
+	PrintFormat         string
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/cduggn/ccexplorer/pkg/printer"
 	aws2 "github.com/cduggn/ccexplorer/pkg/service/aws"
 	"github.com/spf13/cobra"
+	"strings"
 )
 
 func CostAndUsageRunCmd(cmd *cobra.Command, args []string) error {
@@ -85,7 +86,25 @@ func handleCommandLineInput(cmd *cobra.Command) (CommandLineInput, error) {
 	excludeDiscounts, _ := cmd.Flags().GetBool("excludeDiscounts")
 
 	// get granularity
-	interval := cmd.Flags().Lookup("granularity").Value.String()
+	granularity := cmd.Flags().Lookup("granularity").Value.String()
+	granularity = strings.ToUpper(granularity)
+	isValidGranularity := IsValidGranularity(granularity)
+	if !isValidGranularity {
+		return CommandLineInput{}, aws.ValidationError{
+			Message: "Invalid granularity. Valid values are: DAILY, MONTHLY, HOURLY",
+		}
+	}
+
+	printFormat := cmd.Flags().Lookup("printFormat").Value.
+		String()
+	printFormat = strings.ToLower(printFormat)
+	isValidPrintFormat := IsValidPrintFormat(printFormat)
+	if !isValidPrintFormat {
+		return CommandLineInput{}, aws.ValidationError{
+			Message: "Invalid print format. " +
+				"Please use one of the following: stdout, csv, chart",
+		}
+	}
 
 	return CommandLineInput{
 		GroupByValues:       groupBy,
@@ -97,7 +116,8 @@ func handleCommandLineInput(cmd *cobra.Command) (CommandLineInput, error) {
 		Start:               start,
 		End:                 end,
 		ExcludeDiscounts:    excludeDiscounts,
-		Interval:            interval,
+		Interval:            granularity,
+		PrintFormat:         printFormat,
 	}, nil
 
 }
@@ -117,6 +137,7 @@ func synthesizeRequest(input CommandLineInput) aws2.CostAndUsageRequestType {
 		TagFilterValue:             input.TagFilterValue,
 		DimensionFilter:            input.FilterByValues.Dimensions,
 		ExcludeDiscounts:           input.ExcludeDiscounts,
+		PrintFormat:                input.PrintFormat,
 	}
 }
 
@@ -139,7 +160,10 @@ func execute(q aws2.CostAndUsageRequestType) error {
 	printData.Granularity = q.Granularity
 
 	report := printer.CurateCostAndUsageReport(printData)
-	printer.PrintCostAndUsageReport(printer.SortServicesByMetricAmount, report)
+
+	p := printer.PrintFactory(printer.ToPrintWriterType(q.PrintFormat),
+		"costAndUsage")
+	p.Print(printer.SortServicesByMetricAmount, report)
 
 	return nil
 }

@@ -15,4 +15,6 @@ type PresetParams struct {
 	ExcludeDiscounts  bool
 	CommandSyntax     string
 	Description       []string
+	Granularity       string
+	PrintFormat       string
 }
