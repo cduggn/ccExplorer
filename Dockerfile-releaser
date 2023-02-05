@@ -1,7 +1,7 @@
 FROM alpine:latest
 
-WORKDIR /app
-
 COPY ccexplorer /app/ccexplorer
+
+WORKDIR /app
 
 ENTRYPOINT ["/app/ccexplorer"]
