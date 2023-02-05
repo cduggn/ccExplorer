@@ -4,4 +4,6 @@ COPY ccexplorer /app/ccexplorer
 
 WORKDIR /app
 
+RUN mkdir output && chown -R $(whoami) output
+
 ENTRYPOINT ["/app/ccexplorer"]

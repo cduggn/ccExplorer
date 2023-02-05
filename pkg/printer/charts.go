@@ -74,7 +74,7 @@ func (Renderer) Charts(r CostAndUsageOutputType) error {
 	}
 	page.PageTitle = "Cost and Usage Report"
 
-	f, err := os.Create("ccexplorer.html")
+	f, err := os.Create("./output/ccexplorer.html")
 	if err != nil {
 		return PrinterError{
 			msg: "Failed creating ccexplorer.html: " + err.Error(),

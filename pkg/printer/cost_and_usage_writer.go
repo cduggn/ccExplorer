@@ -30,12 +30,24 @@ func CostAndUsageToStdout(sortFn func(r map[int]Service) []Service,
 
 func CostAndUsageToCSV(sortFn func(r map[int]Service) []Service,
 	r CostAndUsageOutputType) error {
-	f, _ := os.Create("ccexplorer.csv")
+
+	_, err := CreateOutPutDir()
+	if err != nil {
+		return PrinterError{
+			msg: "Error creating output directory: " + err.Error(),
+		}
+	}
+
+	f, err := os.Create("./output/ccexplorer.csv")
+	if err != nil {
+		return PrinterError{
+			msg: "Error creating CSV file: " + err.Error()}
+	}
 	defer f.Close()
 
 	// Write the header row
 	w := csv.NewWriter(f)
-	err := w.Write(header)
+	err = w.Write(header)
 	if err != nil {
 		return PrinterError{
 			msg: "Error writing header to CSV file: " + err.Error()}
@@ -57,8 +69,15 @@ func CostAndUsageToCSV(sortFn func(r map[int]Service) []Service,
 func CostAndUsageToChart(sortFn func(r map[int]Service) []Service,
 	r CostAndUsageOutputType) error {
 
+	_, err := CreateOutPutDir()
+	if err != nil {
+		return PrinterError{
+			msg: "Error creating output directory: " + err.Error(),
+		}
+	}
+
 	render := Renderer{}
-	err := render.Charts(r)
+	err = render.Charts(r)
 	if err != nil {
 		return err
 	}

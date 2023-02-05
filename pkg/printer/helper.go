@@ -185,3 +185,19 @@ func PopulatePieDate(s map[int]Service, key int) []opts.
 	}
 	return items
 }
+
+func CreateOutPutDir() (string, error) {
+
+	dir, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+	dir = dir + "/output"
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		err = os.Mkdir(dir, 0755)
+		if err != nil {
+			return "", err
+		}
+	}
+	return dir, nil
+}
