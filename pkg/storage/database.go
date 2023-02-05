@@ -50,7 +50,7 @@ func (c *CostDataStorage) New(dbName string) error {
 }
 
 // return 0 if creation was a success,
-// return 1 if file already exists or return -1 if an error occured
+// return 1 if file already exists or return -1 if an error occurred
 func (c *CostDataStorage) CreateFile(dbName string) (int, error) {
 	if _, err := os.Stat(dbName); os.IsNotExist(err) {
 		file, err := os.Create(dbName)

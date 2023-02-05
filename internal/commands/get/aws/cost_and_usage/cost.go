@@ -2,7 +2,6 @@ package cost_and_usage
 
 import (
 	"context"
-	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/cduggn/ccexplorer/internal/commands/get/aws"
 	"github.com/cduggn/ccexplorer/internal/commands/get/aws/custom_flags"
 	"github.com/cduggn/ccexplorer/pkg/printer"
@@ -106,6 +105,15 @@ func handleCommandLineInput(cmd *cobra.Command) (CommandLineInput, error) {
 		}
 	}
 
+	metric := cmd.Flags().Lookup("metric").Value.String()
+	IsValid := IsValidMetric(metric)
+	if !IsValid {
+		return CommandLineInput{}, aws.ValidationError{
+			Message: "Invalid metric. " +
+				"Please use one of the following: AmortizedCost, BlendedCost, NetAmortizedCost, NetUnblendedCost, NormalizedUsageAmount, UnblendedCost, UsageQuantity",
+		}
+	}
+
 	return CommandLineInput{
 		GroupByValues:       groupBy,
 		GroupByTag:          groupByTag,
@@ -118,6 +126,7 @@ func handleCommandLineInput(cmd *cobra.Command) (CommandLineInput, error) {
 		ExcludeDiscounts:    excludeDiscounts,
 		Interval:            granularity,
 		PrintFormat:         printFormat,
+		Metrics:             []string{metric},
 	}, nil
 
 }
@@ -138,6 +147,7 @@ func synthesizeRequest(input CommandLineInput) aws2.CostAndUsageRequestType {
 		DimensionFilter:            input.FilterByValues.Dimensions,
 		ExcludeDiscounts:           input.ExcludeDiscounts,
 		PrintFormat:                input.PrintFormat,
+		Metrics:                    input.Metrics,
 	}
 }
 
@@ -149,27 +159,20 @@ func ExecutePreset(q aws2.CostAndUsageRequestType) error {
 	return nil
 }
 
-func execute(q aws2.CostAndUsageRequestType) error {
+func execute(req aws2.CostAndUsageRequestType) error {
 	awsClient := aws2.NewAPIClient()
-	costAndUsage, err := awsClient.GetCostAndUsage(context.Background(), awsClient.Client, q)
+	costAndUsageResponse, err := awsClient.GetCostAndUsage(context.
+		Background(), awsClient.Client, req)
 	if err != nil {
 		return err
 	}
 
-	printData := prepareResponseForRendering(costAndUsage)
-	printData.Granularity = q.Granularity
-
-	report := printer.CurateCostAndUsageReport(printData)
-
-	p := printer.PrintFactory(printer.ToPrintWriterType(q.PrintFormat),
+	report := printer.ToCostAndUsageOutputType(costAndUsageResponse, req)
+	p := printer.PrintFactory(printer.ToPrintWriterType(req.PrintFormat),
 		"costAndUsage")
-	p.Print(printer.SortServicesByMetricAmount, report)
-
-	return nil
-}
-
-func prepareResponseForRendering(r *costexplorer.GetCostAndUsageOutput) printer.CostAndUsageReportPrintData {
-	return printer.CostAndUsageReportPrintData{
-		Report: r,
+	err = p.Print(printer.SortServicesByMetricAmount, report)
+	if err != nil {
+		return err
 	}
+	return nil
 }

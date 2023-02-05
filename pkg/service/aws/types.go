@@ -84,6 +84,7 @@ type CostAndUsageRequestType struct {
 	Alias                      string
 	Rates                      []string
 	PrintFormat                string
+	Metrics                    []string
 }
 
 type CostAndUsageRequestWithResourcesType struct {

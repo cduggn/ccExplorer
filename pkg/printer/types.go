@@ -23,7 +23,7 @@ func (e PrinterError) Error() string {
 }
 
 type Printer interface {
-	Print(interface{}, interface{})
+	Print(interface{}, interface{}) error
 }
 type StdoutPrinter struct {
 	Variant string
@@ -47,6 +47,8 @@ type CostAndUsageReport struct {
 	Start       string
 	End         string
 	Granularity string
+	Dimensions  []string
+	Tags        []string
 }
 
 type Service struct {
@@ -65,14 +67,31 @@ type Metrics struct {
 	UsageQuantity float64
 }
 
+type Renderer struct {
+}
+
 type ForecastPrintData struct {
 	Forecast *costexplorer.GetCostForecastOutput
 	Filters  []string
 }
 
-type CostAndUsageReportPrintData struct {
-	Report      *costexplorer.GetCostAndUsageOutput
+type CostAndUsageOutputType struct {
+	Services    map[int]Service
 	Granularity string
+	Start       string
+	End         string
+	Dimensions  []string
+	Tags        []string
+}
+
+type ChartData struct {
+	StartDate      string
+	EndDate        string
+	Granularity    string
+	DimensionOrTag string
+	Title          string
+	SubTitle       string
+	NumericValues  float64
 }
 
 func (c CostAndUsageReport) Len() int {

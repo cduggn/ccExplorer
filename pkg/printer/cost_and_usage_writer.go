@@ -12,7 +12,7 @@ var (
 )
 
 func CostAndUsageToStdout(sortFn func(r map[int]Service) []Service,
-	r CostAndUsageReport) {
+	r CostAndUsageOutputType) {
 	sortedServices := sortFn(r.Services)
 
 	t := CreateTable(costAndUsageHeader)
@@ -29,9 +29,8 @@ func CostAndUsageToStdout(sortFn func(r map[int]Service) []Service,
 }
 
 func CostAndUsageToCSV(sortFn func(r map[int]Service) []Service,
-	r CostAndUsageReport) error {
-
-	f, _ := os.Create("services.csv")
+	r CostAndUsageOutputType) error {
+	f, _ := os.Create("ccexplorer.csv")
 	defer f.Close()
 
 	// Write the header row
@@ -47,10 +46,21 @@ func CostAndUsageToCSV(sortFn func(r map[int]Service) []Service,
 		rows = append(rows, ConvertServiceToSlice(v, r.Granularity)...)
 	}
 
-	// Write the data rows directly to CSV to avoid memory issues
 	if err := w.WriteAll(rows); err != nil {
 		return PrinterError{
 			msg: "Error writing to CSV file: " + err.Error()}
+	}
+
+	return nil
+}
+
+func CostAndUsageToChart(sortFn func(r map[int]Service) []Service,
+	r CostAndUsageOutputType) error {
+
+	render := Renderer{}
+	err := render.Charts(r)
+	if err != nil {
+		return err
 	}
 
 	return nil

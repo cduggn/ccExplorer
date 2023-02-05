@@ -2,6 +2,10 @@ package printer
 
 import (
 	"fmt"
+	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
+	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
+	aws2 "github.com/cduggn/ccexplorer/pkg/service/aws"
+	"github.com/go-echarts/go-echarts/v2/opts"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"os"
 	"strconv"
@@ -12,6 +16,16 @@ func CreateTable(header table.Row) table.Writer {
 	t.SetOutputMirror(os.Stdout)
 	t.AppendHeader(header)
 	return t
+}
+
+func CreateSubTitle(granularity string, start string, end string) string {
+	return fmt.Sprintf("Response granularity: %s. Timeframe: %s-%s",
+		granularity,
+		start, end)
+}
+
+func CreateTitle(dimension string) string {
+	return fmt.Sprintf("Pie chart for dimension: [ %s ]", dimension)
 }
 
 func CostUsageToRows(s []Service, granularity string) CostAndUsage {
@@ -28,7 +42,7 @@ func CostUsageToRows(s []Service, granularity string) CostAndUsage {
 			}
 
 			tempRow := table.Row{index, v.Keys[0], ReturnIfPresent(v.Keys),
-				v.Name, fmt.Sprintf("%f10",
+				m.Name, fmt.Sprintf("%f10",
 					m.NumericAmount), m.Amount,
 				m.Unit,
 				granularity,
@@ -37,7 +51,6 @@ func CostUsageToRows(s []Service, granularity string) CostAndUsage {
 			rows = append(rows, tempRow)
 		}
 	}
-
 	return CostAndUsage{Rows: rows, Total: total}
 }
 
@@ -54,41 +67,58 @@ func ForecastToRows(r ForecastPrintData) []table.Row {
 	return rows
 }
 
+func ToCostAndUsageOutputType(r *costexplorer.GetCostAndUsageOutput,
+	u aws2.CostAndUsageRequestType) CostAndUsageOutputType {
+	return CurateCostAndUsageReport(r, u)
+}
+
 func CurateCostAndUsageReport(
-	d CostAndUsageReportPrintData) CostAndUsageReport {
+	d *costexplorer.GetCostAndUsageOutput, query aws2.CostAndUsageRequestType) CostAndUsageOutputType {
 
-	c := CostAndUsageReport{
+	c := CostAndUsageOutputType{
 		Services:    make(map[int]Service),
-		Granularity: d.Granularity,
+		Granularity: query.Granularity,
+		Dimensions:  query.GroupBy,
+		Tags:        query.GroupByTag,
+		Start:       query.Time.Start,
+		End:         query.Time.End,
 	}
-	count := 0
-	for _, v := range d.Report.ResultsByTime {
-		c.Start = *v.TimePeriod.Start
-		c.End = *v.TimePeriod.End
-		for _, g := range v.Groups {
-			keys := make([]string, 0)
-			service := Service{
-				Start: c.Start,
-				End:   c.End,
-			}
-			keys = append(keys, g.Keys...)
 
-			for key, m := range g.Metrics {
-				metrics := Metrics{
-					Name:          key,
-					Amount:        *m.Amount,
-					NumericAmount: ConvertToFloat(*m.Amount),
-					Unit:          *m.Unit,
-				}
-				service.Metrics = append(service.Metrics, metrics)
+	c.Services = ResultsToServicesMap(d.ResultsByTime)
+	return c
+}
+
+func ResultsToServicesMap(res []types.ResultByTime) map[int]Service {
+	services := make(map[int]Service)
+	count := 0
+	for _, v := range res {
+		for _, g := range v.Groups {
+			keys := append(make([]string, 0), g.Keys...)
+			service := Service{
+				Start: *v.TimePeriod.Start,
+				End:   *v.TimePeriod.End,
+				Keys:  keys,
 			}
-			service.Keys = keys
-			c.Services[count] = service
+
+			service.Metrics = MetricsToService(g.Metrics)
+			services[count] = service
 			count++
 		}
-
 	}
-	return c
+	return services
+}
+
+func MetricsToService(m map[string]types.MetricValue) []Metrics {
+	var metrics []Metrics
+	for k, v := range m {
+		metrics = append(metrics, Metrics{
+			Name:          k,
+			Amount:        *v.Amount,
+			NumericAmount: ConvertToFloat(*v.Amount),
+			Unit:          *v.Unit,
+		})
+	}
+	return metrics
 }
 
 func ConvertToFloat(amount string) float64 {
@@ -106,6 +136,13 @@ func ReturnIfPresent(s []string) string {
 		return s[1]
 	}
 
+}
+
+func ReturnFirst(s []string) string {
+	if len(s) > 1 {
+		return s[0]
+	}
+	return ""
 }
 
 func ConvertServiceToSlice(s Service, granularity string) [][]string {
@@ -131,4 +168,20 @@ func ToPrintWriterType(s string) PrintWriterType {
 	default:
 		return Stdout
 	}
+}
+
+func PopulatePieDate(s map[int]Service, key int) []opts.
+	PieData {
+	items := make([]opts.PieData, 0)
+
+	services := SortServicesByMetricAmount(s)
+
+	for index, v := range services {
+		if index < 15 {
+			items = append(items, opts.PieData{Name: v.Keys[key],
+				Value: v.Metrics[0].NumericAmount})
+		}
+
+	}
+	return items
 }

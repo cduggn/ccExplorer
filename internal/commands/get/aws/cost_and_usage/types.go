@@ -14,4 +14,5 @@ type CommandLineInput struct {
 	ExcludeDiscounts    bool
 	Interval            string
 	PrintFormat         string
+	Metrics             []string
 }

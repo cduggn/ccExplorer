@@ -13,6 +13,7 @@ var (
 	costUsageEndDate          string
 	costUsageWithoutDiscounts bool
 	costAndUsagePrintFormat   string
+	costAndUsageMetric        string
 )
 
 func CostAndUsageCommand(c *cobra.Command) *cobra.Command {
@@ -44,6 +45,10 @@ func CostAndUsageCommand(c *cobra.Command) *cobra.Command {
 
 	c.Flags().StringVarP(&costAndUsagePrintFormat, "printFormat", "p", "stdout",
 		"Valid values: stdout, csv, chart (default: stdout)")
+
+	c.Flags().StringVarP(&costAndUsageMetric, "metric", "i", "UnblendedCost",
+		"Valid values: AmortizedCost, BlendedCost, NetAmortizedCost, "+
+			"NetUnblendedCost, NormalizedUsageAmount, UnblendedCost, UsageQuantity (default: UnblendedCost)")
 
 	return c
 }

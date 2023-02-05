@@ -6,7 +6,7 @@ import (
 
 var (
 	costAndUsageHeader = table.Row{"Rank", "Dimension/Tag", "Dimension/Tag",
-		"Metric Name", "Truncated USD Amount", "USD Amount",
+		"Metric Name", "Truncated USD Amount", "Amount",
 		"Unit",
 		"Granularity",
 		"Start",
@@ -20,7 +20,7 @@ var (
 		"-", ""}
 	costAndUsageTableFooter = func(t float64) table.Row {
 		return table.
-		Row{"", "",
+			Row{"", "",
 			"",
 			"",
 			"TOTAL COST",
@@ -47,29 +47,40 @@ func PrintFactory(printType PrintWriterType, variant string) Printer {
 	}
 }
 
-func (p *StdoutPrinter) Print(f interface{}, c interface{}) {
+func (p *StdoutPrinter) Print(f interface{}, c interface{}) error {
 
 	switch p.Variant {
 	case "forecast":
 		ForecastToStdout(f.(ForecastPrintData), c.([]string))
 	case "costAndUsage":
-		CostAndUsageToStdout(f.(func(r map[int]Service) []Service), c.(CostAndUsageReport))
+		CostAndUsageToStdout(f.(func(r map[int]Service) []Service), c.(CostAndUsageOutputType))
 	}
+	return nil
 
 }
 
-func (p *CsvPrinter) Print(f interface{}, c interface{}) {
+func (p *CsvPrinter) Print(f interface{}, c interface{}) error {
 	switch p.Variant {
 	// no requirement for csv printing for forecast
 	case "costAndUsage":
 		err := CostAndUsageToCSV(f.(func(r map[int]Service) []Service),
-			c.(CostAndUsageReport))
+			c.(CostAndUsageOutputType))
 		if err != nil {
-			panic(err)
+			return err
 		}
 	}
+	return nil
 }
 
-func (p *ChartPrinter) Print(p1 interface{}, p2 interface{}) {
-	// code for printing to a chart
+func (p *ChartPrinter) Print(f interface{}, c interface{}) error {
+	switch p.Variant {
+	// no requirement for csv printing for forecast
+	case "costAndUsage":
+		err := CostAndUsageToChart(f.(func(r map[int]Service) []Service),
+			c.(CostAndUsageOutputType))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

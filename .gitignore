@@ -20,6 +20,6 @@ dist/
 *.config
 *config
 *credentials
-
+*.html
 *.csv
 dist/

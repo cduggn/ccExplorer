@@ -8,6 +8,9 @@
 alt="goreleaser status">
 <img src="https://github.com/cduggn/ccExplorer/actions/workflows/release.yml/badge.svg">
 </a>
+<a href="https://goreportcard.com/report/github.com/cduggn/ccexplorer">
+    <img src="https://goreportcard.com/badge/github.com/cduggn/ccexplorer" alt="Go Report Card">
+</a>
 <a href="https://github.com/cduggn/ccExplorer/actions" 
 alt="CodeQL status">
 <img src="https://github.com/cduggn/ccExplorer/actions/workflows/codeql.yml/badge.svg">
