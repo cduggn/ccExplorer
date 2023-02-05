@@ -4,4 +4,4 @@ WORKDIR /app
 
 ADD ccexplorer /
 
-ENTRYPOINT ["./ccexplorer"]
+ENTRYPOINT ["/app/ccexplorer"]
