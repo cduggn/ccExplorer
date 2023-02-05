@@ -60,7 +60,7 @@ DIMENSION=OPERATION -f SERVICE="Amazon DynamoDB"  -l
 ```console
 # download
 
-$ docker pull ghcr.io/cduggn/ccexplorer:v0.2.0
+$ docker pull ghcr.io/cduggn/ccexplorer:v0.3.0
 
 # Container requires AWS Access key, secret, and region
 
@@ -68,7 +68,7 @@ $ docker run -it \
   -e AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID> \
   -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
   -e AWS_REGION=<AWS-REGION> \
-  ghcr.io/cduggn/ccexplorer:v0.2.0 get aws -g DIMENSION=OPERATION,
+  ghcr.io/cduggn/ccexplorer:v0.3.0 get aws -g DIMENSION=OPERATION,
   DIMENSION=SERVICE -l 
   
 ```
