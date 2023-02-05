@@ -24,11 +24,14 @@ alt="release status">
 </div>
 
 `ccExplorer` (Cloud cost explorer) is a simple command line tool to explore the 
-cost of your cloud resources. It's not 
-designed as a replacement for the official AWS CLI and does not offer the 
-same exhaustive search option. It does however return results in a more
-human-readable format, and orders them by cost in descending order.
-It's primary use case is to surface costs based on pre-defined cost allocation tags. 
+cost of your cloud resources. It's built on opensource tools like [cobra](https://github.com/spf13/cobra),
+[go-echarts](https://github.com/go-echarts/go-echarts), and [go-pretty](https://github.com/jedib0t/go-pretty)
+It lets you quickly surface cost and usage metrics associated with your AWS 
+account and visualize them in a human-readable format like a table, csv file, 
+or chart.
+It's not designed as a replacement for the official AWS COST Explorer CLI 
+but does provide some nice features such as visualization and result sorting. 
+
 
 Installation
 ------------
@@ -60,7 +63,7 @@ DIMENSION=OPERATION -f SERVICE="Amazon DynamoDB"  -l
 ```console
 # download
 
-$ docker pull ghcr.io/cduggn/ccexplorer:v0.3.0
+$ docker pull ghcr.io/cduggn/ccexplorer:v0.3.1
 
 # Container requires AWS Access key, secret, and region
 
@@ -68,8 +71,8 @@ $ docker run -it \
   -e AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID> \
   -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
   -e AWS_REGION=<AWS-REGION> \
-  ghcr.io/cduggn/ccexplorer:v0.3.0 get aws -g DIMENSION=OPERATION,
-  DIMENSION=SERVICE -l 
+  ghcr.io/cduggn/ccexplorer:v0.3.1 get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE \
+  -l -p stdout
   
 ```
 
