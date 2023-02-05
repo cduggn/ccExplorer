@@ -2,6 +2,6 @@ FROM alpine:latest
 
 WORKDIR /app
 
-ADD ccexplorer /
+ADD ccexplorer .
 
-ENTRYPOINT ["/app/ccexplorer"]
+ENTRYPOINT ["./ccexplorer"]
