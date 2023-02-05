@@ -1,6 +1,8 @@
 package helpers
 
-import "time"
+import (
+	"time"
+)
 
 func DefaultEndDate(f func(date time.Time) string) string {
 	return f(time.Now())

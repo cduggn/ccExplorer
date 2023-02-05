@@ -14,6 +14,8 @@ func PresetList() []PresetParams {
 				"Dimension=LINKED_ACCOUNT)"},
 			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
 				"DIMENSION=LINKED_ACCOUNT -l ]",
+			Granularity: "MONTHLY",
+			PrintFormat: "stdout",
 		},
 		{
 			Alias:             "Costs grouped by USAGE_TYPE",
@@ -27,6 +29,8 @@ func PresetList() []PresetParams {
 				"Dimension=USAGE_TYPE)"},
 			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
 				"DIMENSION=USAGE_TYPE -l ]",
+			Granularity: "MONTHLY",
+			PrintFormat: "stdout",
 		},
 		{
 			Alias:             "Costs grouped by OPERATION",
@@ -40,6 +44,8 @@ func PresetList() []PresetParams {
 				"Dimension=OPERATION)"},
 			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
 				"DIMENSION=OPERATION -l ]",
+			Granularity: "MONTHLY",
+			PrintFormat: "stdout",
 		},
 		{
 			Alias:             "S3 costs grouped by OPERATION",
@@ -54,6 +60,8 @@ func PresetList() []PresetParams {
 			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
 				"DIMENSION=OPERATION -f SERVICE=\"Amazon Simple Storage" +
 				" Service\"]",
+			Granularity: "MONTHLY",
+			PrintFormat: "stdout",
 		},
 		{
 			Alias:             "S3 costs grouped by USAGE_TYPE",
@@ -68,6 +76,8 @@ func PresetList() []PresetParams {
 			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
 				"DIMENSION=USAGE_TYPE -f SERVICE=\"Amazon Simple Storage" +
 				" Service\" -l ]",
+			Granularity: "MONTHLY",
+			PrintFormat: "stdout",
 		},
 		{
 			Alias:             "S3 costs grouped by LINKED_ACCOUNT",
@@ -82,6 +92,8 @@ func PresetList() []PresetParams {
 			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
 				"DIMENSION=LINKED_ACCOUNT -f SERVICE=\"Amazon Simple Storage" +
 				" Service\" -l ]",
+			Granularity: "MONTHLY",
+			PrintFormat: "stdout",
 		},
 		{
 			Alias:             "DynamoDB costs grouped by OPERATION",
@@ -95,6 +107,8 @@ func PresetList() []PresetParams {
 				"Dimension=OPERATION)"},
 			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
 				"DIMENSION=OPERATION -f SERVICE=\"Amazon DynamoDB\" -l ]",
+			Granularity: "MONTHLY",
+			PrintFormat: "stdout",
 		},
 		{
 			Alias:             "DynamoDB costs grouped by USAGE_TYPE",
@@ -108,6 +122,8 @@ func PresetList() []PresetParams {
 				"Dimension=USAGE_TYPE)"},
 			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
 				"DIMENSION=USAGE_TYPE -f SERVICE=\"Amazon DynamoDB\" -l ]",
+			Granularity: "MONTHLY",
+			PrintFormat: "stdout",
 		},
 		{
 			Alias:             "DynamoDB costs grouped by LINKED_ACCOUNT",
@@ -121,6 +137,8 @@ func PresetList() []PresetParams {
 				"Dimension=LINKED_ACCOUNT)"},
 			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
 				"DIMENSION=LINKED_ACCOUNT -f SERVICE=\"Amazon DynamoDB\" -l ]",
+			Granularity: "MONTHLY",
+			PrintFormat: "stdout",
 		},
 		{
 			Alias:             "Costs grouped by GetCostAndUsage OPERATION",
@@ -134,6 +152,8 @@ func PresetList() []PresetParams {
 				"Dimension=LINKED_ACCOUNT)"},
 			CommandSyntax: "[ ccexplorer get aws -g DIMENSION=SERVICE," +
 				"DIMENSION=OPERATION -f OPERATION=\"GetCostAndUsage\" -l ]",
+			Granularity: "MONTHLY",
+			PrintFormat: "stdout",
 		},
 	}
 	return p

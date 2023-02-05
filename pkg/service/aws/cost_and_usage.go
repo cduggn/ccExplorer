@@ -7,13 +7,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
 )
 
-var (
-	metrics = []string{"UNBLENDED_COST"}
-)
-
-//"BLENDED_COST", "AMORTIZED_COST", "NET_UNBLENDED_COST",
-//"NET_AMORTIZED_COST", "USAGE_QUANTITY", "NORMALIZED_USAGE_AMOUNT","USAGE_QUANTITY"
-
 type GetCostAndUsageAPI interface {
 	GetCostAndUsage(ctx context.Context, params *costexplorer.GetCostAndUsageInput,
 		optFns ...func(*costexplorer.Options)) (*costexplorer.GetCostAndUsageOutput, error)
@@ -26,7 +19,7 @@ func (*APIClient) GetCostAndUsage(ctx context.Context, api GetCostAndUsageAPI, r
 	result, err := api.GetCostAndUsage(context.TODO(),
 		&costexplorer.GetCostAndUsageInput{
 			Granularity: types.Granularity(req.Granularity), //todo: add option to pass HOURLY granularity as well
-			Metrics:     metrics,
+			Metrics:     req.Metrics,
 			TimePeriod: &types.DateInterval{
 				Start: aws.String(req.Time.Start),
 				End:   aws.String(req.Time.End),

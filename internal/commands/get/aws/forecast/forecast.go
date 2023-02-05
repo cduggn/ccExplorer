@@ -26,7 +26,9 @@ func CostForecastRunCmd(cmd *cobra.Command, args []string) error {
 	filters := filterList(req)
 	printData.Filters = filters
 
-	printer.PrintGetCostForecastReport(printData, filters)
+	p := printer.PrintFactory(printer.ToPrintWriterType("stdout"), "forecast")
+	p.Print(printData, filters)
+
 	return nil
 }
 

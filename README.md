@@ -8,6 +8,9 @@
 alt="goreleaser status">
 <img src="https://github.com/cduggn/ccExplorer/actions/workflows/release.yml/badge.svg">
 </a>
+<a href="https://goreportcard.com/report/github.com/cduggn/ccexplorer">
+    <img src="https://goreportcard.com/badge/github.com/cduggn/ccexplorer" alt="Go Report Card">
+</a>
 <a href="https://github.com/cduggn/ccExplorer/actions" 
 alt="CodeQL status">
 <img src="https://github.com/cduggn/ccExplorer/actions/workflows/codeql.yml/badge.svg">
@@ -57,7 +60,7 @@ DIMENSION=OPERATION -f SERVICE="Amazon DynamoDB"  -l
 ```console
 # download
 
-$ docker pull ghcr.io/cduggn/ccexplorer:v0.2.0
+$ docker pull ghcr.io/cduggn/ccexplorer:v0.3.0
 
 # Container requires AWS Access key, secret, and region
 
@@ -65,7 +68,7 @@ $ docker run -it \
   -e AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID> \
   -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
   -e AWS_REGION=<AWS-REGION> \
-  ghcr.io/cduggn/ccexplorer:v0.2.0 get aws -g DIMENSION=OPERATION,
+  ghcr.io/cduggn/ccexplorer:v0.3.0 get aws -g DIMENSION=OPERATION,
   DIMENSION=SERVICE -l 
   
 ```
@@ -140,6 +143,25 @@ ccexplorer get aws -g TAG=ApplicationName,DIMENSION=OPERATION -s 2022-12-10 -f O
 # Costs grouped by GetCostAndUsage operation and LINKED_ACCOUNT dimension
 $ ccexplorer get aws -g DIMENSION=OPERATION,DIMENSION=LINKED_ACCOUNT -s 2022-12-10 -f OPERATION="GetCostAndUsage" -l
 
+# Costs grouped by HOUR and by SERVICE and OPERATION DIMENSIONS
+$ ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -l -e 2023-01-27T15:04:05Z -s 2023-01-26T15:04:05Z -m HOURLY
+
+# Costs grouped by DAY and by SERVICE and OPERATION DIMEBSIONS
+$ ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -l -e 2023-01-27 -s 2023-01-26 -m DAILY
+
+# Costs exported in CSV format
+$ ccexplorer get aws -g DIMENSION=LINKED_ACCOUNT,DIMENSION=OPERATION -l -m DAILY -p csv
+
+# Costs exported to stdout
+$ ccexplorer get aws -g DIMENSION=LINKED_ACCOUNT,DIMENSION=OPERATION -l -m DAILY -p stdout
+
+# Costs grouped by MONTH by SERVICE and OPERATION and printed to chart
+ccexplorer get aws -g DIMENSION=SERVICE, DIMENSION=OPERATION -l -e 2023-01-27 -s 2023-01-26 -m MONTHLY -p chart
+
+# Costs grouped by MONTH by OPERATION and USAGE_TYPE and printed to chart
+ccexplorer get aws -g DIMENSION=OPERATION,DIMENSION=USAGE_TYPE -l -e 2023-01-27 -s 2023-01-26 -m MONTHLY -p chart
+
+
 ```
 
 #### Default settings
@@ -148,13 +170,20 @@ used to filter and group resources based on their
 AWS resource types. This can be achieved by using the group by and filter 
 flags 
 
-- If no billing period is specified, thecurrent calendar month will be used. 
+- If no billing period is specified, the current calendar month will be used. 
+- UnblendedCost is the default cost metric. Other metrics can be specified 
+  using the `-i` flag.
+- Selecting the chart output format `-p chart` returns a pie chart of the 15 
+  most expensive services.
 - Results are sorted by cost in descending order.
 - Refunds, discounts and credits are applied automatically. The `-l` flag 
   should be used to exclude this behavior.
 - When filtering by cost allocation tags (`-f TAG="my-tag"`) a tag must also 
   be specified in the group by flag (`-g TAG=ApplicationName`). This 
   instructs the `ccExplorer` to filter by `ApplicationName=my-tag` .
+- Hourly results can be returned by using the `-s` and `-e` flags and 
+  providing an ISO 8601 formatted date and time for example `-s 
+  2022-10-10T00:00:00Z -e 2022-10-10T23:59:59Z`. 
   
 
 ## Additional Information

@@ -2,14 +2,53 @@ package printer
 
 import (
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
+	"github.com/jedib0t/go-pretty/v6/table"
 	"sort"
 )
+
+type PrintWriterType int
+
+const (
+	Stdout PrintWriterType = iota
+	CSV
+	Chart
+)
+
+type PrinterError struct {
+	msg string
+}
+
+func (e PrinterError) Error() string {
+	return e.msg
+}
+
+type Printer interface {
+	Print(interface{}, interface{}) error
+}
+type StdoutPrinter struct {
+	Variant string
+}
+
+type CsvPrinter struct {
+	Variant string
+}
+
+type ChartPrinter struct {
+	Variant string
+}
+
+type CostAndUsage struct {
+	Rows  []table.Row
+	Total float64
+}
 
 type CostAndUsageReport struct {
 	Services    map[int]Service
 	Start       string
 	End         string
 	Granularity string
+	Dimensions  []string
+	Tags        []string
 }
 
 type Service struct {
@@ -28,14 +67,31 @@ type Metrics struct {
 	UsageQuantity float64
 }
 
+type Renderer struct {
+}
+
 type ForecastPrintData struct {
 	Forecast *costexplorer.GetCostForecastOutput
 	Filters  []string
 }
 
-type CostAndUsageReportPrintData struct {
-	Report      *costexplorer.GetCostAndUsageOutput
+type CostAndUsageOutputType struct {
+	Services    map[int]Service
 	Granularity string
+	Start       string
+	End         string
+	Dimensions  []string
+	Tags        []string
+}
+
+type ChartData struct {
+	StartDate      string
+	EndDate        string
+	Granularity    string
+	DimensionOrTag string
+	Title          string
+	SubTitle       string
+	NumericValues  float64
 }
 
 func (c CostAndUsageReport) Len() int {

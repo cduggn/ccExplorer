@@ -12,6 +12,8 @@ var (
 	costUsageStartDate        string
 	costUsageEndDate          string
 	costUsageWithoutDiscounts bool
+	costAndUsagePrintFormat   string
+	costAndUsageMetric        string
 )
 
 func CostAndUsageCommand(c *cobra.Command) *cobra.Command {
@@ -36,10 +38,17 @@ func CostAndUsageCommand(c *cobra.Command) *cobra.Command {
 
 	c.Flags().StringVarP(&costUsageStartDate, "startDate", "s",
 		helpers.DefaultStartDate(helpers.DayOfCurrentMonth, helpers.SubtractDays),
-		"End date (defaults to the start of the current month)")
+		"Start date (defaults to the start of the current month)")
 	c.Flags().StringVarP(&costUsageEndDate, "endDate", "e",
 		helpers.DefaultEndDate(helpers.Format),
-		"Start date *(defaults to the present day)")
+		"End date *(defaults to the present day)")
+
+	c.Flags().StringVarP(&costAndUsagePrintFormat, "printFormat", "p", "stdout",
+		"Valid values: stdout, csv, chart (default: stdout)")
+
+	c.Flags().StringVarP(&costAndUsageMetric, "metric", "i", "UnblendedCost",
+		"Valid values: AmortizedCost, BlendedCost, NetAmortizedCost, "+
+			"NetUnblendedCost, NormalizedUsageAmount, UnblendedCost, UsageQuantity (default: UnblendedCost)")
 
 	return c
 }

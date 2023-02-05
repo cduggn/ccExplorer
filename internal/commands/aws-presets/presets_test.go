@@ -28,6 +28,7 @@ func TestGeneratePresetQuery(t *testing.T) {
 					FilterByDimension: true,
 					FilterByTag:       true,
 					ExcludeDiscounts:  true,
+					Granularity:       "MONTHLY",
 				},
 			},
 			want: aws.CostAndUsageRequestType{
