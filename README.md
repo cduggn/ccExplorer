@@ -155,6 +155,12 @@ $ ccexplorer get aws -g DIMENSION=LINKED_ACCOUNT,DIMENSION=OPERATION -l -m DAILY
 # Costs exported to stdout
 $ ccexplorer get aws -g DIMENSION=LINKED_ACCOUNT,DIMENSION=OPERATION -l -m DAILY -p stdout
 
+# Costs grouped by MONTH by SERVICE and OPERATION and printed to chart
+ccexplorer get aws -g DIMENSION=SERVICE, DIMENSION=OPERATION -l -e 2023-01-27 -s 2023-01-26 -m MONTHLY -p chart
+
+# Costs grouped by MONTH by OPERATION and USAGE_TYPE and printed to chart
+ccexplorer get aws -g DIMENSION=OPERATION,DIMENSION=USAGE_TYPE -l -e 2023-01-27 -s 2023-01-26 -m MONTHLY -p chart
+
 
 ```
 
@@ -164,7 +170,11 @@ used to filter and group resources based on their
 AWS resource types. This can be achieved by using the group by and filter 
 flags 
 
-- If no billing period is specified, thecurrent calendar month will be used. 
+- If no billing period is specified, the current calendar month will be used. 
+- UnblendedCost is the default cost metric. Other metrics can be specified 
+  using the `-i` flag.
+- Selecting the chart output format `-p chart` returns a pie chart of the 15 
+  most expensive services.
 - Results are sorted by cost in descending order.
 - Refunds, discounts and credits are applied automatically. The `-l` flag 
   should be used to exclude this behavior.

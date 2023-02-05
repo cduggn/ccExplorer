@@ -34,6 +34,13 @@ const (
 
   # Costs grouped by DAY by SERVICE and OPERATION and printed to CSV
   ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -l -e 2023-01-27 -s 2023-01-26 -m DAILY -p csv
+
+  # Costs grouped by MONTH by SERVICE and OPERATION and printed to chart
+  ccexplorer get aws -g DIMENSION=SERVICE, DIMENSION=OPERATION -l -e 2023-01-27 -s 2023-01-26 -m MONTHLY -p chart
+ 
+  # Costs grouped by MONTH by OPERATION and USAGE_TYPE and printed to chart
+  ccexplorer get aws -g DIMENSION=OPERATION,DIMENSION=USAGE_TYPE -l -e 2023-01-27 -s 2023-01-26 -m MONTHLY -p chart
+
 `
 	forecastExamples = `
   # Service forecast for the next 30 days
