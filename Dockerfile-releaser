@@ -1,5 +1,9 @@
 FROM alpine:latest
 
-ADD ccexplorer /
+COPY ccexplorer /app/ccexplorer
 
-ENTRYPOINT ["./ccexplorer"]
+WORKDIR /app
+
+RUN mkdir output && chown -R $(whoami) output
+
+ENTRYPOINT ["/app/ccexplorer"]

@@ -24,11 +24,14 @@ alt="release status">
 </div>
 
 `ccExplorer` (Cloud cost explorer) is a simple command line tool to explore the 
-cost of your cloud resources. It's not 
-designed as a replacement for the official AWS CLI and does not offer the 
-same exhaustive search option. It does however return results in a more
-human-readable format, and orders them by cost in descending order.
-It's primary use case is to surface costs based on pre-defined cost allocation tags. 
+cost of your cloud resources. It's built on opensource tools like [cobra](https://github.com/spf13/cobra),
+[go-echarts](https://github.com/go-echarts/go-echarts), and [go-pretty](https://github.com/jedib0t/go-pretty).
+It lets you quickly surface cost and usage metrics associated with your AWS 
+account and visualize them in a human-readable format like a table, csv file, 
+or chart.
+It's not designed as a replacement for the official AWS COST Explorer CLI 
+but does provide some nice features for visualization and result sorting. 
+
 
 Installation
 ------------
@@ -51,25 +54,23 @@ $ git clone https://github.com/cduggn/ccExplorer.git
 
 $ cd ccExplorer 
 
-$ go run .\cmd\ccexplorer\ccexplorer.go get aws -g DIMENSION=SERVICE,
-DIMENSION=OPERATION -f SERVICE="Amazon DynamoDB"  -l
+$ go run .\cmd\ccexplorer\ccexplorer.go get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -f SERVICE="Amazon DynamoDB"  -l -p csv
 ```
 
 #### From`docker`:
 
 ```console
 # download
-
-$ docker pull ghcr.io/cduggn/ccexplorer:v0.3.0
+$ docker pull ghcr.io/cduggn/ccexplorer:v0.3.8
 
 # Container requires AWS Access key, secret, and region
-
 $ docker run -it \
   -e AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID> \
   -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
   -e AWS_REGION=<AWS-REGION> \
-  ghcr.io/cduggn/ccexplorer:v0.3.0 get aws -g DIMENSION=OPERATION,
-  DIMENSION=SERVICE -l 
+  --mount type=bind,source="$(pwd)"/output/,target=/app/output \
+  ghcr.io/cduggn/ccexplorer:v0.3.8 get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE \
+  -l -p chart
   
 ```
 
@@ -173,8 +174,8 @@ flags
 - If no billing period is specified, the current calendar month will be used. 
 - UnblendedCost is the default cost metric. Other metrics can be specified 
   using the `-i` flag.
-- Selecting the chart output format `-p chart` returns a pie chart of the 15 
-  most expensive services.
+- `ccExplorer` prints to stdout by default. The `-p` flag can be used to 
+  specify the output format (csv, chart, stdout).
 - Results are sorted by cost in descending order.
 - Refunds, discounts and credits are applied automatically. The `-l` flag 
   should be used to exclude this behavior.
