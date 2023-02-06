@@ -26,5 +26,7 @@ FROM alpine:3.17 as run-stage
 # Copy the binary from build-stage
 COPY --from=build-stage /app/ccexplorer .
 
+RUN mkdir output && chown -R $(whoami) output
+
 # Command to run the executable
 ENTRYPOINT ["./ccexplorer"]
