@@ -3,7 +3,6 @@ package aws
 import (
 	"context"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
-	"github.com/cduggn/ccexplorer/pkg/storage"
 )
 
 type AWSClient interface {
@@ -18,10 +17,6 @@ type AWSClient interface {
 
 type APIClient struct {
 	*costexplorer.Client
-}
-
-type DatabaseManager struct {
-	dbClient *storage.CostDataStorage
 }
 
 type DBError struct {
