@@ -87,13 +87,15 @@ $ ccexplorer --help
 When you invoke a command, `ccExplorer` will use the AWS 
 credential chain to authenticate with AWS.
 
-Presets are the most common way to use `ccExplorer`. Presets are a 
-set of pre-defined cost and usage queries that can be used to quickly get a 
-sense of the cost of your cloud resources. 
+Use the `run-query` command to view and execute a list of preset commands when getting started.
 
 ```console
 $ ccexplorer run-query
 ```
+
+For more advanced usage, you can use the `get` command to query AWS Cost and Usage Reports.
+
+```console
 
 #### Sample queries
 
