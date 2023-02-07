@@ -30,7 +30,7 @@ It lets you quickly surface cost and usage metrics associated with your AWS
 account and visualize them in a human-readable format like a table, csv file, 
 or chart.
 It's not designed as a replacement for the official AWS COST Explorer CLI 
-but does provide some nice features for visualization and result sorting. 
+but does provide some nice features for visualization. 
 
 
 Installation
