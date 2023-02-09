@@ -2,31 +2,55 @@ package printer
 
 import (
 	"fmt"
-	"io"
-	"os"
-
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/components"
 	"github.com/go-echarts/go-echarts/v2/opts"
+	"io"
+	"os"
 )
 
-func pieRadius(r CostAndUsageOutputType) []*charts.Pie {
+func (Renderer) Charts(r CostAndUsageOutputType) error {
+	page := components.NewPage()
+	page.PageTitle = "Cost and Usage Report"
 
-	var pies []*charts.Pie
+	p := buildPieCharts(r)
+	for _, chart := range p {
+		page.AddCharts(chart)
+	}
+
+	f, err := createOutputFile()
+	if err != nil {
+		return PrinterError{
+			msg: "Failed creating ccexplorer.html: " + err.Error(),
+		}
+	}
+
+	err = renderCharts(page, f)
+	if err != nil {
+		return PrinterError{
+			msg: "Failed rendering chart: " + err.Error(),
+		}
+	}
+	return nil
+}
+
+func buildPieCharts(r CostAndUsageOutputType) []*charts.Pie {
+
+	var pieC []*charts.Pie
 	dimensions := r.Dimensions
 	if len(dimensions) > 1 {
 		for index, dimension := range dimensions {
-			pies = append(pies, RenderPieChart(r.Services, dimension, index,
+			pieC = append(pieC, DefinePieChartProperties(r.Services, dimension, index,
 				r.Granularity, r.Start, r.End))
 		}
 	} else {
-		pies = append(pies, RenderPieChart(r.Services, dimensions[0], 0, r.Granularity, r.Start, r.End))
+		pieC = append(pieC, DefinePieChartProperties(r.Services, dimensions[0], 0, r.Granularity, r.Start, r.End))
 	}
-	return pies
+	return pieC
 
 }
 
-func RenderPieChart(s map[int]Service, d string, index int,
+func DefinePieChartProperties(s map[int]Service, d string, index int,
 	granularity string, start string, end string) *charts.Pie {
 	pie := charts.NewPie()
 	pie.SetGlobalOptions(
@@ -64,27 +88,10 @@ func RenderPieChart(s map[int]Service, d string, index int,
 	return pie
 }
 
-func (Renderer) Charts(r CostAndUsageOutputType) error {
-	page := components.NewPage()
+func createOutputFile() (*os.File, error) {
+	return os.Create("./output/ccexplorer.html")
+}
 
-	charts := pieRadius(r)
-
-	for _, chart := range charts {
-		page.AddCharts(chart)
-	}
-	page.PageTitle = "Cost and Usage Report"
-
-	f, err := os.Create("./output/ccexplorer.html")
-	if err != nil {
-		return PrinterError{
-			msg: "Failed creating ccexplorer.html: " + err.Error(),
-		}
-	}
-	err = page.Render(io.MultiWriter(f))
-	if err != nil {
-		return PrinterError{
-			msg: "Failed rendering chart: " + err.Error(),
-		}
-	}
-	return nil
+func renderCharts(p *components.Page, f *os.File) error {
+	return p.Render(io.MultiWriter(f))
 }
