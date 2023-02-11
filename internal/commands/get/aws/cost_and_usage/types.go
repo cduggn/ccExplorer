@@ -15,4 +15,5 @@ type CommandLineInput struct {
 	Interval            string
 	PrintFormat         string
 	Metrics             []string
+	SortByDate          bool
 }

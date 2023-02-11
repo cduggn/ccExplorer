@@ -3,10 +3,16 @@ package printer
 import (
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/jedib0t/go-pretty/v6/table"
-	"sort"
 )
 
 type PrintWriterType int
+
+type SortBy int
+
+const (
+	Amount SortBy = iota
+	Date
+)
 
 const (
 	Stdout PrintWriterType = iota
@@ -82,6 +88,7 @@ type CostAndUsageOutputType struct {
 	End         string
 	Dimensions  []string
 	Tags        []string
+	SortBy      string
 }
 
 type ChartData struct {
@@ -154,32 +161,4 @@ func (m Metrics) Equals(m2 Metrics) bool {
 		return false
 	}
 	return true
-}
-
-func SortServicesByMetricAmount(r map[int]Service) []Service {
-	// Create a slice of key-value pairs
-	pairs := make([]struct {
-		Key   int
-		Value Service
-	}, len(r))
-	i := 0
-	for k, v := range r {
-		pairs[i] = struct {
-			Key   int
-			Value Service
-		}{k, v}
-		i++
-	}
-
-	// Sort the slice by the Value.Metrics[0].Amount field
-	sort.SliceStable(pairs, func(i, j int) bool {
-		return pairs[i].Value.Metrics[0].NumericAmount > pairs[j].Value.
-			Metrics[0].NumericAmount
-	})
-
-	result := make([]Service, len(pairs))
-	for i, pair := range pairs {
-		result[i] = pair.Value
-	}
-	return result
 }

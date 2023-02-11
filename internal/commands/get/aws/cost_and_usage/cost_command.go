@@ -14,6 +14,7 @@ var (
 	costUsageWithoutDiscounts bool
 	costAndUsagePrintFormat   string
 	costAndUsageMetric        string
+	costUsageSortByDate       bool
 )
 
 func CostAndUsageCommand(c *cobra.Command) *cobra.Command {
@@ -35,6 +36,11 @@ func CostAndUsageCommand(c *cobra.Command) *cobra.Command {
 		false,
 		"Exclude credit, refunds, "+
 			"and discounts (default is to include)")
+
+	c.Flags().BoolVarP(&costUsageSortByDate, "sortByDate", "d",
+		false,
+		"Sort results by date in descending order("+
+			"default is to sort by cost in descending order)")
 
 	c.Flags().StringVarP(&costUsageStartDate, "startDate", "s",
 		helpers.DefaultStartDate(helpers.DayOfCurrentMonth, helpers.SubtractDays),

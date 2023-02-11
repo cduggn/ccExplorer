@@ -53,7 +53,8 @@ func (p *StdoutPrinter) Print(f interface{}, c interface{}) error {
 	case "forecast":
 		ForecastToStdout(f.(ForecastPrintData), c.([]string))
 	case "costAndUsage":
-		CostAndUsageToStdout(f.(func(r map[int]Service) []Service), c.(CostAndUsageOutputType))
+		fn := SortFunction(f.(string))
+		CostAndUsageToStdout(fn, c.(CostAndUsageOutputType))
 	}
 	return nil
 
@@ -63,8 +64,8 @@ func (p *CsvPrinter) Print(f interface{}, c interface{}) error {
 	switch p.Variant {
 	// no requirement for csv printing for forecast
 	case "costAndUsage":
-		err := CostAndUsageToCSV(f.(func(r map[int]Service) []Service),
-			c.(CostAndUsageOutputType))
+		fn := SortFunction(f.(string))
+		err := CostAndUsageToCSV(fn, c.(CostAndUsageOutputType))
 		if err != nil {
 			return err
 		}
@@ -76,8 +77,8 @@ func (p *ChartPrinter) Print(f interface{}, c interface{}) error {
 	switch p.Variant {
 	// no requirement for csv printing for forecast
 	case "costAndUsage":
-		err := CostAndUsageToChart(f.(func(r map[int]Service) []Service),
-			c.(CostAndUsageOutputType))
+		fn := SortFunction(f.(string))
+		err := CostAndUsageToChart(fn, c.(CostAndUsageOutputType))
 		if err != nil {
 			return err
 		}

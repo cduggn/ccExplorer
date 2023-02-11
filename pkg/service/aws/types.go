@@ -80,6 +80,7 @@ type CostAndUsageRequestType struct {
 	Rates                      []string
 	PrintFormat                string
 	Metrics                    []string
+	SortByDate                 bool
 }
 
 type CostAndUsageRequestWithResourcesType struct {

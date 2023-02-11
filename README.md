@@ -29,8 +29,7 @@ cost of your cloud resources. It's built on opensource tools like [cobra](https:
 It lets you quickly surface cost and usage metrics associated with your AWS 
 account and visualize them in a human-readable format like a table, csv file, 
 or chart. It was created so I could quickly explore and reason about service costs without switching context from the command line.
-It's not designed as a replacement for the official AWS COST Explorer CLI 
-but does provide some nice features for visualization. 
+It's not designed as a replacement for the official AWS COST Explorer CLI but does provide some nice features for visualization and sorting. 
 
 
 Installation
@@ -117,7 +116,10 @@ $ ccexplorer get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE -s 2022-10-10 -f S
 $ ccexplorer get aws -g DIMENSION=SERVICE -s 2022-10-10
 
 # All service costs grouped by SERVICE and OPERATION
-$ ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -s 2022-10- -l
+$ ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -s 2022-10-01 -l
+
+# All service costs grouped by SERVICE and OPERATION and sorted in descending order by date
+$ ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -s 2023-01-01 -e 2023-02-10 -l -d
 
 # S3 costs grouped by OPERATION 
 $ ccexplorer get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE -s 2022-04-04  -f SERVICE="Amazon Simple Storage Service" -l
@@ -178,7 +180,8 @@ flags
   using the `-i` flag.
 - `ccExplorer` prints to stdout by default. The `-p` flag can be used to 
   specify the output format (csv, chart, stdout).
-- Results are sorted by cost in descending order.
+- Results are sorted by default by cost in descending order. The `-d` flag 
+  can be used to specify date sorting in descending order.
 - Refunds, discounts and credits are applied automatically. The `-l` flag 
   should be used to exclude this behavior.
 - When filtering by cost allocation tags (`-f TAG="my-tag"`) a tag must also 
