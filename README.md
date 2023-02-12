@@ -60,7 +60,7 @@ $ go run .\cmd\ccexplorer\ccexplorer.go get aws -g DIMENSION=SERVICE,DIMENSION=O
 
 ```console
 # download
-$ docker pull ghcr.io/cduggn/ccexplorer:v0.3.9
+$ docker pull ghcr.io/cduggn/ccexplorer:v0.3.10
 
 # Container requires AWS Access key, secret, and region
 $ docker run -it \
@@ -68,7 +68,8 @@ $ docker run -it \
   -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
   -e AWS_REGION=<AWS-REGION> \
   --mount type=bind,source="$(pwd)"/output/,target=/app/output \
-  ghcr.io/cduggn/ccexplorer:v0.3.9 get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE \
+  ghcr.io/cduggn/ccexplorer:v0.3.10 get aws -g DIMENSION=OPERATION,
+  DIMENSION=SERVICE \
   -l -p chart
   
 ```
@@ -119,7 +120,7 @@ $ ccexplorer get aws -g DIMENSION=SERVICE -s 2022-10-10
 $ ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -s 2022-10-01 -l
 
 # All service costs grouped by SERVICE and OPERATION and sorted in descending order by date
-$ ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -s 2023-01-01 -e 2023-02-10 -l -d
+$ ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -s 2023-01-01 -e 2023-02-10 -l -d -m DAILY
 
 # S3 costs grouped by OPERATION 
 $ ccexplorer get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE -s 2022-04-04  -f SERVICE="Amazon Simple Storage Service" -l

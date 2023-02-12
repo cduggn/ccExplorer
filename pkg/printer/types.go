@@ -45,7 +45,7 @@ type ChartPrinter struct {
 
 type CostAndUsage struct {
 	Rows  []table.Row
-	Total float64
+	Total string
 }
 
 type CostAndUsageReport struct {

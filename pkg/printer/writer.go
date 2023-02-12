@@ -18,7 +18,7 @@ var (
 		"-", "-", "-", "-",
 		"-",
 		"-", ""}
-	costAndUsageTableFooter = func(t float64) table.Row {
+	costAndUsageTableFooter = func(t string) table.Row {
 		return table.
 			Row{"", "",
 			"",

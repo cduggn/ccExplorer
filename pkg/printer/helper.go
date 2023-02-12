@@ -53,7 +53,8 @@ func CostUsageToRows(s []Service, granularity string) CostAndUsage {
 			rows = append(rows, tempRow)
 		}
 	}
-	return CostAndUsage{Rows: rows, Total: total}
+	totalFormatted := fmt.Sprintf("%f10", total)
+	return CostAndUsage{Rows: rows, Total: totalFormatted}
 }
 
 func ForecastToRows(r ForecastPrintData) []table.Row {

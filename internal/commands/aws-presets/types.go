@@ -17,4 +17,5 @@ type PresetParams struct {
 	Description       []string
 	Granularity       string
 	PrintFormat       string
+	Metric            []string
 }
