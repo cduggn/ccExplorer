@@ -18,7 +18,7 @@ const (
   ccexplorer get aws -g DIMENSION=SERVICE -s 2022-10-10
 
   # All service costs grouped by SERVICE and OPERATION
-  ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -s 2022-10- -l
+  ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -s 2022-10-01 -l
 
   # S3 costs grouped by OPERATION
   ccexplorer get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE -s 2022-04-04  -f SERVICE="Amazon Simple Storage Service" -l
@@ -40,6 +40,9 @@ const (
  
   # Costs grouped by MONTH by OPERATION and USAGE_TYPE and printed to chart
   ccexplorer get aws -g DIMENSION=OPERATION,DIMENSION=USAGE_TYPE -l -e 2023-01-27 -s 2023-01-26 -m MONTHLY -p chart
+
+  # All service costs grouped by SERVICE and OPERATION and sorted in descending order by date
+  ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -s 2023-01-01 -e 2023-02-10 -l -d
 
 `
 	forecastExamples = `

@@ -8,7 +8,9 @@ import (
 	"github.com/go-echarts/go-echarts/v2/opts"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"os"
+	"sort"
 	"strconv"
+	"time"
 )
 
 func CreateTable(header table.Row) table.Writer {
@@ -51,7 +53,8 @@ func CostUsageToRows(s []Service, granularity string) CostAndUsage {
 			rows = append(rows, tempRow)
 		}
 	}
-	return CostAndUsage{Rows: rows, Total: total}
+	totalFormatted := fmt.Sprintf("%f10", total)
+	return CostAndUsage{Rows: rows, Total: totalFormatted}
 }
 
 func ForecastToRows(r ForecastPrintData) []table.Row {
@@ -200,4 +203,74 @@ func CreateOutPutDir() (string, error) {
 		}
 	}
 	return dir, nil
+}
+
+func SortFunction(sortBy string) func(r map[int]Service) []Service {
+	switch sortBy {
+	case "date":
+		return SortServicesByStartDate
+	case "cost":
+		return SortServicesByMetricAmount
+	default:
+		return SortServicesByMetricAmount
+	}
+}
+
+func SortServicesByMetricAmount(r map[int]Service) []Service {
+	// Create a slice of key-value pairs
+	pairs := make([]struct {
+		Key   int
+		Value Service
+	}, len(r))
+	i := 0
+	for k, v := range r {
+		pairs[i] = struct {
+			Key   int
+			Value Service
+		}{k, v}
+		i++
+	}
+
+	// Sort the slice by the Value.Metrics[0].Amount field
+	sort.SliceStable(pairs, func(i, j int) bool {
+		return pairs[i].Value.Metrics[0].NumericAmount > pairs[j].Value.
+			Metrics[0].NumericAmount
+	})
+
+	result := make([]Service, len(pairs))
+	for i, pair := range pairs {
+		result[i] = pair.Value
+	}
+	return result
+}
+
+func SortServicesByStartDate(r map[int]Service) []Service {
+	// Create a slice of key-value pairs
+	pairs := make([]struct {
+		Key   int
+		Value Service
+	}, len(r))
+	i := 0
+	for k, v := range r {
+		pairs[i] = struct {
+			Key   int
+			Value Service
+		}{k, v}
+		i++
+	}
+
+	// Sort the slice by the Value.Metrics[0].Amount field
+	sort.SliceStable(pairs, func(i, j int) bool {
+
+		t1, _ := time.Parse("2006-01-02", pairs[i].Value.Start)
+		t2, _ := time.Parse("2006-01-02", pairs[j].Value.Start)
+		return t1.After(t2)
+	})
+
+	result := make([]Service, len(pairs))
+	for i, pair := range pairs {
+		result[i] = pair.Value
+	}
+	return result
+
 }

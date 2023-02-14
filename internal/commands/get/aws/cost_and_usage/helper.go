@@ -13,3 +13,10 @@ func IsValidMetric(m string) bool {
 		m == "NetUnblendedCost" || m == "NormalizedUsageAmount" || m == "UnblendedCost" ||
 		m == "UsageQuantity"
 }
+
+func SortByFn(sortByDate bool) string {
+	if sortByDate {
+		return "date"
+	}
+	return "cost"
+}

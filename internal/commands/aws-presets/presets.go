@@ -88,6 +88,8 @@ func SynthesizeQuery(p PresetParams) (aws.CostAndUsageRequestType,
 		Granularity:      p.Granularity,
 		ExcludeDiscounts: p.ExcludeDiscounts,
 		PrintFormat:      p.PrintFormat,
+		SortByDate:       false,
+		Metrics:          p.Metric,
 	}, nil
 }
 

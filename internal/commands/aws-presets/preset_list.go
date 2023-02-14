@@ -16,6 +16,7 @@ func PresetList() []PresetParams {
 				"DIMENSION=LINKED_ACCOUNT -l ]",
 			Granularity: "MONTHLY",
 			PrintFormat: "stdout",
+			Metric:      []string{"UnblendedCost"},
 		},
 		{
 			Alias:             "Costs grouped by USAGE_TYPE",
@@ -31,6 +32,7 @@ func PresetList() []PresetParams {
 				"DIMENSION=USAGE_TYPE -l ]",
 			Granularity: "MONTHLY",
 			PrintFormat: "stdout",
+			Metric:      []string{"UnblendedCost"},
 		},
 		{
 			Alias:             "Costs grouped by OPERATION",
@@ -46,6 +48,7 @@ func PresetList() []PresetParams {
 				"DIMENSION=OPERATION -l ]",
 			Granularity: "MONTHLY",
 			PrintFormat: "stdout",
+			Metric:      []string{"UnblendedCost"},
 		},
 		{
 			Alias:             "S3 costs grouped by OPERATION",
@@ -62,6 +65,7 @@ func PresetList() []PresetParams {
 				" Service\"]",
 			Granularity: "MONTHLY",
 			PrintFormat: "stdout",
+			Metric:      []string{"UnblendedCost"},
 		},
 		{
 			Alias:             "S3 costs grouped by USAGE_TYPE",
@@ -78,6 +82,7 @@ func PresetList() []PresetParams {
 				" Service\" -l ]",
 			Granularity: "MONTHLY",
 			PrintFormat: "stdout",
+			Metric:      []string{"UnblendedCost"},
 		},
 		{
 			Alias:             "S3 costs grouped by LINKED_ACCOUNT",
@@ -94,6 +99,7 @@ func PresetList() []PresetParams {
 				" Service\" -l ]",
 			Granularity: "MONTHLY",
 			PrintFormat: "stdout",
+			Metric:      []string{"UnblendedCost"},
 		},
 		{
 			Alias:             "DynamoDB costs grouped by OPERATION",
@@ -109,6 +115,7 @@ func PresetList() []PresetParams {
 				"DIMENSION=OPERATION -f SERVICE=\"Amazon DynamoDB\" -l ]",
 			Granularity: "MONTHLY",
 			PrintFormat: "stdout",
+			Metric:      []string{"UnblendedCost"},
 		},
 		{
 			Alias:             "DynamoDB costs grouped by USAGE_TYPE",
@@ -124,6 +131,7 @@ func PresetList() []PresetParams {
 				"DIMENSION=USAGE_TYPE -f SERVICE=\"Amazon DynamoDB\" -l ]",
 			Granularity: "MONTHLY",
 			PrintFormat: "stdout",
+			Metric:      []string{"UnblendedCost"},
 		},
 		{
 			Alias:             "DynamoDB costs grouped by LINKED_ACCOUNT",
@@ -139,6 +147,7 @@ func PresetList() []PresetParams {
 				"DIMENSION=LINKED_ACCOUNT -f SERVICE=\"Amazon DynamoDB\" -l ]",
 			Granularity: "MONTHLY",
 			PrintFormat: "stdout",
+			Metric:      []string{"UnblendedCost"},
 		},
 		{
 			Alias:             "Costs grouped by GetCostAndUsage OPERATION",
@@ -154,6 +163,7 @@ func PresetList() []PresetParams {
 				"DIMENSION=OPERATION -f OPERATION=\"GetCostAndUsage\" -l ]",
 			Granularity: "MONTHLY",
 			PrintFormat: "stdout",
+			Metric:      []string{"UnblendedCost"},
 		},
 	}
 	return p

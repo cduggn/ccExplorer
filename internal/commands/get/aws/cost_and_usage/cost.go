@@ -114,6 +114,9 @@ func handleCommandLineInput(cmd *cobra.Command) (CommandLineInput, error) {
 		}
 	}
 
+	// check if exclude tag is set
+	sortByDate, _ := cmd.Flags().GetBool("sortByDate")
+
 	return CommandLineInput{
 		GroupByValues:       groupBy,
 		GroupByTag:          groupByTag,
@@ -127,6 +130,7 @@ func handleCommandLineInput(cmd *cobra.Command) (CommandLineInput, error) {
 		Interval:            granularity,
 		PrintFormat:         printFormat,
 		Metrics:             []string{metric},
+		SortByDate:          sortByDate,
 	}, nil
 
 }
@@ -148,6 +152,7 @@ func synthesizeRequest(input CommandLineInput) aws2.CostAndUsageRequestType {
 		ExcludeDiscounts:           input.ExcludeDiscounts,
 		PrintFormat:                input.PrintFormat,
 		Metrics:                    input.Metrics,
+		SortByDate:                 input.SortByDate,
 	}
 }
 
@@ -170,7 +175,7 @@ func execute(req aws2.CostAndUsageRequestType) error {
 	report := printer.ToCostAndUsageOutputType(costAndUsageResponse, req)
 	p := printer.PrintFactory(printer.ToPrintWriterType(req.PrintFormat),
 		"costAndUsage")
-	err = p.Print(printer.SortServicesByMetricAmount, report)
+	err = p.Print(SortByFn(req.SortByDate), report)
 	if err != nil {
 		return err
 	}
