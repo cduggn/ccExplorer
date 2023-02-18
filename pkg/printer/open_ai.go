@@ -12,7 +12,7 @@ var (
 		" Cost" +
 		" Explorer data. Display date-range, " +
 		"top 20 costs in table descending with borders," +
-		"5 bullet point summary:  "
+		"display a 5 bullet point summary of costs:  "
 	aiFileName = "ccexplorer_ai.html"
 )
 
