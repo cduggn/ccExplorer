@@ -50,7 +50,7 @@ func CostAndUsageCommand(c *cobra.Command) *cobra.Command {
 		"End date *(defaults to the present day)")
 
 	c.Flags().StringVarP(&costAndUsagePrintFormat, "printFormat", "p", "stdout",
-		"Valid values: stdout, csv, chart, openai (default: stdout)")
+		"Valid values: stdout, csv, chart, gpt3 (default: stdout)")
 
 	c.Flags().StringVarP(&costAndUsageMetric, "metric", "i", "UnblendedCost",
 		"Valid values: AmortizedCost, BlendedCost, NetAmortizedCost, "+

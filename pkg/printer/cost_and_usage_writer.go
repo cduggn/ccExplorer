@@ -1,5 +1,7 @@
 package printer
 
+import "fmt"
+
 func CostAndUsageToStdout(sortFn func(r map[int]Service) []Service,
 	r CostAndUsageOutputType) {
 	sortedServices := sortFn(r.Services)
@@ -20,7 +22,7 @@ func CostAndUsageToStdout(sortFn func(r map[int]Service) []Service,
 func CostAndUsageToCSV(sortFn func(r map[int]Service) []Service,
 	r CostAndUsageOutputType) error {
 
-	f, err := NewCSVFile(outputDir, csvFileName)
+	f, err := NewCSVFile(OutputDir, csvFileName)
 	if err != nil {
 		return PrinterError{
 			msg: "Error creating CSV file: " + err.Error()}
@@ -56,6 +58,8 @@ func CostAndUsageToChart(sortFn func(r map[int]Service) []Service,
 func CostAndUsageToOpenAI(sortFn func(r map[int]Service) []Service,
 	r CostAndUsageOutputType) error {
 
+	fmt.Print("GPT3 generating costAndUsage report...")
+
 	rows := ToRows(r.Services, r.Granularity)
 	data := ToCSVString(rows[:20])
 
@@ -64,7 +68,7 @@ func CostAndUsageToOpenAI(sortFn func(r map[int]Service) []Service,
 		return err
 	}
 
-	f, err := NewFile(outputDir, aiFileName)
+	f, err := NewFile(OutputDir, aiFileName)
 	if err != nil {
 		return PrinterError{
 			msg: "Failed creating AI HTML: " + err.Error(),

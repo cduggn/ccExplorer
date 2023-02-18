@@ -162,7 +162,7 @@ func ToPrintWriterType(s string) PrintWriterType {
 		return Stdout
 	case "chart":
 		return Chart
-	case "openai":
+	case "gpt3":
 		return OpenAPI
 	default:
 		return Stdout

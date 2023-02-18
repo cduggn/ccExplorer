@@ -2,6 +2,7 @@ package printer
 
 import (
 	"context"
+	"fmt"
 	gogpt "github.com/sashabaranov/go-gpt3"
 	"os"
 )
@@ -14,6 +15,7 @@ var (
 		"top 20 costs in table descending with borders," +
 		"display a 5 bullet point summary of costs:  "
 	aiFileName = "ccexplorer_ai.html"
+	//standByText
 )
 
 func AIWriter(f *os.File, completions string) error {
@@ -28,6 +30,8 @@ func AIWriter(f *os.File, completions string) error {
 
 func SummarizeWIthAI(apiKey string, data string) (gogpt.CompletionResponse,
 	error) {
+
+	fmt.Println()
 
 	c := gogpt.NewClient(apiKey)
 	ctx := context.Background()

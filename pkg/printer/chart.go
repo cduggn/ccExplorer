@@ -14,7 +14,7 @@ var (
 
 func ChartWriter(p *components.Page) error {
 
-	f, err := NewFile(outputDir, chartFileName)
+	f, err := NewFile(OutputDir, chartFileName)
 	if err != nil {
 		return PrinterError{
 			msg: "Failed creating chart HTML file: " + err.Error(),

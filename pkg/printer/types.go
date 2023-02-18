@@ -107,6 +107,14 @@ type ChartData struct {
 	NumericValues  float64
 }
 
+type FormatError struct {
+	Msg string
+}
+
+func (e FormatError) Error() string {
+	return e.Msg
+}
+
 func (c CostAndUsageReport) Len() int {
 	return len(c.Services)
 }

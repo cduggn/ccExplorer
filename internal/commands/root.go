@@ -36,11 +36,9 @@ func RootCommand() *cobra.Command {
 func init() {
 	rootCmd.AddCommand(get.AWSCostAndUsageCommand())
 	rootCmd.AddCommand(aws_presets.AddAWSPresetCommands())
-	err := viper.BindPFlag("open_ai_api_key", rootCmd.PersistentFlags().Lookup(
+	_ = viper.BindPFlag("open_ai_api_key", rootCmd.PersistentFlags().Lookup(
 		"OPEN_AI_API_KEY"))
-	if err != nil {
-		fmt.Println("OPEN_AI_API_KEY not set")
-	}
+
 }
 
 func paintRootHeader() string {
@@ -59,8 +57,8 @@ func LoadConfig(path string) {
 
 	viper.AutomaticEnv()
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+		fmt.Println("Using config file at:", viper.ConfigFileUsed())
 	} else {
-		fmt.Println("No config file found:", err.Error())
+		fmt.Println("No config file specified:", err.Error())
 	}
 }

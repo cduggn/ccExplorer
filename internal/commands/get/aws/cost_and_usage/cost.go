@@ -101,11 +101,11 @@ func handleCommandLineInput(cmd *cobra.Command) (CommandLineInput, error) {
 	printFormat := cmd.Flags().Lookup("printFormat").Value.
 		String()
 	printFormat = strings.ToLower(printFormat)
-	isValidPrintFormat := IsValidPrintFormat(printFormat)
+	isValidPrintFormat := ValidatePrintFormat(printFormat, openAIKey)
 	if !isValidPrintFormat {
 		return CommandLineInput{}, aws.ValidationError{
 			Message: "Invalid print format. " +
-				"Please use one of the following: stdout, csv, chart",
+				"Please use one of the following: stdout, csv, chart, gpt3",
 		}
 	}
 
