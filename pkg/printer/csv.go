@@ -12,7 +12,9 @@ var (
 		"Granularity",
 		"Start",
 		"End", "USD Amount", "Unit"}
-	csvFileName = "ccexplorer.csv"
+	csvFileName           = "ccexplorer.csv"
+	csvHeaderPromptFormat = "Dimension/Tag,Dimension/Tag,Metric," +
+		"Granularity,Start,End,USD Amount,Unit;"
 )
 
 func CSVWriter(f *os.File, header []string, rows [][]string) error {
@@ -51,6 +53,9 @@ func NewCSVFile(dir string, file string) (*os.File, error) {
 
 func ToCSVString(rows [][]string) string {
 	var buf bytes.Buffer
+
+	buf.WriteString(csvHeaderPromptFormat)
+
 	for i, row := range rows {
 		for j, col := range row {
 			buf.WriteString(col)
