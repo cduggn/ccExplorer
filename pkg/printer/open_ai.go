@@ -8,14 +8,8 @@ import (
 )
 
 var (
-	aiPrompt = "Create HTML report using the CSV provided which represents" +
-		" AWS" +
-		" Cost" +
-		" Explorer data. Display date-range, " +
-		"top 20 costs in table descending with borders," +
-		"display a 5 bullet point summary of costs:  "
+	aiPrompt   = "Create a styled HTML page summary of the following data. Use a table with alternate color for each row. Dispaly the headings which is the first row for csv data. Make three cost reducing recommendations"
 	aiFileName = "ccexplorer_ai.html"
-	//standByText
 )
 
 func AIWriter(f *os.File, completions string) error {
@@ -31,14 +25,14 @@ func AIWriter(f *os.File, completions string) error {
 func SummarizeWIthAI(apiKey string, data string) (gogpt.CompletionResponse,
 	error) {
 
-	fmt.Println()
+	fmt.Println("Generating costAndUsage report with gpt3...")
 
 	c := gogpt.NewClient(apiKey)
 	ctx := context.Background()
 
 	req := gogpt.CompletionRequest{
 		Model:     gogpt.GPT3TextDavinci003,
-		MaxTokens: 1500,
+		MaxTokens: 400,
 		Prompt:    BuildPromptText(data),
 	}
 	resp, err := c.CreateCompletion(ctx, req)

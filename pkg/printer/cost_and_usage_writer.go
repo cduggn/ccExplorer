@@ -1,7 +1,5 @@
 package printer
 
-import "fmt"
-
 func CostAndUsageToStdout(sortFn func(r map[int]Service) []Service,
 	r CostAndUsageOutputType) {
 	sortedServices := sortFn(r.Services)
@@ -57,8 +55,6 @@ func CostAndUsageToChart(sortFn func(r map[int]Service) []Service,
 
 func CostAndUsageToOpenAI(sortFn func(r map[int]Service) []Service,
 	r CostAndUsageOutputType) error {
-
-	fmt.Print("GPT3 generating costAndUsage report...")
 
 	rows := ToRows(r.Services, r.Granularity)
 	data := ToCSVString(rows[:20])
