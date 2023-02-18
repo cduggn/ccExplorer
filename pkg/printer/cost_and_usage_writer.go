@@ -1,16 +1,5 @@
 package printer
 
-import (
-	"encoding/csv"
-	"os"
-)
-
-var (
-	header = []string{"Dimension/Tag", "Dimension/Tag", "Metric", "Granularity",
-		"Start",
-		"End", "USD Amount", "Unit"}
-)
-
 func CostAndUsageToStdout(sortFn func(r map[int]Service) []Service,
 	r CostAndUsageOutputType) {
 	sortedServices := sortFn(r.Services)
@@ -31,36 +20,18 @@ func CostAndUsageToStdout(sortFn func(r map[int]Service) []Service,
 func CostAndUsageToCSV(sortFn func(r map[int]Service) []Service,
 	r CostAndUsageOutputType) error {
 
-	_, err := CreateOutPutDir()
-	if err != nil {
-		return PrinterError{
-			msg: "Error creating output directory: " + err.Error(),
-		}
-	}
-
-	f, err := os.Create("./output/ccexplorer.csv")
+	f, err := NewCSVFile(outputDir, csvFileName)
 	if err != nil {
 		return PrinterError{
 			msg: "Error creating CSV file: " + err.Error()}
 	}
 	defer f.Close()
 
-	// Write the header row
-	w := csv.NewWriter(f)
-	err = w.Write(header)
+	rows := ToRows(r.Services, r.Granularity)
+
+	err = CSVWriter(f, csvheader, rows)
 	if err != nil {
-		return PrinterError{
-			msg: "Error writing header to CSV file: " + err.Error()}
-	}
-
-	var rows [][]string
-	for _, v := range r.Services {
-		rows = append(rows, ConvertServiceToSlice(v, r.Granularity)...)
-	}
-
-	if err := w.WriteAll(rows); err != nil {
-		return PrinterError{
-			msg: "Error writing to CSV file: " + err.Error()}
+		return nil
 	}
 
 	return nil
@@ -69,15 +40,39 @@ func CostAndUsageToCSV(sortFn func(r map[int]Service) []Service,
 func CostAndUsageToChart(sortFn func(r map[int]Service) []Service,
 	r CostAndUsageOutputType) error {
 
-	_, err := CreateOutPutDir()
+	builder := ChartBuilder{}
+	charts, err := builder.NewCharts(r)
 	if err != nil {
-		return PrinterError{
-			msg: "Error creating output directory: " + err.Error(),
-		}
+		return err
 	}
 
-	render := Renderer{}
-	err = render.Charts(r)
+	err = ChartWriter(charts)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func CostAndUsageToOpenAI(sortFn func(r map[int]Service) []Service,
+	r CostAndUsageOutputType) error {
+
+	rows := ToRows(r.Services, r.Granularity)
+	data := ToCSVString(rows[:20])
+
+	resp, err := SummarizeWIthAI(r.OpenAIAPIKey, data)
+	if err != nil {
+		return err
+	}
+
+	f, err := NewFile(outputDir, aiFileName)
+	if err != nil {
+		return PrinterError{
+			msg: "Failed creating AI HTML: " + err.Error(),
+		}
+	}
+	defer f.Close()
+
+	err = AIWriter(f, resp.Choices[0].Text)
 	if err != nil {
 		return err
 	}

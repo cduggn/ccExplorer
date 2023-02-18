@@ -79,12 +79,13 @@ func CurateCostAndUsageReport(
 	d *costexplorer.GetCostAndUsageOutput, query aws2.CostAndUsageRequestType) CostAndUsageOutputType {
 
 	c := CostAndUsageOutputType{
-		Services:    make(map[int]Service),
-		Granularity: query.Granularity,
-		Dimensions:  query.GroupBy,
-		Tags:        query.GroupByTag,
-		Start:       query.Time.Start,
-		End:         query.Time.End,
+		Services:     make(map[int]Service),
+		Granularity:  query.Granularity,
+		Dimensions:   query.GroupBy,
+		Tags:         query.GroupByTag,
+		Start:        query.Time.Start,
+		End:          query.Time.End,
+		OpenAIAPIKey: query.OpenAIAPIKey,
 	}
 
 	c.Services = ResultsToServicesMap(d.ResultsByTime)
@@ -141,13 +142,6 @@ func ReturnIfPresent(s []string) string {
 
 }
 
-func ReturnFirst(s []string) string {
-	if len(s) > 1 {
-		return s[0]
-	}
-	return ""
-}
-
 func ConvertServiceToSlice(s Service, granularity string) [][]string {
 
 	var r [][]string
@@ -168,6 +162,8 @@ func ToPrintWriterType(s string) PrintWriterType {
 		return Stdout
 	case "chart":
 		return Chart
+	case "openai":
+		return OpenAPI
 	default:
 		return Stdout
 	}
@@ -189,21 +185,21 @@ func PopulatePieDate(s map[int]Service, key int) []opts.
 	return items
 }
 
-func CreateOutPutDir() (string, error) {
-
-	dir, err := os.Getwd()
-	if err != nil {
-		return "", err
-	}
-	dir = dir + "/output"
-	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		err = os.Mkdir(dir, 0755)
-		if err != nil {
-			return "", err
-		}
-	}
-	return dir, nil
-}
+//func CreateOutputDir(outputDir string) (string, error) {
+//
+//	dir, err := os.Getwd()
+//	if err != nil {
+//		return "", err
+//	}
+//	dir = dir + outputDir
+//	if _, err := os.Stat(dir); os.IsNotExist(err) {
+//		err = os.Mkdir(dir, 0755)
+//		if err != nil {
+//			return "", err
+//		}
+//	}
+//	return dir, nil
+//}
 
 func SortFunction(sortBy string) func(r map[int]Service) []Service {
 	switch sortBy {
@@ -259,7 +255,6 @@ func SortServicesByStartDate(r map[int]Service) []Service {
 		i++
 	}
 
-	// Sort the slice by the Value.Metrics[0].Amount field
 	sort.SliceStable(pairs, func(i, j int) bool {
 
 		t1, _ := time.Parse("2006-01-02", pairs[i].Value.Start)
@@ -272,5 +267,21 @@ func SortServicesByStartDate(r map[int]Service) []Service {
 		result[i] = pair.Value
 	}
 	return result
+}
 
+func NewFile(dir string, file string) (*os.File, error) {
+	filePath := BuildOutputFilePath(dir, file)
+	return os.Create(filePath)
+}
+
+func ToRows(s map[int]Service, granularity string) [][]string {
+	var rows [][]string
+	for _, v := range s {
+		rows = append(rows, ConvertServiceToSlice(v, granularity)...)
+	}
+	return rows
+}
+
+func BuildOutputFilePath(dir string, fileName string) string {
+	return dir + "/" + fileName
 }

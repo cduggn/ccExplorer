@@ -7,6 +7,7 @@ import (
 	"github.com/cduggn/ccexplorer/pkg/printer"
 	aws2 "github.com/cduggn/ccexplorer/pkg/service/aws"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"strings"
 )
 
@@ -29,6 +30,9 @@ func CostAndUsageRunCmd(cmd *cobra.Command, args []string) error {
 func handleCommandLineInput(cmd *cobra.Command) (CommandLineInput, error) {
 
 	var err error
+
+	// get the open_ai_api_key from the viper config
+	openAIKey := viper.GetString("open_ai_api_key")
 
 	// groupBY dimensions and tags
 	groupByValues := cmd.Flags().Lookup("groupBy").Value
@@ -131,6 +135,7 @@ func handleCommandLineInput(cmd *cobra.Command) (CommandLineInput, error) {
 		PrintFormat:         printFormat,
 		Metrics:             []string{metric},
 		SortByDate:          sortByDate,
+		OpenAIAPIKey:        openAIKey,
 	}, nil
 
 }
@@ -153,6 +158,7 @@ func synthesizeRequest(input CommandLineInput) aws2.CostAndUsageRequestType {
 		PrintFormat:                input.PrintFormat,
 		Metrics:                    input.Metrics,
 		SortByDate:                 input.SortByDate,
+		OpenAIAPIKey:               input.OpenAIAPIKey,
 	}
 }
 

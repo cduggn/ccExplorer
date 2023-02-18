@@ -16,7 +16,12 @@ var (
 		Short: "A CLI tool to explore cloud costs and usage",
 		Long:  paintRootHeader(),
 	}
-	cfgFile string
+	cfgFile        string
+	LoadConfigFunc = func(path string) func() {
+		return func() {
+			LoadConfig(path)
+		}
+	}
 )
 
 func RootCommand() *cobra.Command {
@@ -24,7 +29,7 @@ func RootCommand() *cobra.Command {
 	if err != nil {
 		panic(err.Error())
 	}
-	cobra.OnInitialize(initConfig)
+	cobra.OnInitialize(LoadConfigFunc("."))
 	return rootCmd
 }
 
@@ -43,13 +48,13 @@ func paintRootHeader() string {
 	return myFigure.String()
 }
 
-func initConfig() {
+func LoadConfig(path string) {
 	if cfgFile != "" {
 		viper.SetConfigFile(cfgFile)
 	} else {
-		viper.AddConfigPath(".")
-		viper.SetConfigType("yaml")
-		viper.SetConfigName(".cobra")
+		viper.AddConfigPath(path)
+		viper.SetConfigType("env")
+		viper.SetConfigName(".ccexplorer")
 	}
 
 	viper.AutomaticEnv()

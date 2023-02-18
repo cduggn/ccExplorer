@@ -7,7 +7,6 @@ func ForecastToStdout(r ForecastPrintData,
 	filteredBy := strings.Join(dimensions, " | ")
 
 	t := CreateTable(forecastedHeader)
-
 	rows := ForecastToRows(r)
 	t.AppendRows(rows)
 

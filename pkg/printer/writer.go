@@ -1,7 +1,9 @@
 package printer
 
 import (
+	"fmt"
 	"github.com/jedib0t/go-pretty/v6/table"
+	"os"
 )
 
 var (
@@ -32,7 +34,17 @@ var (
 			unit,
 			amount}
 	}
+	outputDir = "./output"
 )
+
+func init() {
+	if _, err := os.Stat(outputDir); os.IsNotExist(err) {
+		err := os.Mkdir(outputDir, 0755)
+		if err != nil {
+			panic("Unable output directory")
+		}
+	}
+}
 
 func PrintFactory(printType PrintWriterType, variant string) Printer {
 	switch printType {
@@ -42,6 +54,8 @@ func PrintFactory(printType PrintWriterType, variant string) Printer {
 		return &CsvPrinter{variant}
 	case Chart:
 		return &ChartPrinter{variant}
+	case OpenAPI:
+		return &OpenAIPrinter{variant}
 	default:
 		panic("Invalid print type")
 	}
@@ -79,6 +93,23 @@ func (p *ChartPrinter) Print(f interface{}, c interface{}) error {
 	case "costAndUsage":
 		fn := SortFunction(f.(string))
 		err := CostAndUsageToChart(fn, c.(CostAndUsageOutputType))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (p *OpenAIPrinter) Print(f interface{}, c interface{}) error {
+
+	// no requirement for csv printing for forecast
+
+	fmt.Print("OpenAPI Printer")
+
+	switch p.Variant {
+	case "costAndUsage":
+		fn := SortFunction(f.(string))
+		err := CostAndUsageToOpenAI(fn, c.(CostAndUsageOutputType))
 		if err != nil {
 			return err
 		}

@@ -24,4 +24,4 @@ dist/
 *.csv
 dist/
 output/
-.cobra
+.ccexplorer

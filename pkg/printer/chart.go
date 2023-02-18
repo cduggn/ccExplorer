@@ -6,10 +6,26 @@ import (
 	"github.com/go-echarts/go-echarts/v2/components"
 	"github.com/go-echarts/go-echarts/v2/opts"
 	"io"
-	"os"
 )
 
-func (Renderer) Charts(r CostAndUsageOutputType) error {
+var (
+	chartFileName = "ccexplorer_chart.html"
+)
+
+func ChartWriter(p *components.Page) error {
+
+	f, err := NewFile(outputDir, chartFileName)
+	if err != nil {
+		return PrinterError{
+			msg: "Failed creating chart HTML file: " + err.Error(),
+		}
+	}
+	defer f.Close()
+	return p.Render(io.MultiWriter(f))
+}
+
+func (ChartBuilder) NewCharts(r CostAndUsageOutputType) (*components.Page,
+	error) {
 	page := components.NewPage()
 	page.PageTitle = "Cost and Usage Report"
 
@@ -18,20 +34,7 @@ func (Renderer) Charts(r CostAndUsageOutputType) error {
 		page.AddCharts(chart)
 	}
 
-	f, err := createOutputFile()
-	if err != nil {
-		return PrinterError{
-			msg: "Failed creating ccexplorer.html: " + err.Error(),
-		}
-	}
-
-	err = renderCharts(page, f)
-	if err != nil {
-		return PrinterError{
-			msg: "Failed rendering chart: " + err.Error(),
-		}
-	}
-	return nil
+	return page, nil
 }
 
 func buildPieCharts(r CostAndUsageOutputType) []*charts.Pie {
@@ -40,17 +43,17 @@ func buildPieCharts(r CostAndUsageOutputType) []*charts.Pie {
 	dimensions := r.Dimensions
 	if len(dimensions) > 1 {
 		for index, dimension := range dimensions {
-			pieC = append(pieC, DefinePieChartProperties(r.Services, dimension, index,
+			pieC = append(pieC, definePieChartProperties(r.Services, dimension, index,
 				r.Granularity, r.Start, r.End))
 		}
 	} else {
-		pieC = append(pieC, DefinePieChartProperties(r.Services, dimensions[0], 0, r.Granularity, r.Start, r.End))
+		pieC = append(pieC, definePieChartProperties(r.Services, dimensions[0], 0, r.Granularity, r.Start, r.End))
 	}
 	return pieC
 
 }
 
-func DefinePieChartProperties(s map[int]Service, d string, index int,
+func definePieChartProperties(s map[int]Service, d string, index int,
 	granularity string, start string, end string) *charts.Pie {
 	pie := charts.NewPie()
 	pie.SetGlobalOptions(
@@ -86,12 +89,4 @@ func DefinePieChartProperties(s map[int]Service, d string, index int,
 	)
 
 	return pie
-}
-
-func createOutputFile() (*os.File, error) {
-	return os.Create("./output/ccexplorer.html")
-}
-
-func renderCharts(p *components.Page, f *os.File) error {
-	return p.Render(io.MultiWriter(f))
 }
