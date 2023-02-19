@@ -57,7 +57,8 @@ func CostAndUsageToOpenAI(sortFn func(r map[int]Service) []Service,
 	r CostAndUsageOutputType) error {
 
 	rows := ToRows(r.Services, r.Granularity)
-	data := ToCSVString(rows[:20])
+
+	data := ConvertToCommaDelimitedString(rows[:30])
 
 	resp, err := SummarizeWIthAI(r.OpenAIAPIKey, data)
 	if err != nil {

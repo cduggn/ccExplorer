@@ -1,7 +1,6 @@
 package printer
 
 import (
-	"bytes"
 	"encoding/csv"
 	"io"
 	"os"
@@ -49,24 +48,4 @@ func NewCSVFile(dir string, file string) (*os.File, error) {
 			msg: "Error creating CSV file: " + err.Error()}
 	}
 	return f, nil
-}
-
-func ToCSVString(rows [][]string) string {
-	var buf bytes.Buffer
-
-	buf.WriteString(csvHeaderPromptFormat)
-
-	for i, row := range rows {
-		for j, col := range row {
-			buf.WriteString(col)
-			if j < len(row)-1 {
-				buf.WriteByte(',')
-			}
-		}
-		if i < len(rows)-1 {
-			buf.WriteByte(';')
-		}
-	}
-	cvsString := buf.String()
-	return cvsString
 }

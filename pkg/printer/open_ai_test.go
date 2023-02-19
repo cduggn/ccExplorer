@@ -1,0 +1,114 @@
+package printer
+
+import (
+	"html/template"
+	"strings"
+	"testing"
+)
+
+var (
+	tableTemplate = `
+<table>
+	<thead>
+		<tr>
+			<th>Dimension/Tag</th>
+			<th>Dimension/Tag</th>
+			<th>Metric</th>
+			<th>Granularity</th>
+			<th>Start</th>
+			<th>End</th>
+			<th>USD Amount</th>
+			<th>Unit</th>
+		</tr>
+	</thead>
+	<tbody>
+		{{range .}}
+			<tr>
+			<td>{{.Dimension}}</td>
+			<td>{{.Tag}}</td>
+			<td>{{.Metric}}</td>
+			<td>{{.Granularity}}</td>
+			<td>{{.Start}}</td>
+			<td>{{.End}}</td>
+			<td>{{.USDAmount}}</td>
+			<td>{{.Unit}}</td>
+			</tr>
+		{{end}}
+	</tbody>
+</table>
+`
+	trainingTemplateOutput = `
+<table>
+	<thead>
+		<tr>
+			<th>Dimension/Tag</th>
+			<th>Dimension/Tag</th>
+			<th>Metric</th>
+			<th>Granularity</th>
+			<th>Start</th>
+			<th>End</th>
+			<th>USD Amount</th>
+			<th>Unit</th>
+		</tr>
+	</thead>
+	<tbody>
+		
+			<tr>
+			<td>a</td>
+			<td>b</td>
+			<td>c</td>
+			<td>d</td>
+			<td>e</td>
+			<td>f</td>
+			<td>0.0</td>
+			<td>h</td>
+			</tr>
+		
+	</tbody>
+</table>
+`
+)
+
+func TestNewTrainingExample(t *testing.T) {
+	type args struct {
+		t *template.Template
+		s []TrainingData
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "test1",
+			args: args{
+				t: template.Must(template.New("table1").Parse(tableTemplate)),
+				s: []TrainingData{
+					{
+						Dimension:   "a",
+						Tag:         "b",
+						Metric:      "c",
+						Granularity: "d",
+						Start:       "e",
+						End:         "f",
+						USDAmount:   "0.0",
+						Unit:        "h",
+					},
+				},
+			},
+			want: trainingTemplateOutput,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got, _ := NewTrainingExample(tt.args.t, tt.args.s); got != tt.want {
+				//t.Errorf("NewTrainingExample() = %v, want %v", got, tt.want)
+				t.Errorf("Expected %v, got %v", removeSpacingAndTabs(tt.want), removeSpacingAndTabs(got))
+			}
+		})
+	}
+}
+
+func removeSpacingAndTabs(s string) string {
+	return strings.ReplaceAll(strings.ReplaceAll(s, " ", ""), "\t", "")
+}

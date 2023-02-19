@@ -1,16 +1,63 @@
 package printer
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	gogpt "github.com/sashabaranov/go-gpt3"
+	"html/template"
 	"os"
 )
 
 var (
-	aiPrompt   = "Create a styled HTML page summary of the following data. Use a table with alternate color for each row. Dispaly the headings which is the first row for csv data. Make three cost reducing recommendations"
-	aiFileName = "ccexplorer_ai.html"
+	aiPromptPre = "Generate an HTML table with 15 rows that displays data" +
+		" with the following headings: Dimension/Tag, Dimension/Tag, Metric, Granularity, Start, End, USD Amount, Unit. Style the table so that every other row has a different background color (e.g. one row white, one row light gray). Populate the table with the following CSV data:"
+	aiPromptPost = " /nPlease make sure that the CSV data contains the" +
+		" columns" +
+		" specified in the table headings, and that each row has data for each column."
+	aiFileName       = "ccexplorer_ai.html"
+	trainingTemplate = `
+        <table>
+            <thead>
+                <tr>
+                    <th>Dimension/Tag</th>
+                    <th>Dimension/Tag</th>
+                    <th>Metric</th>
+                    <th>Granularity</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>USD Amount</th>
+                    <th>Unit</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .}}
+                <tr>
+                    <td>{{.Dimension}}</td>
+                    <td>{{.Tag}}</td>
+                    <td>{{.Metric}}</td>
+                    <td>{{.Granularity}}</td>
+                    <td>{{.Start}}</td>
+                    <td>{{.End}}</td>
+                    <td>{{.USDAmount}}</td>
+                    <td>{{.Unit}}</td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+    `
 )
+
+type TrainingData struct {
+	Dimension   string
+	Tag         string
+	Metric      string
+	Granularity string
+	Start       string
+	End         string
+	USDAmount   string
+	Unit        string
+}
 
 func AIWriter(f *os.File, completions string) error {
 	_, err := f.WriteString(completions)
@@ -32,7 +79,7 @@ func SummarizeWIthAI(apiKey string, data string) (gogpt.CompletionResponse,
 
 	req := gogpt.CompletionRequest{
 		Model:     gogpt.GPT3TextDavinci003,
-		MaxTokens: 400,
+		MaxTokens: 1000,
 		Prompt:    BuildPromptText(data),
 	}
 	resp, err := c.CreateCompletion(ctx, req)
@@ -43,6 +90,69 @@ func SummarizeWIthAI(apiKey string, data string) (gogpt.CompletionResponse,
 	return resp, nil
 }
 
+func ConvertToCommaDelimitedString(rows [][]string) string {
+	var buf bytes.Buffer
+
+	buf.WriteString(csvHeaderPromptFormat)
+
+	for i, row := range rows {
+		for j, col := range row {
+			buf.WriteString(col)
+			if j < len(row)-1 {
+				buf.WriteByte(',')
+			}
+		}
+		if i < len(rows)-1 {
+			buf.WriteByte(';')
+		}
+	}
+	cvsString := buf.String()
+	return cvsString
+}
+
 func BuildPromptText(data string) string {
-	return aiPrompt + data
+	return aiPromptPre + data + aiPromptPost
+}
+
+func PrepareTrainingPrompt(rows [][]string) string {
+	t := NewTrainingTemplate()
+	s, err := NewTrainingExample(t, NewTrainingDataRow(rows))
+	if err != nil {
+		fmt.Println("Error populating template: ", err)
+	}
+	return s
+
+}
+
+func NewTrainingDataRow(rows [][]string) []TrainingData {
+	return []TrainingData{
+		{
+			Dimension:   rows[0][0],
+			Tag:         rows[0][1],
+			Metric:      rows[0][2],
+			Granularity: rows[0][3],
+			Start:       rows[0][4],
+			End:         rows[0][5],
+			USDAmount:   rows[0][6],
+			Unit:        rows[0][7],
+		},
+	}
+}
+
+func NewTrainingExample(t *template.Template, data []TrainingData) (string,
+	error) {
+	var buf bytes.Buffer
+	err := t.Execute(&buf, data)
+	if err != nil {
+		return "", err
+	}
+
+	s := buf.String()
+	return s, nil
+}
+
+func NewTrainingTemplate() *template.Template {
+	// define the template
+	t := template.Must(template.New("table").Parse(trainingTemplate))
+	return t
 }
