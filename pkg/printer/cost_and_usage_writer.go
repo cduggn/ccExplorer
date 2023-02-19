@@ -58,7 +58,7 @@ func CostAndUsageToOpenAI(sortFn func(r map[int]Service) []Service,
 
 	rows := ToRows(r.Services, r.Granularity)
 
-	data := ConvertToCommaDelimitedString(rows[:30])
+	data := BuildPromptText(rows)
 
 	resp, err := SummarizeWIthAI(r.OpenAIAPIKey, data)
 	if err != nil {

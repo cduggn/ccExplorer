@@ -7,14 +7,21 @@ import (
 	gogpt "github.com/sashabaranov/go-gpt3"
 	"html/template"
 	"os"
+	"strings"
 )
 
+type TrainingData struct {
+	Dimension   string
+	Tag         string
+	Metric      string
+	Granularity string
+	Start       string
+	End         string
+	USDAmount   string
+	Unit        string
+}
+
 var (
-	aiPromptPre = "Generate an HTML table with 15 rows that displays data" +
-		" with the following headings: Dimension/Tag, Dimension/Tag, Metric, Granularity, Start, End, USD Amount, Unit. Style the table so that every other row has a different background color (e.g. one row white, one row light gray). Populate the table with the following CSV data:"
-	aiPromptPost = " /nPlease make sure that the CSV data contains the" +
-		" columns" +
-		" specified in the table headings, and that each row has data for each column."
 	aiFileName       = "ccexplorer_ai.html"
 	trainingTemplate = `
         <table>
@@ -48,17 +55,6 @@ var (
     `
 )
 
-type TrainingData struct {
-	Dimension   string
-	Tag         string
-	Metric      string
-	Granularity string
-	Start       string
-	End         string
-	USDAmount   string
-	Unit        string
-}
-
 func AIWriter(f *os.File, completions string) error {
 	_, err := f.WriteString(completions)
 	if err != nil {
@@ -67,27 +63,6 @@ func AIWriter(f *os.File, completions string) error {
 		}
 	}
 	return nil
-}
-
-func SummarizeWIthAI(apiKey string, data string) (gogpt.CompletionResponse,
-	error) {
-
-	fmt.Println("Generating costAndUsage report with gpt3...")
-
-	c := gogpt.NewClient(apiKey)
-	ctx := context.Background()
-
-	req := gogpt.CompletionRequest{
-		Model:     gogpt.GPT3TextDavinci003,
-		MaxTokens: 1000,
-		Prompt:    BuildPromptText(data),
-	}
-	resp, err := c.CreateCompletion(ctx, req)
-	if err != nil {
-		return gogpt.CompletionResponse{}, err
-	}
-
-	return resp, nil
 }
 
 func ConvertToCommaDelimitedString(rows [][]string) string {
@@ -110,21 +85,47 @@ func ConvertToCommaDelimitedString(rows [][]string) string {
 	return cvsString
 }
 
-func BuildPromptText(data string) string {
-	return aiPromptPre + data + aiPromptPost
+func BuildPromptText(rows [][]string) string {
+	var builder strings.Builder
+	builder.WriteString("Generate a html table that looks like this ")
+
+	trainingData := BuildCostAndUsagePromptText(rows)
+	builder.WriteString(trainingData)
+
+	builder.WriteString(" from the following csv data ")
+	costAndUsageData := ConvertToCommaDelimitedString(rows[:30])
+	builder.WriteString(costAndUsageData)
+
+	builder.WriteString(" and generate 3 aws recommendations to save money")
+
+	return builder.String()
 }
 
-func PrepareTrainingPrompt(rows [][]string) string {
-	t := NewTrainingTemplate()
-	s, err := NewTrainingExample(t, NewTrainingDataRow(rows))
+func BuildCostAndUsagePromptText(rows [][]string) string {
+	t := CreateTrainingTemplate()
+	s, err := CreateTrainingData(t, BuildTrainingDataRow(rows))
 	if err != nil {
 		fmt.Println("Error populating template: ", err)
 	}
 	return s
-
 }
 
-func NewTrainingDataRow(rows [][]string) []TrainingData {
+func CreateTrainingTemplate() *template.Template {
+	t := template.Must(template.New("table").Parse(trainingTemplate))
+	return t
+}
+
+func CreateTrainingData(t *template.Template, data []TrainingData) (string,
+	error) {
+	var buf bytes.Buffer
+	err := t.Execute(&buf, data)
+	if err != nil {
+		return "", err
+	}
+	return buf.String(), nil
+}
+
+func BuildTrainingDataRow(rows [][]string) []TrainingData {
 	return []TrainingData{
 		{
 			Dimension:   rows[0][0],
@@ -139,20 +140,24 @@ func NewTrainingDataRow(rows [][]string) []TrainingData {
 	}
 }
 
-func NewTrainingExample(t *template.Template, data []TrainingData) (string,
+func SummarizeWIthAI(apiKey string, promptData string) (gogpt.
+	CompletionResponse,
 	error) {
-	var buf bytes.Buffer
-	err := t.Execute(&buf, data)
+
+	fmt.Println("Generating costAndUsage report with gpt3...")
+
+	c := gogpt.NewClient(apiKey)
+	ctx := context.Background()
+
+	req := gogpt.CompletionRequest{
+		Model:     gogpt.GPT3TextDavinci003,
+		MaxTokens: 2500,
+		Prompt:    promptData,
+	}
+	resp, err := c.CreateCompletion(ctx, req)
 	if err != nil {
-		return "", err
+		return gogpt.CompletionResponse{}, err
 	}
 
-	s := buf.String()
-	return s, nil
-}
-
-func NewTrainingTemplate() *template.Template {
-	// define the template
-	t := template.Must(template.New("table").Parse(trainingTemplate))
-	return t
+	return resp, nil
 }

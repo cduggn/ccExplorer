@@ -101,9 +101,12 @@ func TestNewTrainingExample(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := NewTrainingExample(tt.args.t, tt.args.s); got != tt.want {
+
+			got, _ := CreateTrainingData(tt.args.t, tt.args.s)
+			want := removeSpacingAndTabs(tt.want)
+			if removeSpacingAndTabs(got) != want {
 				//t.Errorf("NewTrainingExample() = %v, want %v", got, tt.want)
-				t.Errorf("Expected %v, got %v", removeSpacingAndTabs(tt.want), removeSpacingAndTabs(got))
+				t.Errorf("Expected %v, got %v", want, removeSpacingAndTabs(got))
 			}
 		})
 	}
@@ -111,4 +114,34 @@ func TestNewTrainingExample(t *testing.T) {
 
 func removeSpacingAndTabs(s string) string {
 	return strings.ReplaceAll(strings.ReplaceAll(s, " ", ""), "\t", "")
+}
+
+func TestBuildPrompt(t *testing.T) {
+	type args struct {
+		rows [][]string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "test1",
+			args: args{
+				rows: [][]string{
+					{"a", "b", "c", "d", "e", "f", "0.0", "h"},
+				},
+			},
+			want: trainingTemplateOutput,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			want := removeSpacingAndTabs(tt.want)
+			got := removeSpacingAndTabs(BuildCostAndUsagePromptText(tt.args.rows))
+			if got != want {
+				t.Errorf("Expected %v, got %v", want, got)
+			}
+		})
+	}
 }
