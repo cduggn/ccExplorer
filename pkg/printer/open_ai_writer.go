@@ -29,12 +29,9 @@ var (
                 <tr>
                     <th>Dimension/Tag</th>
                     <th>Dimension/Tag</th>
-                    <th>Metric</th>
-                    <th>Granularity</th>
                     <th>Start</th>
                     <th>End</th>
                     <th>USD Amount</th>
-                    <th>Unit</th>
                 </tr>
             </thead>
             <tbody>
@@ -42,12 +39,9 @@ var (
                 <tr>
                     <td>{{.Dimension}}</td>
                     <td>{{.Tag}}</td>
-                    <td>{{.Metric}}</td>
-                    <td>{{.Granularity}}</td>
                     <td>{{.Start}}</td>
                     <td>{{.End}}</td>
                     <td>{{.USDAmount}}</td>
-                    <td>{{.Unit}}</td>
                 </tr>
                 {{end}}
             </tbody>
@@ -92,11 +86,22 @@ func BuildPromptText(rows [][]string) string {
 	trainingData := BuildCostAndUsagePromptText(rows)
 	builder.WriteString(trainingData)
 
-	builder.WriteString(" from the following csv data ")
-	costAndUsageData := ConvertToCommaDelimitedString(rows[:30])
+	builder.WriteString(" from the following csv data, " +
+		"showing top 10 rows ")
+	costAndUsageData := ConvertToCommaDelimitedString(rows[:20])
 	builder.WriteString(costAndUsageData)
 
-	builder.WriteString(" and generate 3 aws recommendations to save money")
+	builder.WriteString(" Display the title Cost And Usage Report above" +
+		" the table in h2 font ," +
+		"display USD currency and date range in h3 font below the title. " +
+		"Style the table with css")
+
+	builder.WriteString("Place a hr tag below the table. " +
+		"Generate recommendations in bullet list for cost optimization for" +
+		" most expensive rows. Recommendations should resemble this below but" +
+		" using the table data")
+
+	builder.WriteString("Health-Check-Option-AWS => Use Amazon Route 53's Traffic Flow feature: Amazon Route 53's Traffic Flow feature allows you to route traffic based on endpoint health")
 
 	return builder.String()
 }
@@ -151,7 +156,7 @@ func SummarizeWIthAI(apiKey string, promptData string) (gogpt.
 
 	req := gogpt.CompletionRequest{
 		Model:     gogpt.GPT3TextDavinci003,
-		MaxTokens: 2500,
+		MaxTokens: 2400,
 		Prompt:    promptData,
 	}
 	resp, err := c.CreateCompletion(ctx, req)

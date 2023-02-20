@@ -282,6 +282,14 @@ func ToRows(s map[int]Service, granularity string) [][]string {
 	return rows
 }
 
+func ToRowsFromSlice(s []Service, granularity string) [][]string {
+	var rows [][]string
+	for _, v := range s {
+		rows = append(rows, ConvertServiceToSlice(v, granularity)...)
+	}
+	return rows
+}
+
 func BuildOutputFilePath(dir string, fileName string) string {
 	return dir + "/" + fileName
 }

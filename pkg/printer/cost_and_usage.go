@@ -56,7 +56,9 @@ func CostAndUsageToChart(sortFn func(r map[int]Service) []Service,
 func CostAndUsageToOpenAI(sortFn func(r map[int]Service) []Service,
 	r CostAndUsageOutputType) error {
 
-	rows := ToRows(r.Services, r.Granularity)
+	sorted := sortFn(r.Services)
+
+	rows := ToRowsFromSlice(sorted, r.Granularity)
 
 	data := BuildPromptText(rows)
 

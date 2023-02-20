@@ -13,12 +13,9 @@ var (
 		<tr>
 			<th>Dimension/Tag</th>
 			<th>Dimension/Tag</th>
-			<th>Metric</th>
-			<th>Granularity</th>
 			<th>Start</th>
 			<th>End</th>
 			<th>USD Amount</th>
-			<th>Unit</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -26,12 +23,9 @@ var (
 			<tr>
 			<td>{{.Dimension}}</td>
 			<td>{{.Tag}}</td>
-			<td>{{.Metric}}</td>
-			<td>{{.Granularity}}</td>
 			<td>{{.Start}}</td>
 			<td>{{.End}}</td>
 			<td>{{.USDAmount}}</td>
-			<td>{{.Unit}}</td>
 			</tr>
 		{{end}}
 	</tbody>
@@ -43,12 +37,9 @@ var (
 		<tr>
 			<th>Dimension/Tag</th>
 			<th>Dimension/Tag</th>
-			<th>Metric</th>
-			<th>Granularity</th>
 			<th>Start</th>
 			<th>End</th>
 			<th>USD Amount</th>
-			<th>Unit</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -56,12 +47,9 @@ var (
 			<tr>
 			<td>a</td>
 			<td>b</td>
-			<td>c</td>
-			<td>d</td>
 			<td>e</td>
 			<td>f</td>
 			<td>0.0</td>
-			<td>h</td>
 			</tr>
 		
 	</tbody>
@@ -85,14 +73,11 @@ func TestNewTrainingExample(t *testing.T) {
 				t: template.Must(template.New("table1").Parse(tableTemplate)),
 				s: []TrainingData{
 					{
-						Dimension:   "a",
-						Tag:         "b",
-						Metric:      "c",
-						Granularity: "d",
-						Start:       "e",
-						End:         "f",
-						USDAmount:   "0.0",
-						Unit:        "h",
+						Dimension: "a",
+						Tag:       "b",
+						Start:     "e",
+						End:       "f",
+						USDAmount: "0.0",
 					},
 				},
 			},
