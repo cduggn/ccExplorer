@@ -96,8 +96,8 @@ func BuildPromptText(rows [][]string) string {
 		"display USD currency and date range in h3 font below the title. " +
 		"Style the table with css")
 
-	builder.WriteString("Place a hr tag below the table. " +
-		"Generate recommendations in bullet list for cost optimization for" +
+	builder.WriteString("Place a hr tag below the table, below" +
+		"generate recommendations in bullet list for cost optimization for" +
 		" most expensive rows. Recommendations should resemble this below but" +
 		" using the table data")
 
