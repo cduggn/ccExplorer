@@ -25,7 +25,7 @@ alt="release status">
 
 `ccExplorer` (Cloud cost explorer) is a simple command line tool to explore the 
 cost of your cloud resources. It's built on opensource tools like [cobra](https://github.com/spf13/cobra),
-[go-echarts](https://github.com/go-echarts/go-echarts), and [go-pretty](https://github.com/jedib0t/go-pretty).
+[go-echarts](https://github.com/go-echarts/go-echarts), [go-gpt3](https://github.com/sashabaranov/go-gpt3) and [go-pretty](https://github.com/jedib0t/go-pretty).
 It lets you quickly surface cost and usage metrics associated with your AWS 
 account and visualize them in a human-readable format like a table, csv file, 
 or chart. It was created so I could quickly explore and reason about service costs without switching context from the command line.
