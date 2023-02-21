@@ -175,8 +175,7 @@ $ ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=USAGE_TYPE -l -s 2023-02-15 
 #### Print Writers
 The `ccExplorer` supports the following output formats: stdout, csv, chart 
 and gpt3. When using GPT-3, the `ccExplorer` will look for the 
-`OPEN_AI_API_KEY` environment variable. This can be set on the command line 
-or in the `.ccexplorer` env file. 
+`OPEN_AI_API_KEY` environment variable. This can be set in an env file called `.ccexplorer`. 
 
 ```.ccexplorer
 OPEN_AI_API_KEY=<openai_key>
