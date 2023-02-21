@@ -1,6 +1,7 @@
 package printer
 
 import (
+	"github.com/cduggn/ccexplorer/pkg/printer/writers/chart"
 	"github.com/go-echarts/go-echarts/v2/opts"
 	"reflect"
 	"testing"
@@ -164,7 +165,7 @@ func TestCostAndUsageToCSV(t *testing.T) {
 
 func TestGeneratePieItemsC(t *testing.T) {
 	type args struct {
-		Services map[int]Service
+		Services []chart.Service
 		Key      int
 	}
 
@@ -174,12 +175,12 @@ func TestGeneratePieItemsC(t *testing.T) {
 	}{
 		{
 			input: args{
-				Services: map[int]Service{
+				Services: []chart.Service{
 					0: {
 						Name: "SERVICE",
 						Keys: []string{"Amazon Simple Storage Service",
 							"PutObject"},
-						Metrics: []Metrics{
+						Metrics: []chart.Metrics{
 							{
 								Name:          "UNBLENDED",
 								Amount:        "0.0000147",
@@ -214,7 +215,7 @@ func TestGeneratePieItemsC(t *testing.T) {
 		},
 	}
 	for _, c := range cases {
-		result := PopulatePieDate(c.input.Services, c.input.Key)
+		result := chart.PopulatePieDate(c.input.Services, c.input.Key)
 		if !reflect.DeepEqual(result, c.expect) {
 			t.Errorf("expected %v, got %v", c.expect, result)
 		}
@@ -244,7 +245,7 @@ func TestCreateTitle(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		result := CreateTitle(c.input.Dimension)
+		result := chart.CreateTitle(c.input.Dimension)
 		if !reflect.DeepEqual(result, c.expect) {
 			t.Errorf("expected %v, got %v", c.expect, result)
 		}

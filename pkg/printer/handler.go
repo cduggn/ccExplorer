@@ -1,38 +1,10 @@
 package printer
 
 import (
-	"github.com/jedib0t/go-pretty/v6/table"
 	"os"
 )
 
 var (
-	costAndUsageHeader = table.Row{"Rank", "Dimension/Tag", "Dimension/Tag",
-		"Metric Name", "Truncated USD Amount", "Amount",
-		"Unit",
-		"Granularity",
-		"Start",
-		"End"}
-	forecastedHeader = table.Row{"Start", "End", "Mean Value",
-		"Prediction Interval LowerBound",
-		"Prediction Interval UpperBound", "Unit", "Total"}
-	tableDivider = table.Row{"-", "-", "-",
-		"-", "-", "-", "-",
-		"-",
-		"-", ""}
-	costAndUsageTableFooter = func(t string) table.Row {
-		return table.
-			Row{"", "",
-			"",
-			"",
-			"TOTAL COST",
-			t, "", "", "", ""}
-	}
-	forecasteTableFooter = func(filter string, unit string,
-		amount string) table.Row {
-		return table.Row{"FilteredBy", filter, "", "", "",
-			unit,
-			amount}
-	}
 	OutputDir = "./output"
 )
 

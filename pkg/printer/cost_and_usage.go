@@ -1,5 +1,39 @@
 package printer
 
+import (
+	"github.com/cduggn/ccexplorer/pkg/printer/writers/chart"
+	"github.com/cduggn/ccexplorer/pkg/printer/writers/csv"
+	"github.com/cduggn/ccexplorer/pkg/printer/writers/openai"
+	"github.com/jedib0t/go-pretty/v6/table"
+)
+
+var (
+	csvFileName = "ccexplorer.csv"
+	csvHeader   = []string{"Dimension/Tag", "Dimension/Tag", "Metric",
+		"Granularity",
+		"Start",
+		"End", "USD Amount", "Unit"}
+
+	costAndUsageHeader = table.Row{"Rank", "Dimension/Tag", "Dimension/Tag",
+		"Metric Name", "Truncated USD Amount", "Amount",
+		"Unit",
+		"Granularity",
+		"Start",
+		"End"}
+	tableDivider = table.Row{"-", "-", "-",
+		"-", "-", "-", "-",
+		"-",
+		"-", ""}
+	costAndUsageTableFooter = func(t string) table.Row {
+		return table.
+			Row{"", "",
+			"",
+			"",
+			"TOTAL COST",
+			t, "", "", "", ""}
+	}
+)
+
 func CostAndUsageToStdout(sortFn func(r map[int]Service) []Service,
 	r CostAndUsageOutputType) {
 	sortedServices := sortFn(r.Services)
@@ -20,16 +54,16 @@ func CostAndUsageToStdout(sortFn func(r map[int]Service) []Service,
 func CostAndUsageToCSV(sortFn func(r map[int]Service) []Service,
 	r CostAndUsageOutputType) error {
 
-	f, err := NewCSVFile(OutputDir, csvFileName)
+	f, err := csv.NewCSVFile(OutputDir, csvFileName)
 	if err != nil {
-		return PrinterError{
+		return Error{
 			msg: "Error creating CSV file: " + err.Error()}
 	}
 	defer f.Close()
 
-	rows := ToRows(r.Services, r.Granularity)
+	rows := ConvertServiceMapToArray(r.Services, r.Granularity)
 
-	err = CSVWriter(f, csvheader, rows)
+	err = csv.Writer(f, csvHeader, rows)
 	if err != nil {
 		return nil
 	}
@@ -40,13 +74,18 @@ func CostAndUsageToCSV(sortFn func(r map[int]Service) []Service,
 func CostAndUsageToChart(sortFn func(r map[int]Service) []Service,
 	r CostAndUsageOutputType) error {
 
-	builder := ChartBuilder{}
-	charts, err := builder.NewCharts(r)
+	builder := chart.Builder{}
+
+	s := sortFn(r.Services)
+
+	input := ConvertToChartInputType(r, s)
+
+	charts, err := builder.NewCharts(input)
 	if err != nil {
 		return err
 	}
 
-	err = ChartWriter(charts)
+	err = chart.Writer(charts)
 	if err != nil {
 		return err
 	}
@@ -58,24 +97,16 @@ func CostAndUsageToOpenAI(sortFn func(r map[int]Service) []Service,
 
 	sorted := sortFn(r.Services)
 
-	rows := ToRowsFromSlice(sorted, r.Granularity)
+	rows := ConvertServiceSliceToArray(sorted, r.Granularity)
 
-	data := BuildPromptText(rows)
+	data := openai.BuildPromptText(rows)
 
-	resp, err := SummarizeWIthAI(r.OpenAIAPIKey, data)
+	resp, err := openai.Summarize(r.OpenAIAPIKey, data)
 	if err != nil {
 		return err
 	}
 
-	f, err := NewFile(OutputDir, aiFileName)
-	if err != nil {
-		return PrinterError{
-			msg: "Failed creating AI HTML: " + err.Error(),
-		}
-	}
-	defer f.Close()
-
-	err = AIWriter(f, resp.Choices[0].Text)
+	err = openai.Writer(resp.Choices[0].Text)
 	if err != nil {
 		return err
 	}

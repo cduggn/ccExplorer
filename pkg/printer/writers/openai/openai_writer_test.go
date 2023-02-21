@@ -1,4 +1,4 @@
-package printer
+package openai
 
 import (
 	"html/template"

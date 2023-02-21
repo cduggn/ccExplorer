@@ -60,7 +60,7 @@ $ go run .\cmd\ccexplorer\ccexplorer.go get aws -g DIMENSION=SERVICE,DIMENSION=O
 
 ```console
 # download
-$ docker pull ghcr.io/cduggn/ccexplorer:v0.3.10
+$ docker pull ghcr.io/cduggn/ccexplorer:v0.3.11
 
 # Container requires AWS Access key, secret, and region
 $ docker run -it \
@@ -68,7 +68,7 @@ $ docker run -it \
   -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
   -e AWS_REGION=<AWS-REGION> \
   --mount type=bind,source="$(pwd)"/output/,target=/app/output \
-  ghcr.io/cduggn/ccexplorer:v0.3.10 get aws -g DIMENSION=OPERATION,
+  ghcr.io/cduggn/ccexplorer:v0.3.11 get aws -g DIMENSION=OPERATION,
   DIMENSION=SERVICE \
   -l -p chart
   
@@ -167,6 +167,8 @@ $ ccexplorer get aws -g DIMENSION=SERVICE, DIMENSION=OPERATION -l -e 2023-01-27 
 # Costs grouped by MONTH by OPERATION and USAGE_TYPE and printed to chart
 $ ccexplorer get aws -g DIMENSION=OPERATION,DIMENSION=USAGE_TYPE -l -e 2023-01-27 -s 2023-01-26 -m MONTHLY -p chart
 
+# Costs grouped by MONTH by SERVICE and USAGE_TYPE and printed to HTML using GPT-3
+$ ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=USAGE_TYPE -l -s 2023-02-15 -p gpt3
 
 ```
 
@@ -181,6 +183,8 @@ flags
   using the `-i` flag.
 - `ccExplorer` prints to stdout by default. The `-p` flag can be used to 
   specify the output format (csv, chart, stdout).
+- HTML results can be generated using the `-p gpt3` flag. This will use the 
+  OpenAI GPT-3 API to generate a report. 
 - Results are sorted by default by cost in descending order. The `-d` flag 
   can be used to specify date sorting in descending order.
 - Refunds, discounts and credits are applied automatically. The `-l` flag 

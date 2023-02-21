@@ -56,9 +56,7 @@ func LoadConfig(path string) {
 	}
 
 	viper.AutomaticEnv()
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file at:", viper.ConfigFileUsed())
-	} else {
+	if err := viper.ReadInConfig(); err != nil {
 		fmt.Println("No config file specified:", err.Error())
 	}
 }

@@ -1,4 +1,4 @@
-package printer
+package chart
 
 import (
 	"fmt"
@@ -6,17 +6,19 @@ import (
 	"github.com/go-echarts/go-echarts/v2/components"
 	"github.com/go-echarts/go-echarts/v2/opts"
 	"io"
+	"os"
 )
 
 var (
 	chartFileName = "ccexplorer_chart.html"
+	OutputDir     = "./output"
 )
 
-func ChartWriter(p *components.Page) error {
+func Writer(p *components.Page) error {
 
-	f, err := NewFile(OutputDir, chartFileName)
+	f, err := newFile(OutputDir, chartFileName)
 	if err != nil {
-		return PrinterError{
+		return Error{
 			msg: "Failed creating chart HTML file: " + err.Error(),
 		}
 	}
@@ -24,7 +26,7 @@ func ChartWriter(p *components.Page) error {
 	return p.Render(io.MultiWriter(f))
 }
 
-func (ChartBuilder) NewCharts(r CostAndUsageOutputType) (*components.Page,
+func (Builder) NewCharts(r InputType) (*components.Page,
 	error) {
 	page := components.NewPage()
 	page.PageTitle = "Cost and Usage Report"
@@ -37,7 +39,7 @@ func (ChartBuilder) NewCharts(r CostAndUsageOutputType) (*components.Page,
 	return page, nil
 }
 
-func buildPieCharts(r CostAndUsageOutputType) []*charts.Pie {
+func buildPieCharts(r InputType) []*charts.Pie {
 
 	var pieC []*charts.Pie
 	dimensions := r.Dimensions
@@ -53,7 +55,7 @@ func buildPieCharts(r CostAndUsageOutputType) []*charts.Pie {
 
 }
 
-func definePieChartProperties(s map[int]Service, d string, index int,
+func definePieChartProperties(s []Service, d string, index int,
 	granularity string, start string, end string) *charts.Pie {
 	pie := charts.NewPie()
 	pie.SetGlobalOptions(
@@ -89,4 +91,35 @@ func definePieChartProperties(s map[int]Service, d string, index int,
 	)
 
 	return pie
+}
+
+// todo remove duplication
+func newFile(dir string, file string) (*os.File, error) {
+	filePath := buildOutputFilePath(dir, file)
+	return os.Create(filePath)
+}
+
+// todo remove duplication
+func buildOutputFilePath(dir string, fileName string) string {
+	return dir + "/" + fileName
+}
+
+func PopulatePieDate(services []Service, key int) []opts.
+	PieData {
+	items := make([]opts.PieData, 0)
+
+	//services := SortServicesByMetricAmount(s)
+
+	for index, v := range services {
+		if index < 15 {
+			items = append(items, opts.PieData{Name: v.Keys[key],
+				Value: v.Metrics[0].NumericAmount})
+		}
+
+	}
+	return items
+}
+
+func CreateTitle(dimension string) string {
+	return fmt.Sprintf("Pie chart for dimension: [ %s ]", dimension)
 }

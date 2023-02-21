@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
+	"github.com/cduggn/ccexplorer/pkg/printer/writers/chart"
 	aws2 "github.com/cduggn/ccexplorer/pkg/service/aws"
-	"github.com/go-echarts/go-echarts/v2/opts"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"os"
 	"sort"
@@ -24,10 +24,6 @@ func CreateSubTitle(granularity string, start string, end string) string {
 	return fmt.Sprintf("Response granularity: %s. Timeframe: %s-%s",
 		granularity,
 		start, end)
-}
-
-func CreateTitle(dimension string) string {
-	return fmt.Sprintf("Pie chart for dimension: [ %s ]", dimension)
 }
 
 func CostUsageToRows(s []Service, granularity string) CostAndUsage {
@@ -169,22 +165,6 @@ func ToPrintWriterType(s string) PrintWriterType {
 	}
 }
 
-func PopulatePieDate(s map[int]Service, key int) []opts.
-	PieData {
-	items := make([]opts.PieData, 0)
-
-	services := SortServicesByMetricAmount(s)
-
-	for index, v := range services {
-		if index < 15 {
-			items = append(items, opts.PieData{Name: v.Keys[key],
-				Value: v.Metrics[0].NumericAmount})
-		}
-
-	}
-	return items
-}
-
 //func CreateOutputDir(outputDir string) (string, error) {
 //
 //	dir, err := os.Getwd()
@@ -210,34 +190,6 @@ func SortFunction(sortBy string) func(r map[int]Service) []Service {
 	default:
 		return SortServicesByMetricAmount
 	}
-}
-
-func SortServicesByMetricAmount(r map[int]Service) []Service {
-	// Create a slice of key-value pairs
-	pairs := make([]struct {
-		Key   int
-		Value Service
-	}, len(r))
-	i := 0
-	for k, v := range r {
-		pairs[i] = struct {
-			Key   int
-			Value Service
-		}{k, v}
-		i++
-	}
-
-	// Sort the slice by the Value.Metrics[0].Amount field
-	sort.SliceStable(pairs, func(i, j int) bool {
-		return pairs[i].Value.Metrics[0].NumericAmount > pairs[j].Value.
-			Metrics[0].NumericAmount
-	})
-
-	result := make([]Service, len(pairs))
-	for i, pair := range pairs {
-		result[i] = pair.Value
-	}
-	return result
 }
 
 func SortServicesByStartDate(r map[int]Service) []Service {
@@ -269,12 +221,36 @@ func SortServicesByStartDate(r map[int]Service) []Service {
 	return result
 }
 
-func NewFile(dir string, file string) (*os.File, error) {
-	filePath := BuildOutputFilePath(dir, file)
-	return os.Create(filePath)
+func SortServicesByMetricAmount(r map[int]Service) []Service {
+	// Create a slice of key-value pairs
+	pairs := make([]struct {
+		Key   int
+		Value Service
+	}, len(r))
+	i := 0
+	for k, v := range r {
+		pairs[i] = struct {
+			Key   int
+			Value Service
+		}{k, v}
+		i++
+	}
+
+	// Sort the slice by the Value.Metrics[0].Amount field
+	sort.SliceStable(pairs, func(i, j int) bool {
+		return pairs[i].Value.Metrics[0].NumericAmount > pairs[j].Value.
+			Metrics[0].NumericAmount
+	})
+
+	result := make([]Service, len(pairs))
+	for i, pair := range pairs {
+		result[i] = pair.Value
+	}
+	return result
 }
 
-func ToRows(s map[int]Service, granularity string) [][]string {
+func ConvertServiceMapToArray(s map[int]Service,
+	granularity string) [][]string {
 	var rows [][]string
 	for _, v := range s {
 		rows = append(rows, ConvertServiceToSlice(v, granularity)...)
@@ -282,7 +258,7 @@ func ToRows(s map[int]Service, granularity string) [][]string {
 	return rows
 }
 
-func ToRowsFromSlice(s []Service, granularity string) [][]string {
+func ConvertServiceSliceToArray(s []Service, granularity string) [][]string {
 	var rows [][]string
 	for _, v := range s {
 		rows = append(rows, ConvertServiceToSlice(v, granularity)...)
@@ -290,6 +266,41 @@ func ToRowsFromSlice(s []Service, granularity string) [][]string {
 	return rows
 }
 
-func BuildOutputFilePath(dir string, fileName string) string {
-	return dir + "/" + fileName
+func ConvertToChartInputType(r CostAndUsageOutputType,
+	s []Service) chart.InputType {
+
+	input := chart.InputType{
+		Granularity: r.Granularity,
+		Start:       r.Start,
+		End:         r.End,
+		Dimensions:  r.Dimensions,
+		Tags:        r.Tags,
+	}
+
+	var services []chart.Service
+	for _, service := range s {
+		var metrics []chart.Metrics
+		for _, metric := range service.Metrics {
+			metrics = append(metrics, chart.Metrics{
+				Name:          metric.Name,
+				Amount:        metric.Amount,
+				Unit:          metric.Unit,
+				UsageQuantity: metric.UsageQuantity,
+				NumericAmount: metric.NumericAmount,
+			})
+		}
+
+		services = append(services, chart.Service{
+			Name:    service.Name,
+			Keys:    service.Keys,
+			Start:   service.Start,
+			End:     service.End,
+			Metrics: metrics,
+		})
+	}
+
+	input.Services = services
+
+	return input
+
 }

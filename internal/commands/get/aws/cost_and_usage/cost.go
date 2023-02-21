@@ -31,9 +31,6 @@ func handleCommandLineInput(cmd *cobra.Command) (CommandLineInput, error) {
 
 	var err error
 
-	// get the open_ai_api_key from the viper config
-	openAIKey := viper.GetString("open_ai_api_key")
-
 	// groupBY dimensions and tags
 	groupByValues := cmd.Flags().Lookup("groupBy").Value
 	groupBy, _ := groupByValues.(*custom_flags.DimensionAndTagFlag)
@@ -98,14 +95,23 @@ func handleCommandLineInput(cmd *cobra.Command) (CommandLineInput, error) {
 		}
 	}
 
+	// get the open_ai_api_key from the viper config
+	openAIKey := viper.GetString("open_ai_api_key")
+
 	printFormat := cmd.Flags().Lookup("printFormat").Value.
 		String()
 	printFormat = strings.ToLower(printFormat)
-	isValidPrintFormat := ValidatePrintFormat(printFormat, openAIKey)
+	isValidPrintFormat := IsValidPrintFormat(printFormat)
 	if !isValidPrintFormat {
 		return CommandLineInput{}, aws.ValidationError{
 			Message: "Invalid print format. " +
 				"Please use one of the following: stdout, csv, chart, gpt3",
+		}
+	}
+
+	if printFormat == "gpt3" && openAIKey == "" {
+		return CommandLineInput{}, aws.ValidationError{
+			Message: "OpenAI API key not set. Please set the open_ai_api_key in the config file or environment variable",
 		}
 	}
 

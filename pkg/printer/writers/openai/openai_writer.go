@@ -1,4 +1,4 @@
-package printer
+package openai
 
 import (
 	"bytes"
@@ -10,19 +10,7 @@ import (
 	"strings"
 )
 
-type TrainingData struct {
-	Dimension   string
-	Tag         string
-	Metric      string
-	Granularity string
-	Start       string
-	End         string
-	USDAmount   string
-	Unit        string
-}
-
 var (
-	aiFileName       = "ccexplorer_ai.html"
 	trainingTemplate = `
         <table>
             <thead>
@@ -47,12 +35,25 @@ var (
             </tbody>
         </table>
     `
+	rowHeader = "Dimension/Tag,Dimension/Tag,Metric," +
+		"Granularity,Start,End,USD Amount,Unit;"
+	OutputDir  = "./output"
+	aiFileName = "ccexplorer_ai.html"
 )
 
-func AIWriter(f *os.File, completions string) error {
-	_, err := f.WriteString(completions)
+func Writer(completions string) error {
+
+	f, err := newFile(OutputDir, aiFileName)
 	if err != nil {
-		return PrinterError{
+		return Error{
+			msg: "Failed creating AI HTML: " + err.Error(),
+		}
+	}
+	defer f.Close()
+
+	_, err = f.WriteString(completions)
+	if err != nil {
+		return Error{
 			msg: "Failed writing to AI HTML: " + err.Error(),
 		}
 	}
@@ -62,7 +63,7 @@ func AIWriter(f *os.File, completions string) error {
 func ConvertToCommaDelimitedString(rows [][]string) string {
 	var buf bytes.Buffer
 
-	buf.WriteString(csvHeaderPromptFormat)
+	buf.WriteString(rowHeader)
 
 	for i, row := range rows {
 		for j, col := range row {
@@ -145,8 +146,8 @@ func BuildTrainingDataRow(rows [][]string) []TrainingData {
 	}
 }
 
-func SummarizeWIthAI(apiKey string, promptData string) (gogpt.
-	CompletionResponse,
+func Summarize(apiKey string, promptData string) (gogpt.
+CompletionResponse,
 	error) {
 
 	fmt.Println("Generating costAndUsage report with gpt3...")
@@ -165,4 +166,15 @@ func SummarizeWIthAI(apiKey string, promptData string) (gogpt.
 	}
 
 	return resp, nil
+}
+
+// todo remove duplication
+func newFile(dir string, file string) (*os.File, error) {
+	filePath := buildOutputFilePath(dir, file)
+	return os.Create(filePath)
+}
+
+// todo remove duplication
+func buildOutputFilePath(dir string, fileName string) string {
+	return dir + "/" + fileName
 }

@@ -21,11 +21,11 @@ const (
 	OpenAPI
 )
 
-type PrinterError struct {
+type Error struct {
 	msg string
 }
 
-func (e PrinterError) Error() string {
+func (e Error) Error() string {
 	return e.msg
 }
 
@@ -76,9 +76,6 @@ type Metrics struct {
 	NumericAmount float64
 	Unit          string
 	UsageQuantity float64
-}
-
-type ChartBuilder struct {
 }
 
 type ForecastPrintData struct {

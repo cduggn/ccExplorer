@@ -1,6 +1,7 @@
-package printer
+package csv
 
 import (
+	"github.com/cduggn/ccexplorer/pkg/printer/writers/openai"
 	"testing"
 )
 
@@ -41,7 +42,7 @@ func TestToCSVString(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := ConvertToCommaDelimitedString(tt.args.data); got != tt.want {
+			if got := openai.ConvertToCommaDelimitedString(tt.args.data); got != tt.want {
 				t.Errorf("Expected %v, got %v", tt.want, got)
 			}
 		})
