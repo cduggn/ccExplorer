@@ -81,6 +81,7 @@ type CostAndUsageRequestType struct {
 	PrintFormat                string
 	Metrics                    []string
 	SortByDate                 bool
+	OpenAIAPIKey               string
 }
 
 type CostAndUsageRequestWithResourcesType struct {

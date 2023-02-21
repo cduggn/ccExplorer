@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
+	"github.com/cduggn/ccexplorer/pkg/printer/writers/chart"
 	aws2 "github.com/cduggn/ccexplorer/pkg/service/aws"
-	"github.com/go-echarts/go-echarts/v2/opts"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"os"
 	"sort"
@@ -24,10 +24,6 @@ func CreateSubTitle(granularity string, start string, end string) string {
 	return fmt.Sprintf("Response granularity: %s. Timeframe: %s-%s",
 		granularity,
 		start, end)
-}
-
-func CreateTitle(dimension string) string {
-	return fmt.Sprintf("Pie chart for dimension: [ %s ]", dimension)
 }
 
 func CostUsageToRows(s []Service, granularity string) CostAndUsage {
@@ -79,12 +75,13 @@ func CurateCostAndUsageReport(
 	d *costexplorer.GetCostAndUsageOutput, query aws2.CostAndUsageRequestType) CostAndUsageOutputType {
 
 	c := CostAndUsageOutputType{
-		Services:    make(map[int]Service),
-		Granularity: query.Granularity,
-		Dimensions:  query.GroupBy,
-		Tags:        query.GroupByTag,
-		Start:       query.Time.Start,
-		End:         query.Time.End,
+		Services:     make(map[int]Service),
+		Granularity:  query.Granularity,
+		Dimensions:   query.GroupBy,
+		Tags:         query.GroupByTag,
+		Start:        query.Time.Start,
+		End:          query.Time.End,
+		OpenAIAPIKey: query.OpenAIAPIKey,
 	}
 
 	c.Services = ResultsToServicesMap(d.ResultsByTime)
@@ -141,13 +138,6 @@ func ReturnIfPresent(s []string) string {
 
 }
 
-func ReturnFirst(s []string) string {
-	if len(s) > 1 {
-		return s[0]
-	}
-	return ""
-}
-
 func ConvertServiceToSlice(s Service, granularity string) [][]string {
 
 	var r [][]string
@@ -168,42 +158,28 @@ func ToPrintWriterType(s string) PrintWriterType {
 		return Stdout
 	case "chart":
 		return Chart
+	case "gpt3":
+		return OpenAPI
 	default:
 		return Stdout
 	}
 }
 
-func PopulatePieDate(s map[int]Service, key int) []opts.
-	PieData {
-	items := make([]opts.PieData, 0)
-
-	services := SortServicesByMetricAmount(s)
-
-	for index, v := range services {
-		if index < 15 {
-			items = append(items, opts.PieData{Name: v.Keys[key],
-				Value: v.Metrics[0].NumericAmount})
-		}
-
-	}
-	return items
-}
-
-func CreateOutPutDir() (string, error) {
-
-	dir, err := os.Getwd()
-	if err != nil {
-		return "", err
-	}
-	dir = dir + "/output"
-	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		err = os.Mkdir(dir, 0755)
-		if err != nil {
-			return "", err
-		}
-	}
-	return dir, nil
-}
+//func CreateOutputDir(outputDir string) (string, error) {
+//
+//	dir, err := os.Getwd()
+//	if err != nil {
+//		return "", err
+//	}
+//	dir = dir + outputDir
+//	if _, err := os.Stat(dir); os.IsNotExist(err) {
+//		err = os.Mkdir(dir, 0755)
+//		if err != nil {
+//			return "", err
+//		}
+//	}
+//	return dir, nil
+//}
 
 func SortFunction(sortBy string) func(r map[int]Service) []Service {
 	switch sortBy {
@@ -214,6 +190,35 @@ func SortFunction(sortBy string) func(r map[int]Service) []Service {
 	default:
 		return SortServicesByMetricAmount
 	}
+}
+
+func SortServicesByStartDate(r map[int]Service) []Service {
+	// Create a slice of key-value pairs
+	pairs := make([]struct {
+		Key   int
+		Value Service
+	}, len(r))
+	i := 0
+	for k, v := range r {
+		pairs[i] = struct {
+			Key   int
+			Value Service
+		}{k, v}
+		i++
+	}
+
+	sort.SliceStable(pairs, func(i, j int) bool {
+
+		t1, _ := time.Parse("2006-01-02", pairs[i].Value.Start)
+		t2, _ := time.Parse("2006-01-02", pairs[j].Value.Start)
+		return t1.After(t2)
+	})
+
+	result := make([]Service, len(pairs))
+	for i, pair := range pairs {
+		result[i] = pair.Value
+	}
+	return result
 }
 
 func SortServicesByMetricAmount(r map[int]Service) []Service {
@@ -244,33 +249,58 @@ func SortServicesByMetricAmount(r map[int]Service) []Service {
 	return result
 }
 
-func SortServicesByStartDate(r map[int]Service) []Service {
-	// Create a slice of key-value pairs
-	pairs := make([]struct {
-		Key   int
-		Value Service
-	}, len(r))
-	i := 0
-	for k, v := range r {
-		pairs[i] = struct {
-			Key   int
-			Value Service
-		}{k, v}
-		i++
+func ConvertServiceMapToArray(s map[int]Service,
+	granularity string) [][]string {
+	var rows [][]string
+	for _, v := range s {
+		rows = append(rows, ConvertServiceToSlice(v, granularity)...)
+	}
+	return rows
+}
+
+func ConvertServiceSliceToArray(s []Service, granularity string) [][]string {
+	var rows [][]string
+	for _, v := range s {
+		rows = append(rows, ConvertServiceToSlice(v, granularity)...)
+	}
+	return rows
+}
+
+func ConvertToChartInputType(r CostAndUsageOutputType,
+	s []Service) chart.InputType {
+
+	input := chart.InputType{
+		Granularity: r.Granularity,
+		Start:       r.Start,
+		End:         r.End,
+		Dimensions:  r.Dimensions,
+		Tags:        r.Tags,
 	}
 
-	// Sort the slice by the Value.Metrics[0].Amount field
-	sort.SliceStable(pairs, func(i, j int) bool {
+	var services []chart.Service
+	for _, service := range s {
+		var metrics []chart.Metrics
+		for _, metric := range service.Metrics {
+			metrics = append(metrics, chart.Metrics{
+				Name:          metric.Name,
+				Amount:        metric.Amount,
+				Unit:          metric.Unit,
+				UsageQuantity: metric.UsageQuantity,
+				NumericAmount: metric.NumericAmount,
+			})
+		}
 
-		t1, _ := time.Parse("2006-01-02", pairs[i].Value.Start)
-		t2, _ := time.Parse("2006-01-02", pairs[j].Value.Start)
-		return t1.After(t2)
-	})
-
-	result := make([]Service, len(pairs))
-	for i, pair := range pairs {
-		result[i] = pair.Value
+		services = append(services, chart.Service{
+			Name:    service.Name,
+			Keys:    service.Keys,
+			Start:   service.Start,
+			End:     service.End,
+			Metrics: metrics,
+		})
 	}
-	return result
+
+	input.Services = services
+
+	return input
 
 }

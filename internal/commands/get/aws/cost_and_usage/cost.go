@@ -7,6 +7,7 @@ import (
 	"github.com/cduggn/ccexplorer/pkg/printer"
 	aws2 "github.com/cduggn/ccexplorer/pkg/service/aws"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"strings"
 )
 
@@ -94,6 +95,9 @@ func handleCommandLineInput(cmd *cobra.Command) (CommandLineInput, error) {
 		}
 	}
 
+	// get the open_ai_api_key from the viper config
+	openAIKey := viper.GetString("open_ai_api_key")
+
 	printFormat := cmd.Flags().Lookup("printFormat").Value.
 		String()
 	printFormat = strings.ToLower(printFormat)
@@ -101,7 +105,13 @@ func handleCommandLineInput(cmd *cobra.Command) (CommandLineInput, error) {
 	if !isValidPrintFormat {
 		return CommandLineInput{}, aws.ValidationError{
 			Message: "Invalid print format. " +
-				"Please use one of the following: stdout, csv, chart",
+				"Please use one of the following: stdout, csv, chart, gpt3",
+		}
+	}
+
+	if printFormat == "gpt3" && openAIKey == "" {
+		return CommandLineInput{}, aws.ValidationError{
+			Message: "OpenAI API key not set. Please set the open_ai_api_key in the config file or environment variable",
 		}
 	}
 
@@ -131,6 +141,7 @@ func handleCommandLineInput(cmd *cobra.Command) (CommandLineInput, error) {
 		PrintFormat:         printFormat,
 		Metrics:             []string{metric},
 		SortByDate:          sortByDate,
+		OpenAIAPIKey:        openAIKey,
 	}, nil
 
 }
@@ -153,6 +164,7 @@ func synthesizeRequest(input CommandLineInput) aws2.CostAndUsageRequestType {
 		PrintFormat:                input.PrintFormat,
 		Metrics:                    input.Metrics,
 		SortByDate:                 input.SortByDate,
+		OpenAIAPIKey:               input.OpenAIAPIKey,
 	}
 }
 

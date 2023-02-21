@@ -16,4 +16,5 @@ type CommandLineInput struct {
 	PrintFormat         string
 	Metrics             []string
 	SortByDate          bool
+	OpenAIAPIKey        string
 }

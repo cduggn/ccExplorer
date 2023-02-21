@@ -18,13 +18,14 @@ const (
 	Stdout PrintWriterType = iota
 	CSV
 	Chart
+	OpenAPI
 )
 
-type PrinterError struct {
+type Error struct {
 	msg string
 }
 
-func (e PrinterError) Error() string {
+func (e Error) Error() string {
 	return e.msg
 }
 
@@ -36,6 +37,10 @@ type StdoutPrinter struct {
 }
 
 type CsvPrinter struct {
+	Variant string
+}
+
+type OpenAIPrinter struct {
 	Variant string
 }
 
@@ -73,22 +78,20 @@ type Metrics struct {
 	UsageQuantity float64
 }
 
-type Renderer struct {
-}
-
 type ForecastPrintData struct {
 	Forecast *costexplorer.GetCostForecastOutput
 	Filters  []string
 }
 
 type CostAndUsageOutputType struct {
-	Services    map[int]Service
-	Granularity string
-	Start       string
-	End         string
-	Dimensions  []string
-	Tags        []string
-	SortBy      string
+	Services     map[int]Service
+	Granularity  string
+	Start        string
+	End          string
+	Dimensions   []string
+	Tags         []string
+	SortBy       string
+	OpenAIAPIKey string
 }
 
 type ChartData struct {
@@ -99,6 +102,14 @@ type ChartData struct {
 	Title          string
 	SubTitle       string
 	NumericValues  float64
+}
+
+type FormatError struct {
+	Msg string
+}
+
+func (e FormatError) Error() string {
+	return e.Msg
 }
 
 func (c CostAndUsageReport) Len() int {
