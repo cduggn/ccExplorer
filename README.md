@@ -172,6 +172,17 @@ $ ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=USAGE_TYPE -l -s 2023-02-15 
 
 ```
 
+#### Print Writers
+The `ccExplorer` supports the following output formats: stdout, csv, chart 
+and gpt3. When using GPT-3, the `ccExplorer` will look for the 
+`OPEN_AI_API_KEY` environment variable. This can be set on the command line 
+or in the `.ccexplorer` env file. 
+
+```.ccexplorer
+OPEN_AI_API_KEY=<openai_key>
+````
+
+
 #### Default settings
 If no cost allocation tags have been defined, the  `ccExplorer` can still be 
 used to filter and group resources based on their 

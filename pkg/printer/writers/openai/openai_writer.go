@@ -93,14 +93,14 @@ func BuildPromptText(rows [][]string) string {
 	builder.WriteString(costAndUsageData)
 
 	builder.WriteString(" Display the title Cost And Usage Report above" +
-		" the table in h2 font ," +
-		"display USD currency and date range in h3 font below the title. " +
-		"Style the table with css")
+		" the table in h2 font. " +
+		"Include USD currency and date range in smaller font. " +
+		"Style the table rows with css")
 
-	builder.WriteString("Place a hr tag below the table, below" +
-		"generate recommendations in bullet list for cost optimization for" +
-		" most expensive rows. Recommendations should resemble this below but" +
-		" using the table data")
+	builder.WriteString("Place a hr beneath the table and beneath the hr " +
+		"generate recommendations for each row entry in bullet list form" +
+		" with cost optimization recommendations. " +
+		"For example recommendations should resemble the following: ")
 
 	builder.WriteString("Health-Check-Option-AWS => Use Amazon Route 53's Traffic Flow feature: Amazon Route 53's Traffic Flow feature allows you to route traffic based on endpoint health")
 
@@ -147,7 +147,7 @@ func BuildTrainingDataRow(rows [][]string) []TrainingData {
 }
 
 func Summarize(apiKey string, promptData string) (gogpt.
-CompletionResponse,
+	CompletionResponse,
 	error) {
 
 	fmt.Println("Generating costAndUsage report with gpt3...")
