@@ -95,7 +95,7 @@ func BuildPromptText(rows [][]string) string {
 		"clean , minimalistic design. " +
 		"Add a column to number each row. " +
 		"Center the table on the page. " +
-		"Use ocean color theme for table. " +
+		"Use easy on the eyes color theme for table. " +
 		"Set a table width no more than 70% of page width. " +
 		"Table style should include alternating row colors, a hover effect. " +
 		"Left align table text. ")
