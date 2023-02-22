@@ -82,27 +82,32 @@ func ConvertToCommaDelimitedString(rows [][]string) string {
 
 func BuildPromptText(rows [][]string) string {
 	var builder strings.Builder
-	builder.WriteString("Generate a html table that looks like this ")
+	builder.WriteString("Generate a stylish html table that look like this: ")
 
 	trainingData := BuildCostAndUsagePromptText(rows)
 	builder.WriteString(trainingData)
 
-	builder.WriteString(" from the following csv data, " +
-		"showing top 10 rows ")
+	builder.WriteString(" Use the following csv data to display the top 10 rows: ")
 	costAndUsageData := ConvertToCommaDelimitedString(rows[:20])
 	builder.WriteString(costAndUsageData)
 
-	builder.WriteString(" Display the title Cost And Usage Report above" +
-		" the table in h2 font. " +
-		"Include USD currency and date range in smaller font. " +
-		"Style the table rows with css")
+	builder.WriteString(" Use HTML, CSS and modern libraries to create a simple, " +
+		"clean , minimalistic design. " +
+		"Add a column to number each row. " +
+		"Center the table on the page. " +
+		"Use a green color scheme that is easy on the eyes. " +
+		"Set a table width no more than 70% of page width. " +
+		"Table style should include alternating row colors, a hover effect. " +
+		"Left align table text. ")
 
-	builder.WriteString("Place a hr beneath the table and beneath the hr " +
-		"generate recommendations for each row entry in bullet list form" +
-		" with cost optimization recommendations. " +
-		"For example recommendations should resemble the following: ")
+	builder.WriteString(" Set table header title as Cost and Usage Report. " +
+		" Display the date range in a smaller font below the" +
+		" title. ")
 
-	builder.WriteString("Health-Check-Option-AWS => Use Amazon Route 53's Traffic Flow feature: Amazon Route 53's Traffic Flow feature allows you to route traffic based on endpoint health")
+	builder.WriteString(" Generate cost optimization" +
+		" recommendations for each table row entry which is specific to that" +
+		" row. Display recommendations in a new row. " +
+		"Recommendations should be specific for each row " + ": ")
 
 	return builder.String()
 }

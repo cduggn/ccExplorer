@@ -20,3 +20,13 @@ func SortByFn(sortByDate bool) string {
 	}
 	return "cost"
 }
+
+func HasAccountInformation(groupBy []string) bool {
+	for _, v := range groupBy {
+		if v == "LINKED_ACCOUNT" {
+			return true
+		}
+	}
+	return false
+
+}

@@ -115,6 +115,14 @@ func handleCommandLineInput(cmd *cobra.Command) (CommandLineInput, error) {
 		}
 	}
 
+	if printFormat == "gpt3" && openAIKey != "" {
+		if HasAccountInformation(groupBy.Dimensions) {
+			return CommandLineInput{}, aws.ValidationError{
+				Message: "Cannot use GPT-3 with account information. Please remove the account dimension",
+			}
+		}
+	}
+
 	metric := cmd.Flags().Lookup("metric").Value.String()
 	IsValid := IsValidMetric(metric)
 	if !IsValid {
