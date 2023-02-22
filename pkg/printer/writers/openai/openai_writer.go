@@ -88,14 +88,14 @@ func BuildPromptText(rows [][]string) string {
 	builder.WriteString(trainingData)
 
 	builder.WriteString(" Use the following csv data to display the top 10 rows: ")
-	costAndUsageData := ConvertToCommaDelimitedString(rows[:20])
+	costAndUsageData := ConvertToCommaDelimitedString(rows[:15])
 	builder.WriteString(costAndUsageData)
 
 	builder.WriteString(" Use HTML, CSS and modern libraries to create a simple, " +
 		"clean , minimalistic design. " +
 		"Add a column to number each row. " +
 		"Center the table on the page. " +
-		"Use a green color theme for the table that is easy on the eyes. " +
+		"Use ocean color theme for table. " +
 		"Set a table width no more than 70% of page width. " +
 		"Table style should include alternating row colors, a hover effect. " +
 		"Left align table text. ")
