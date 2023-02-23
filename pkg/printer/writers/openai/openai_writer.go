@@ -91,22 +91,18 @@ func BuildPromptText(rows [][]string) string {
 	costAndUsageData := ConvertToCommaDelimitedString(rows[:15])
 	builder.WriteString(costAndUsageData)
 
-	builder.WriteString(" Use HTML, CSS and modern libraries to create a simple, " +
-		"clean , minimalistic design. " +
-		"Add a column to number each row. " +
-		"Center the table on the page. " +
-		"Use simple grey theme for table and font size 16 for columns and" +
-		" rows. " +
-		"Set a table width no more than 70% of page width. " +
-		"Table style should include alternating row colors, a hover effect. " +
-		"Left align table row text. ")
+	builder.WriteString(" Display a title named Cost and Usage Report above" +
+		" the table centered. " +
+		" Include the date range in smaller font.")
 
-	builder.WriteString(" Set table header title as Cost and Usage Report. " +
-		" Display the date range in a smaller font below the" +
-		" title. ")
+	builder.WriteString(" Use HTML, CSS and modern libraries to create a simple, " +
+		"minimalistic design with alternating row colors, and hover effect.Left align table row text. " +
+		"Add a column to number each row. " +
+		"Use a simple grey theme for table and font size 16 for columns and" +
+		" rows. ")
 
 	builder.WriteString(" Generate a cost optimization" +
-		" recommendation for each specific table row entry. ")
+		" recommendation sentence for each specific table row entry. ")
 
 	//builder.WriteString(" Amazon Route 53 HostedZone: Optimize DNS queries with Amazon Route 53 latency-based routing. ")
 	return builder.String()
