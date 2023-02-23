@@ -82,27 +82,35 @@ func ConvertToCommaDelimitedString(rows [][]string) string {
 
 func BuildPromptText(rows [][]string) string {
 	var builder strings.Builder
-	builder.WriteString("Generate a html table that looks like this ")
+	builder.WriteString("Generate a stylish html table that look like this: ")
 
 	trainingData := BuildCostAndUsagePromptText(rows)
 	builder.WriteString(trainingData)
 
-	builder.WriteString(" from the following csv data, " +
-		"showing top 10 rows ")
-	costAndUsageData := ConvertToCommaDelimitedString(rows[:20])
+	builder.WriteString(" Use the following csv data to display the top 10 rows: ")
+	costAndUsageData := ConvertToCommaDelimitedString(rows[:15])
 	builder.WriteString(costAndUsageData)
 
-	builder.WriteString(" Display the title Cost And Usage Report above" +
-		" the table in h2 font. " +
-		"Include USD currency and date range in smaller font. " +
-		"Style the table rows with css")
+	builder.WriteString(" Display a title named Cost and Usage Report above" +
+		" the table centered. " +
+		" Include the date range in smaller font.")
 
-	builder.WriteString("Place a hr beneath the table and beneath the hr " +
-		"generate recommendations for each row entry in bullet list form" +
-		" with cost optimization recommendations. " +
-		"For example recommendations should resemble the following: ")
+	builder.WriteString(" Use HTML, CSS and modern libraries to create a simple, " +
+		"minimalistic design with alternating row colors, " +
+		"and hover effect. Left align table row text. " +
+		" Use a simple grey theme for the table. " +
+		"Text font should be no more than size 18. ")
 
-	builder.WriteString("Health-Check-Option-AWS => Use Amazon Route 53's Traffic Flow feature: Amazon Route 53's Traffic Flow feature allows you to route traffic based on endpoint health")
+	builder.WriteString(" Add a column to number each row.")
+
+	builder.WriteString(" Add a column to display the percentage of the total " +
+		"cost for each row. ")
+
+	builder.WriteString(" Detail a cost optimization" +
+		" recommendation sentence for each table row based on the costs" +
+		" shown in a new column. ")
+	builder.WriteString(" Add the AWS well architected framework principle" +
+		" which applies to the cost recommendation. ")
 
 	return builder.String()
 }
@@ -147,7 +155,7 @@ func BuildTrainingDataRow(rows [][]string) []TrainingData {
 }
 
 func Summarize(apiKey string, promptData string) (gogpt.
-	CompletionResponse,
+CompletionResponse,
 	error) {
 
 	fmt.Println("Generating costAndUsage report with gpt3...")
@@ -157,12 +165,15 @@ func Summarize(apiKey string, promptData string) (gogpt.
 
 	req := gogpt.CompletionRequest{
 		Model:     gogpt.GPT3TextDavinci003,
-		MaxTokens: 2400,
+		MaxTokens: 3070,
 		Prompt:    promptData,
+		//Temperature:
 	}
 	resp, err := c.CreateCompletion(ctx, req)
 	if err != nil {
-		return gogpt.CompletionResponse{}, err
+		return gogpt.CompletionResponse{}, Error{
+			msg: "GPT-3 failed to generate report: " + err.Error(),
+		}
 	}
 
 	return resp, nil
