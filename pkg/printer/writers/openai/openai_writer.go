@@ -99,7 +99,7 @@ func BuildPromptText(rows [][]string) string {
 		" rows. " +
 		"Set a table width no more than 70% of page width. " +
 		"Table style should include alternating row colors, a hover effect. " +
-		"Left align table text. ")
+		"Left align table row text. ")
 
 	builder.WriteString(" Set table header title as Cost and Usage Report. " +
 		" Display the date range in a smaller font below the" +
@@ -109,8 +109,9 @@ func BuildPromptText(rows [][]string) string {
 		" recommendations for each table row entry which are specific to that" +
 		" row. This should be in text form now a URL. Display recommendations" +
 		" in a new row. " +
-		"Recommendations should be specific for each row " + ": ")
+		"Recommendations should be specific for each row for example" + ": ")
 
+	builder.WriteString(" Amazon Route 53 HostedZone: Optimize DNS queries with Amazon Route 53 latency-based routing. ")
 	return builder.String()
 }
 
