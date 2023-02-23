@@ -105,13 +105,10 @@ func BuildPromptText(rows [][]string) string {
 		" Display the date range in a smaller font below the" +
 		" title. ")
 
-	builder.WriteString(" Generate cost optimization" +
-		" recommendations for each table row entry which are specific to that" +
-		" row. This should be in text form now a URL. Display recommendations" +
-		" in a new row. " +
-		"Recommendations should be specific for each row for example" + ": ")
+	builder.WriteString(" Generate a cost optimization" +
+		" recommendation for each specific table row entry. ")
 
-	builder.WriteString(" Amazon Route 53 HostedZone: Optimize DNS queries with Amazon Route 53 latency-based routing. ")
+	//builder.WriteString(" Amazon Route 53 HostedZone: Optimize DNS queries with Amazon Route 53 latency-based routing. ")
 	return builder.String()
 }
 
@@ -155,7 +152,7 @@ func BuildTrainingDataRow(rows [][]string) []TrainingData {
 }
 
 func Summarize(apiKey string, promptData string) (gogpt.
-	CompletionResponse,
+CompletionResponse,
 	error) {
 
 	fmt.Println("Generating costAndUsage report with gpt3...")
