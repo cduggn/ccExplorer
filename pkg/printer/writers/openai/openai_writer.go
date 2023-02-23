@@ -95,7 +95,8 @@ func BuildPromptText(rows [][]string) string {
 		"clean , minimalistic design. " +
 		"Add a column to number each row. " +
 		"Center the table on the page. " +
-		"Use easy on the eyes color theme for table. " +
+		"Use simple grey theme for table and font size 16 for columns and" +
+		" rows. " +
 		"Set a table width no more than 70% of page width. " +
 		"Table style should include alternating row colors, a hover effect. " +
 		"Left align table text. ")
@@ -105,8 +106,9 @@ func BuildPromptText(rows [][]string) string {
 		" title. ")
 
 	builder.WriteString(" Generate cost optimization" +
-		" recommendations for each table row entry which is specific to that" +
-		" row. Display recommendations in a new row. " +
+		" recommendations for each table row entry which are specific to that" +
+		" row. This should be in text form now a URL. Display recommendations" +
+		" in a new row. " +
 		"Recommendations should be specific for each row " + ": ")
 
 	return builder.String()
@@ -164,6 +166,7 @@ func Summarize(apiKey string, promptData string) (gogpt.
 		Model:     gogpt.GPT3TextDavinci003,
 		MaxTokens: 2400,
 		Prompt:    promptData,
+		//Temperature:
 	}
 	resp, err := c.CreateCompletion(ctx, req)
 	if err != nil {
