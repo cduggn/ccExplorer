@@ -155,7 +155,7 @@ func BuildTrainingDataRow(rows [][]string) []TrainingData {
 }
 
 func Summarize(apiKey string, promptData string) (gogpt.
-	CompletionResponse,
+CompletionResponse,
 	error) {
 
 	fmt.Println("Generating costAndUsage report with gpt3...")
@@ -165,7 +165,7 @@ func Summarize(apiKey string, promptData string) (gogpt.
 
 	req := gogpt.CompletionRequest{
 		Model:     gogpt.GPT3TextDavinci003,
-		MaxTokens: 3080,
+		MaxTokens: 3070,
 		Prompt:    promptData,
 		//Temperature:
 	}
