@@ -98,7 +98,8 @@ func BuildPromptText(rows [][]string) string {
 	builder.WriteString(" Use HTML, CSS and modern libraries to create a simple, " +
 		"minimalistic design with alternating row colors, " +
 		"and hover effect. Left align table row text. " +
-		" Use a simple grey theme for the table. Use font size 16 for table. ")
+		" Use a simple grey theme for the table. " +
+		"Text font should be no more than size 18. ")
 
 	builder.WriteString(" Add a column to number each row.")
 
