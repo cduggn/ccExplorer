@@ -96,15 +96,21 @@ func BuildPromptText(rows [][]string) string {
 		" Include the date range in smaller font.")
 
 	builder.WriteString(" Use HTML, CSS and modern libraries to create a simple, " +
-		"minimalistic design with alternating row colors, and hover effect.Left align table row text. " +
-		"Add a column to number each row. " +
-		"Use a simple grey theme for table and font size 16 for columns and" +
-		" rows. ")
+		"minimalistic design with alternating row colors, " +
+		"and hover effect. Left align table row text. " +
+		" Use a simple grey theme for the table. Use font size 16 for table. ")
 
-	builder.WriteString(" Generate a cost optimization" +
-		" recommendation sentence for each specific table row entry. ")
+	builder.WriteString(" Add a column to number each row.")
 
-	//builder.WriteString(" Amazon Route 53 HostedZone: Optimize DNS queries with Amazon Route 53 latency-based routing. ")
+	builder.WriteString(" Add a column to display the percentage of the total " +
+		"cost for each row. ")
+
+	builder.WriteString(" Detail a cost optimization" +
+		" recommendation sentence for each table row based on the costs" +
+		" shown. ")
+	builder.WriteString("Relate it to an AWS well architected framework" +
+		" principle in a new column. ")
+
 	return builder.String()
 }
 
@@ -148,7 +154,7 @@ func BuildTrainingDataRow(rows [][]string) []TrainingData {
 }
 
 func Summarize(apiKey string, promptData string) (gogpt.
-CompletionResponse,
+	CompletionResponse,
 	error) {
 
 	fmt.Println("Generating costAndUsage report with gpt3...")
@@ -164,7 +170,9 @@ CompletionResponse,
 	}
 	resp, err := c.CreateCompletion(ctx, req)
 	if err != nil {
-		return gogpt.CompletionResponse{}, err
+		return gogpt.CompletionResponse{}, Error{
+			msg: "GPT-3 failed to generate report: " + err.Error(),
+		}
 	}
 
 	return resp, nil
