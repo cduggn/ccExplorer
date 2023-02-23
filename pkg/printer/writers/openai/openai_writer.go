@@ -108,9 +108,9 @@ func BuildPromptText(rows [][]string) string {
 
 	builder.WriteString(" Detail a cost optimization" +
 		" recommendation sentence for each table row based on the costs" +
-		" shown. ")
-	builder.WriteString("Relate it to an AWS well architected framework" +
-		" principle in a new column. ")
+		" shown in a new column. ")
+	builder.WriteString(" Add the AWS well architected framework principle" +
+		" which applies to the cost recommendation. ")
 
 	return builder.String()
 }
@@ -165,7 +165,7 @@ func Summarize(apiKey string, promptData string) (gogpt.
 
 	req := gogpt.CompletionRequest{
 		Model:     gogpt.GPT3TextDavinci003,
-		MaxTokens: 2400,
+		MaxTokens: 3080,
 		Prompt:    promptData,
 		//Temperature:
 	}
