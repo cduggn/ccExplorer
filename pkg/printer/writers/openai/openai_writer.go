@@ -11,6 +11,7 @@ import (
 )
 
 var (
+	maxModelTokens   = 4096
 	trainingTemplate = `
         <table>
             <thead>
@@ -42,7 +43,6 @@ var (
 )
 
 func Writer(completions string) error {
-
 	f, err := newFile(OutputDir, aiFileName)
 	if err != nil {
 		return Error{
@@ -58,6 +58,30 @@ func Writer(completions string) error {
 		}
 	}
 	return nil
+}
+
+func Summarize(apiKey string, promptData string) (gogpt.
+	CompletionResponse,
+	error) {
+
+	fmt.Println("Generating costAndUsage report with gpt3...")
+
+	c := gogpt.NewClient(apiKey)
+	ctx := context.Background()
+
+	req := gogpt.CompletionRequest{
+		Model:     gogpt.GPT3TextDavinci003,
+		MaxTokens: maxModelTokens - len(promptData),
+		Prompt:    promptData,
+	}
+	resp, err := c.CreateCompletion(ctx, req)
+	if err != nil {
+		return gogpt.CompletionResponse{}, Error{
+			msg: "GPT-3 failed to generate report: " + err.Error(),
+		}
+	}
+
+	return resp, nil
 }
 
 func ConvertToCommaDelimitedString(rows [][]string) string {
@@ -88,7 +112,7 @@ func BuildPromptText(rows [][]string) string {
 	builder.WriteString(trainingData)
 
 	builder.WriteString(" Use the following csv data to display the top 10 rows: ")
-	costAndUsageData := ConvertToCommaDelimitedString(rows[:15])
+	costAndUsageData := ConvertToCommaDelimitedString(rows)
 	builder.WriteString(costAndUsageData)
 
 	builder.WriteString(" Display a title named Cost and Usage Report above" +
@@ -152,31 +176,6 @@ func BuildTrainingDataRow(rows [][]string) []TrainingData {
 			Unit:        rows[0][7],
 		},
 	}
-}
-
-func Summarize(apiKey string, promptData string) (gogpt.
-CompletionResponse,
-	error) {
-
-	fmt.Println("Generating costAndUsage report with gpt3...")
-
-	c := gogpt.NewClient(apiKey)
-	ctx := context.Background()
-
-	req := gogpt.CompletionRequest{
-		Model:     gogpt.GPT3TextDavinci003,
-		MaxTokens: 3070,
-		Prompt:    promptData,
-		//Temperature:
-	}
-	resp, err := c.CreateCompletion(ctx, req)
-	if err != nil {
-		return gogpt.CompletionResponse{}, Error{
-			msg: "GPT-3 failed to generate report: " + err.Error(),
-		}
-	}
-
-	return resp, nil
 }
 
 // todo remove duplication

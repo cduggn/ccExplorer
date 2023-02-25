@@ -8,8 +8,9 @@ import (
 )
 
 var (
-	csvFileName = "ccexplorer.csv"
-	csvHeader   = []string{"Dimension/Tag", "Dimension/Tag", "Metric",
+	maxDisplayRows = 10
+	csvFileName    = "ccexplorer.csv"
+	csvHeader      = []string{"Dimension/Tag", "Dimension/Tag", "Metric",
 		"Granularity",
 		"Start",
 		"End", "USD Amount", "Unit"}
@@ -95,12 +96,12 @@ func CostAndUsageToChart(sortFn func(r map[int]Service) []Service,
 func CostAndUsageToOpenAI(sortFn func(r map[int]Service) []Service,
 	r CostAndUsageOutputType) error {
 
-	sorted := sortFn(r.Services)
+	sortedData := sortFn(r.Services)
+	rows := ConvertServiceSliceToArray(sortedData, r.Granularity)
 
-	rows := ConvertServiceSliceToArray(sorted, r.Granularity)
+	maxRows := MaxRows(rows, maxDisplayRows)
 
-	data := openai.BuildPromptText(rows)
-
+	data := openai.BuildPromptText(rows[:maxRows])
 	resp, err := openai.Summarize(r.OpenAIAPIKey, data)
 	if err != nil {
 		return err
@@ -110,6 +111,12 @@ func CostAndUsageToOpenAI(sortFn func(r map[int]Service) []Service,
 	if err != nil {
 		return err
 	}
-
 	return nil
+}
+
+func MaxRows(rows [][]string, maxRows int) int {
+	if len(rows) > maxRows {
+		return maxRows
+	}
+	return len(rows)
 }
