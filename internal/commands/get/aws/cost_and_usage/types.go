@@ -1,11 +1,9 @@
 package cost_and_usage
 
-import "github.com/cduggn/ccexplorer/internal/commands/get/aws/custom_flags"
-
 type CommandLineInput struct {
-	GroupByValues       *custom_flags.DimensionAndTagFlag
+	GroupByDimension    []string
 	GroupByTag          []string
-	FilterByValues      *custom_flags.DimensionAndTagFilterFlag
+	FilterByValues      map[string]string
 	IsFilterByTag       bool
 	TagFilterValue      string
 	IsFilterByDimension bool
@@ -17,4 +15,20 @@ type CommandLineInput struct {
 	Metrics             []string
 	SortByDate          bool
 	OpenAIAPIKey        string
+}
+
+type FilterBySelections struct {
+	Tags                string
+	Dimensions          map[string]string
+	IsFilterByTag       bool
+	IsFilterByDimension bool
+}
+
+type PrintOptions struct {
+	IsSortByDate     bool
+	ExcludeDiscounts bool
+	Format           string
+	OpenAIKey        string
+	Granularity      string
+	Metric           string
 }
