@@ -7,11 +7,12 @@ import (
 	gogpt "github.com/sashabaranov/go-gpt3"
 	"html/template"
 	"os"
+	"regexp"
 	"strings"
 )
 
 var (
-	maxModelTokens   = 4096
+	maxModelTokens   = 4097
 	trainingTemplate = `
         <table>
             <thead>
@@ -71,7 +72,7 @@ func Summarize(apiKey string, promptData string) (gogpt.
 
 	req := gogpt.CompletionRequest{
 		Model:     gogpt.GPT3TextDavinci003,
-		MaxTokens: maxModelTokens - len(promptData),
+		MaxTokens: maxModelTokens - 840, //todo - make this value dynamic
 		Prompt:    promptData,
 	}
 	resp, err := c.CreateCompletion(ctx, req)
@@ -109,7 +110,10 @@ func BuildPromptText(rows [][]string) string {
 	builder.WriteString("Generate a stylish html table that look like this: ")
 
 	trainingData := BuildCostAndUsagePromptText(rows)
-	builder.WriteString(trainingData)
+
+	cleanedTrainingData := CleanString(trainingData)
+
+	builder.WriteString(cleanedTrainingData)
 
 	builder.WriteString(" Use the following csv data to display the top 10 rows: ")
 	costAndUsageData := ConvertToCommaDelimitedString(rows)
@@ -176,6 +180,16 @@ func BuildTrainingDataRow(rows [][]string) []TrainingData {
 			Unit:        rows[0][7],
 		},
 	}
+}
+
+func CleanString(s string) string {
+	re := regexp.MustCompile(`[\t\n ]+`)
+	return re.ReplaceAllString(s, "")
+}
+
+func CountTokens(prompt string) int {
+	tokens := strings.Split(prompt, " ")
+	return len(tokens)
 }
 
 // todo remove duplication
