@@ -11,32 +11,8 @@ import (
 )
 
 var (
-	maxModelTokens   = 4097
-	trainingTemplate = `
-        <table>
-            <thead>
-                <tr>
-                    <th>Dimension/Tag</th>
-                    <th>Dimension/Tag</th>
-                    <th>Start</th>
-                    <th>End</th>
-                    <th>USD Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{range .}}
-                <tr>
-                    <td>{{.Dimension}}</td>
-                    <td>{{.Tag}}</td>
-                    <td>{{.Start}}</td>
-                    <td>{{.End}}</td>
-                    <td>{{.USDAmount}}</td>
-                </tr>
-                {{end}}
-            </tbody>
-        </table>
-    `
-	rowHeader = "Dimension/Tag,Dimension/Tag,Metric," +
+	maxModelTokens = 4097
+	rowHeader      = "Dimension/Tag,Dimension/Tag,Metric," +
 		"Granularity,Start,End,USD Amount,Unit;"
 	OutputDir  = "./output"
 	aiFileName = "ccexplorer_ai.html"
@@ -106,9 +82,12 @@ func ConvertToCommaDelimitedString(rows [][]string) string {
 
 func BuildPromptText(rows [][]string) string {
 	var builder strings.Builder
-	builder.WriteString("Generate a stylish html table that look like this: ")
+	builder.WriteString("<!DOCTYPE html> Generate table that looks like this: ")
 
-	builder.WriteString("# Table headers [Dimension/Tag, Dimension/Tag, " + "Metric, Granularity, Start, End, USD Amount, Unit]")
+	builder.WriteString("# Table headers [Dimension/Tag, " +
+		"Dimension/Tag, " +
+		"Metric, Granularity, Start, End, USD Amount, Unit, " +
+		"Percentage of Total\t] ")
 
 	builder.WriteString(" Use the following csv data to display the top 10 rows: ")
 
@@ -117,7 +96,7 @@ func BuildPromptText(rows [][]string) string {
 
 	builder.WriteString(" Display a title named Cost and Usage Report above" +
 		" the table centered. " +
-		" Include the date range in smaller font.")
+		" Include a subtitle with the date range in smaller font.")
 
 	builder.WriteString(" Use HTML, CSS and modern libraries to create a simple, " +
 		"minimalistic design with alternating row colors, " +
@@ -137,20 +116,6 @@ func BuildPromptText(rows [][]string) string {
 		" which applies to the cost recommendation. ")
 
 	return builder.String()
-}
-
-func BuildCostAndUsagePromptText(rows [][]string) string {
-	t := CreateTrainingTemplate()
-	s, err := CreateTrainingData(t, BuildTrainingDataRow(rows))
-	if err != nil {
-		fmt.Println("Error populating template: ", err)
-	}
-	return s
-}
-
-func CreateTrainingTemplate() *template.Template {
-	t := template.Must(template.New("table").Parse(trainingTemplate))
-	return t
 }
 
 func CreateTrainingData(t *template.Template, data []TrainingData) (string,

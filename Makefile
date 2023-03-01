@@ -46,3 +46,6 @@ build: checks
 
 release: $(GORELEASER)
 	$(GORELEASER) release --rm-dist
+
+git-secrets:
+	git secrets --register-aws --global
