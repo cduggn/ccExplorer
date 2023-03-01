@@ -7,7 +7,6 @@ import (
 	gogpt "github.com/sashabaranov/go-gpt3"
 	"html/template"
 	"os"
-	"regexp"
 	"strings"
 )
 
@@ -109,13 +108,10 @@ func BuildPromptText(rows [][]string) string {
 	var builder strings.Builder
 	builder.WriteString("Generate a stylish html table that look like this: ")
 
-	trainingData := BuildCostAndUsagePromptText(rows)
-
-	cleanedTrainingData := CleanString(trainingData)
-
-	builder.WriteString(cleanedTrainingData)
+	builder.WriteString("# Table headers [Dimension/Tag, Dimension/Tag, " + "Metric, Granularity, Start, End, USD Amount, Unit]")
 
 	builder.WriteString(" Use the following csv data to display the top 10 rows: ")
+
 	costAndUsageData := ConvertToCommaDelimitedString(rows)
 	builder.WriteString(costAndUsageData)
 
@@ -180,16 +176,6 @@ func BuildTrainingDataRow(rows [][]string) []TrainingData {
 			Unit:        rows[0][7],
 		},
 	}
-}
-
-func CleanString(s string) string {
-	re := regexp.MustCompile(`[\t\n ]+`)
-	return re.ReplaceAllString(s, "")
-}
-
-func CountTokens(prompt string) int {
-	tokens := strings.Split(prompt, " ")
-	return len(tokens)
 }
 
 // todo remove duplication
