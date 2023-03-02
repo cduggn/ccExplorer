@@ -11,7 +11,7 @@ require (
 	github.com/go-echarts/go-echarts/v2 v2.2.4
 	github.com/jedib0t/go-pretty/v6 v6.4.4
 	github.com/mattn/go-sqlite3 v1.14.16
-	github.com/sashabaranov/go-gpt3 v1.1.0
+	github.com/sashabaranov/go-gpt3 v1.3.1
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.15.0
 	github.com/stretchr/testify v1.8.1

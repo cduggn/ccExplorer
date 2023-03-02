@@ -36,7 +36,7 @@ func Writer(completions string) error {
 	return nil
 }
 
-func Summarize(apiKey string, promptData string) (gogpt.
+func SummarizeCompletionsAPI(apiKey string, promptData string) (gogpt.
 	CompletionResponse,
 	error) {
 
@@ -58,6 +58,51 @@ func Summarize(apiKey string, promptData string) (gogpt.
 	}
 
 	return resp, nil
+}
+
+func Summarize(apiKey string, userMessage string) (gogpt.ChatCompletionResponse,
+	error) {
+
+	fmt.Println("Generating costAndUsage report with gpt3...")
+
+	c := gogpt.NewClient(apiKey)
+	ctx := context.Background()
+
+	message := CreateChatCompletionMessage(userMessage)
+
+	req := gogpt.ChatCompletionRequest{
+		Model:     gogpt.GPT3Dot5Turbo,
+		Messages:  message,
+		MaxTokens: maxModelTokens - 840,
+		Stream:    false,
+	}
+
+	resp, err := c.CreateChatCompletion(ctx, req)
+	if err != nil {
+		return gogpt.ChatCompletionResponse{}, Error{
+			msg: "GPT-3 failed to generate report: " + err.Error(),
+		}
+	}
+
+	return resp, nil
+}
+
+func CreateChatCompletionMessage(userMessage string) []gogpt.
+	ChatCompletionMessage {
+	return []gogpt.ChatCompletionMessage{
+
+		{
+			Role: "system",
+			Content: "You are an AWS cost optimization expert that recommends" +
+				" specific cost saving measure in HTML format for each row" +
+				" of CSV" +
+				" data.",
+		},
+		{
+			Role:    "user",
+			Content: userMessage,
+		},
+	}
 }
 
 func ConvertToCommaDelimitedString(rows [][]string) string {

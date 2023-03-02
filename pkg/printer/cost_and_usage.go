@@ -27,7 +27,7 @@ var (
 		"-", ""}
 	costAndUsageTableFooter = func(t string) table.Row {
 		return table.
-			Row{"", "",
+		Row{"", "",
 			"",
 			"",
 			"TOTAL COST",
@@ -107,7 +107,10 @@ func CostAndUsageToOpenAI(sortFn func(r map[int]Service) []Service,
 		return err
 	}
 
-	err = openai.Writer(resp.Choices[0].Text)
+	//err = openai.Writer(resp.Choices[0].Text)
+
+	err = openai.Writer(resp.Choices[0].Message.Content)
+
 	if err != nil {
 		return err
 	}
