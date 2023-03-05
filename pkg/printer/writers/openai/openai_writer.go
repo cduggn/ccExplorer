@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	gogpt "github.com/sashabaranov/go-gpt3"
-	"html/template"
 	"os"
 	"strings"
 )
@@ -36,8 +35,7 @@ func Writer(completions string) error {
 	return nil
 }
 
-func Summarize(apiKey string, promptData string) (gogpt.
-	CompletionResponse,
+func Summarize(apiKey string, userMessage string) (gogpt.ChatCompletionResponse,
 	error) {
 
 	fmt.Println("Generating costAndUsage report with gpt3...")
@@ -45,19 +43,41 @@ func Summarize(apiKey string, promptData string) (gogpt.
 	c := gogpt.NewClient(apiKey)
 	ctx := context.Background()
 
-	req := gogpt.CompletionRequest{
-		Model:     gogpt.GPT3TextDavinci003,
-		MaxTokens: maxModelTokens - 840, //todo - make this value dynamic
-		Prompt:    promptData,
+	message := CreateChatCompletionMessage(userMessage)
+
+	req := gogpt.ChatCompletionRequest{
+		Model:     gogpt.GPT3Dot5Turbo,
+		Messages:  message,
+		MaxTokens: maxModelTokens - 840,
+		Stream:    false,
 	}
-	resp, err := c.CreateCompletion(ctx, req)
+
+	resp, err := c.CreateChatCompletion(ctx, req)
 	if err != nil {
-		return gogpt.CompletionResponse{}, Error{
+		return gogpt.ChatCompletionResponse{}, Error{
 			msg: "GPT-3 failed to generate report: " + err.Error(),
 		}
 	}
 
 	return resp, nil
+}
+
+func CreateChatCompletionMessage(userMessage string) []gogpt.
+	ChatCompletionMessage {
+	return []gogpt.ChatCompletionMessage{
+
+		{
+			Role: "system",
+			Content: "You are an AWS cost optimization expert that recommends" +
+				" specific cost saving measure in HTML format for each row" +
+				" of CSV" +
+				" data.",
+		},
+		{
+			Role:    "user",
+			Content: userMessage,
+		},
+	}
 }
 
 func ConvertToCommaDelimitedString(rows [][]string) string {
@@ -116,31 +136,6 @@ func BuildPromptText(rows [][]string) string {
 		" which applies to the cost recommendation. ")
 
 	return builder.String()
-}
-
-func CreateTrainingData(t *template.Template, data []TrainingData) (string,
-	error) {
-	var buf bytes.Buffer
-	err := t.Execute(&buf, data)
-	if err != nil {
-		return "", err
-	}
-	return buf.String(), nil
-}
-
-func BuildTrainingDataRow(rows [][]string) []TrainingData {
-	return []TrainingData{
-		{
-			Dimension:   rows[0][0],
-			Tag:         rows[0][1],
-			Metric:      rows[0][2],
-			Granularity: rows[0][3],
-			Start:       rows[0][4],
-			End:         rows[0][5],
-			USDAmount:   rows[0][6],
-			Unit:        rows[0][7],
-		},
-	}
 }
 
 // todo remove duplication
