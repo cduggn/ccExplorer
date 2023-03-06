@@ -5,6 +5,7 @@ import (
 	"github.com/cduggn/ccexplorer/pkg/printer/writers/csv"
 	"github.com/cduggn/ccexplorer/pkg/printer/writers/openai"
 	"github.com/cduggn/ccexplorer/pkg/printer/writers/stdout"
+	"os"
 )
 
 var (
@@ -17,17 +18,18 @@ var (
 )
 
 func CostAndUsageToStdout(sortFn func(r map[int]Service) []Service,
-	r CostAndUsageOutputType) {
+	r CostAndUsageOutputType) error {
 
 	sortedServices := sortFn(r.Services)
 	output := ConvertToStdoutType(sortedServices, r.Granularity)
 
 	w, err := stdout.NewStdoutWriter("costAndUsage")
 	if err != nil {
-		return
+		return Error{
+			msg: "Error writing to stdout : " + err.Error()}
 	}
-
 	w.Writer(output)
+	return nil
 }
 
 func CostAndUsageToCSV(sortFn func(r map[int]Service) []Service,
@@ -38,16 +40,19 @@ func CostAndUsageToCSV(sortFn func(r map[int]Service) []Service,
 		return Error{
 			msg: "Error creating CSV file: " + err.Error()}
 	}
-	defer f.Close()
+	defer func(f *os.File) {
+		err := f.Close()
+		if err != nil {
+			panic(err)
+		}
+	}(f)
 
 	rows := ConvertServiceMapToArray(r.Services, r.Granularity)
-
 	err = csv.Writer(f, csvHeader, rows)
 	if err != nil {
 		return Error{
 			msg: "Error writing to CSV file: " + err.Error()}
 	}
-
 	return nil
 }
 
@@ -55,9 +60,7 @@ func CostAndUsageToChart(sortFn func(r map[int]Service) []Service,
 	r CostAndUsageOutputType) error {
 
 	builder := chart.Builder{}
-
 	s := sortFn(r.Services)
-
 	input := ConvertToChartInputType(r, s)
 
 	charts, err := builder.NewCharts(input)
@@ -79,7 +82,6 @@ func CostAndUsageToOpenAI(sortFn func(r map[int]Service) []Service,
 	rows := ConvertServiceSliceToArray(sortedData, r.Granularity)
 
 	maxRows := MaxRows(rows, maxDisplayRows)
-
 	data := openai.BuildPromptText(rows[:maxRows])
 	resp, err := openai.Summarize(r.OpenAIAPIKey, data)
 	if err != nil {

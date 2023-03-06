@@ -9,11 +9,6 @@ type PrintWriterType int
 type SortBy int
 
 const (
-	Amount SortBy = iota
-	Date
-)
-
-const (
 	Stdout PrintWriterType = iota
 	CSV
 	Chart

@@ -26,7 +26,6 @@ func runCommand(cmd *cobra.Command, args []string) {
 	optionsNameList := PromptQueryList(presets)
 
 	var prompt = Prompt(optionsNameList)
-
 	selection := 0
 	err := survey.AskOne(prompt, &selection)
 	if err != nil {
@@ -45,7 +44,6 @@ func runCommand(cmd *cobra.Command, args []string) {
 	}
 
 	DisplaySynthesizedQuery(selectedOption)
-
 	err = execute(apiRequest)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -64,9 +62,6 @@ func Prompt(o []string) *survey.Select {
 	return &survey.Select{
 		Message: "Choose a query to execute:",
 		Options: o,
-		//Description: func(value string, index int) string {
-		//	return strings.Join(presets[index].Description, ",")
-		//},
 	}
 }
 
@@ -100,7 +95,6 @@ func DisplaySynthesizedQuery(p PresetParams) {
 }
 
 func execute(q aws.CostAndUsageRequestType) error {
-
 	err := aws3.ExecutePreset(q)
 	if err != nil {
 		err := PresetError{
@@ -108,6 +102,5 @@ func execute(q aws.CostAndUsageRequestType) error {
 		}
 		return err
 	}
-
 	return nil
 }

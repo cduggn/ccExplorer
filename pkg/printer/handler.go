@@ -39,7 +39,10 @@ func (p *StdoutPrinter) Print(f interface{}, c interface{}) error {
 		ForecastToStdout(f.(ForecastPrintData), c.([]string))
 	case "costAndUsage":
 		fn := SortFunction(f.(string))
-		CostAndUsageToStdout(fn, c.(CostAndUsageOutputType))
+		err := CostAndUsageToStdout(fn, c.(CostAndUsageOutputType))
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 
