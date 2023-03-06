@@ -5,65 +5,17 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
 	"github.com/cduggn/ccexplorer/pkg/printer/writers/chart"
+	"github.com/cduggn/ccexplorer/pkg/printer/writers/stdout"
 	aws2 "github.com/cduggn/ccexplorer/pkg/service/aws"
-	"github.com/jedib0t/go-pretty/v6/table"
-	"os"
 	"sort"
 	"strconv"
 	"time"
 )
 
-func CreateTable(header table.Row) table.Writer {
-	t := table.NewWriter()
-	t.SetOutputMirror(os.Stdout)
-	t.AppendHeader(header)
-	return t
-}
-
 func CreateSubTitle(granularity string, start string, end string) string {
 	return fmt.Sprintf("Response granularity: %s. Timeframe: %s-%s",
 		granularity,
 		start, end)
-}
-
-func CostUsageToRows(s []Service, granularity string) CostAndUsage {
-	var rows []table.Row
-	var total float64
-	for index, v := range s {
-		for _, m := range v.Metrics {
-
-			if index%10 == 0 {
-				rows = append(rows, tableDivider)
-			}
-			if m.Unit == "USD" {
-				total += m.NumericAmount
-			}
-
-			tempRow := table.Row{index, v.Keys[0], ReturnIfPresent(v.Keys),
-				m.Name, fmt.Sprintf("%f10",
-					m.NumericAmount), m.Amount,
-				m.Unit,
-				granularity,
-				v.Start, v.End}
-
-			rows = append(rows, tempRow)
-		}
-	}
-	totalFormatted := fmt.Sprintf("%f10", total)
-	return CostAndUsage{Rows: rows, Total: totalFormatted}
-}
-
-func ForecastToRows(r ForecastPrintData) []table.Row {
-
-	var rows []table.Row
-	for _, v := range r.Forecast.ForecastResultsByTime {
-		tempRow := table.Row{*v.TimePeriod.Start,
-			*v.TimePeriod.End, *v.MeanValue, *v.PredictionIntervalUpperBound,
-			*v.PredictionIntervalLowerBound}
-
-		rows = append(rows, tempRow)
-	}
-	return rows
 }
 
 func ToCostAndUsageOutputType(r *costexplorer.GetCostAndUsageOutput,
@@ -266,6 +218,37 @@ func ConvertServiceSliceToArray(s []Service, granularity string) [][]string {
 	return rows
 }
 
+func ConvertToStdoutType(s []Service,
+	granularity string) stdout.CostAndUsageStdoutType {
+
+	outputType := stdout.CostAndUsageStdoutType{
+		Granularity: granularity,
+	}
+
+	var services []stdout.Service
+	for _, v := range s {
+		var metrics []stdout.Metrics
+		for _, m := range v.Metrics {
+			metrics = append(metrics, stdout.Metrics{
+				Name:          m.Name,
+				Amount:        m.Amount,
+				Unit:          m.Unit,
+				NumericAmount: m.NumericAmount,
+			})
+		}
+		services = append(services, stdout.Service{
+			Name:    v.Keys[0],
+			Keys:    v.Keys,
+			Start:   v.Start,
+			End:     v.End,
+			Metrics: metrics,
+		})
+	}
+	outputType.Services = services
+
+	return outputType
+}
+
 func ConvertToChartInputType(r CostAndUsageOutputType,
 	s []Service) chart.InputType {
 
@@ -302,5 +285,31 @@ func ConvertToChartInputType(r CostAndUsageOutputType,
 	input.Services = services
 
 	return input
+
+}
+
+func ConvertToForecastStdoutType(r ForecastPrintData,
+	filteredBy string) stdout.ForecastStdoutType {
+	var forecast []stdout.ForecastResults
+	for _, v := range r.Forecast.ForecastResultsByTime {
+		forecast = append(forecast, stdout.ForecastResults{
+			TimePeriod: stdout.DateInterval{
+				Start: *v.TimePeriod.Start,
+				End:   *v.TimePeriod.End,
+			},
+			MeanValue:                    *v.MeanValue,
+			PredictionIntervalLowerBound: *v.PredictionIntervalLowerBound,
+			PredictionIntervalUpperBound: *v.PredictionIntervalUpperBound,
+		})
+	}
+
+	return stdout.ForecastStdoutType{
+		Forecast: forecast,
+		Total: stdout.Total{
+			Amount: *r.Forecast.Total.Amount,
+			Unit:   *r.Forecast.Total.Unit,
+		},
+		FilteredBy: filteredBy,
+	}
 
 }

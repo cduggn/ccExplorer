@@ -4,7 +4,7 @@ import (
 	"github.com/cduggn/ccexplorer/pkg/printer/writers/chart"
 	"github.com/cduggn/ccexplorer/pkg/printer/writers/csv"
 	"github.com/cduggn/ccexplorer/pkg/printer/writers/openai"
-	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/cduggn/ccexplorer/pkg/printer/writers/stdout"
 )
 
 var (
@@ -14,42 +14,20 @@ var (
 		"Granularity",
 		"Start",
 		"End", "USD Amount", "Unit"}
-
-	costAndUsageHeader = table.Row{"Rank", "Dimension/Tag", "Dimension/Tag",
-		"Metric Name", "Truncated USD Amount", "Amount",
-		"Unit",
-		"Granularity",
-		"Start",
-		"End"}
-	tableDivider = table.Row{"-", "-", "-",
-		"-", "-", "-", "-",
-		"-",
-		"-", ""}
-	costAndUsageTableFooter = func(t string) table.Row {
-		return table.
-		Row{"", "",
-			"",
-			"",
-			"TOTAL COST",
-			t, "", "", "", ""}
-	}
 )
 
 func CostAndUsageToStdout(sortFn func(r map[int]Service) []Service,
 	r CostAndUsageOutputType) {
+
 	sortedServices := sortFn(r.Services)
+	output := ConvertToStdoutType(sortedServices, r.Granularity)
 
-	t := CreateTable(costAndUsageHeader)
+	w, err := stdout.NewStdoutWriter("costAndUsage")
+	if err != nil {
+		return
+	}
 
-	granularity := r.Granularity
-
-	rows := CostUsageToRows(sortedServices, granularity)
-
-	t.AppendRows(rows.Rows)
-	t.AppendRow(tableDivider)
-	t.AppendRow(costAndUsageTableFooter(rows.Total))
-
-	t.Render()
+	w.Writer(output)
 }
 
 func CostAndUsageToCSV(sortFn func(r map[int]Service) []Service,
@@ -66,7 +44,8 @@ func CostAndUsageToCSV(sortFn func(r map[int]Service) []Service,
 
 	err = csv.Writer(f, csvHeader, rows)
 	if err != nil {
-		return nil
+		return Error{
+			msg: "Error writing to CSV file: " + err.Error()}
 	}
 
 	return nil
@@ -106,9 +85,6 @@ func CostAndUsageToOpenAI(sortFn func(r map[int]Service) []Service,
 	if err != nil {
 		return err
 	}
-
-	//err = openai.Writer(resp.Choices[0].Text)
-
 	err = openai.Writer(resp.Choices[0].Message.Content)
 
 	if err != nil {
