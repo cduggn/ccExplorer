@@ -7,10 +7,10 @@ import (
 )
 
 var (
-	tableDivider = table.Row{"-", "-", "-",
-		"-", "-", "-", "-",
-		"-",
-		"-", ""}
+	tableDivider = table.Row{"", "", "",
+		"", "", "", "",
+		"",
+		"", ""}
 	costAndUsageHeader = table.Row{"Rank", "Dimension/Tag", "Dimension/Tag",
 		"Metric Name", "Truncated USD Amount", "Amount",
 		"Unit",
@@ -55,6 +55,7 @@ func (c CostAndUsageTable) Writer(output interface{}) {
 	outputType := output.(CostAndUsageStdoutType)
 	c.Table.SetOutputMirror(os.Stdout)
 	c.Table.SetStyle(table.StyleColoredCyanWhiteOnBlack)
+	c.Table.SuppressEmptyColumns()
 	c.Header()
 	rows := CostUsageToRows(outputType.Services, outputType.Granularity)
 
@@ -67,6 +68,9 @@ func (c CostAndUsageTable) Writer(output interface{}) {
 func (f ForecastTable) Writer(output interface{}) {
 	outputType := output.(ForecastStdoutType)
 	f.Table.SetOutputMirror(os.Stdout)
+	f.Table.SetOutputMirror(os.Stdout)
+	f.Table.SetStyle(table.StyleColoredCyanWhiteOnBlack)
+	//f.Table.SuppressEmptyColumns()
 	f.Header()
 	rows := ForecastToRows(outputType)
 	f.AddRows(rows)
