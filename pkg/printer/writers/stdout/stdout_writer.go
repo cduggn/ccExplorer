@@ -19,7 +19,7 @@ var (
 		"End"}
 	costAndUsageTableFooter = func(t string) table.Row {
 		return table.
-		Row{"", "",
+			Row{"", "",
 			"",
 			"",
 			"TOTAL COST",
@@ -54,6 +54,7 @@ func NewStdoutWriter(variant string) (Table, error) {
 func (c CostAndUsageTable) Writer(output interface{}) {
 	outputType := output.(CostAndUsageStdoutType)
 	c.Table.SetOutputMirror(os.Stdout)
+	c.Table.SetStyle(table.StyleColoredCyanWhiteOnBlack)
 	c.Header()
 	rows := CostUsageToRows(outputType.Services, outputType.Granularity)
 
