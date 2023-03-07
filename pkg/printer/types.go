@@ -2,17 +2,11 @@ package printer
 
 import (
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
-	"github.com/jedib0t/go-pretty/v6/table"
 )
 
 type PrintWriterType int
 
 type SortBy int
-
-const (
-	Amount SortBy = iota
-	Date
-)
 
 const (
 	Stdout PrintWriterType = iota
@@ -46,11 +40,6 @@ type OpenAIPrinter struct {
 
 type ChartPrinter struct {
 	Variant string
-}
-
-type CostAndUsage struct {
-	Rows  []table.Row
-	Total string
 }
 
 type CostAndUsageReport struct {
