@@ -9,6 +9,7 @@ type Table interface {
 	Header()
 	Footer(row table.Row)
 	AddRows(rows []table.Row)
+	Style()
 }
 
 type CostAndUsageTable struct {

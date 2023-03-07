@@ -12,7 +12,7 @@ var (
 		"",
 		"", ""}
 	costAndUsageHeader = table.Row{"Rank", "Dimension/Tag", "Dimension/Tag",
-		"Metric Name", "Truncated USD Amount", "Amount",
+		"Metric Name", "Amount", "Rounded",
 		"Unit",
 		"Granularity",
 		"Start",
@@ -22,7 +22,7 @@ var (
 			Row{"", "",
 			"",
 			"",
-			"TOTAL COST",
+			"Cost",
 			t, "", "", "", ""}
 	}
 	forecastedHeader = table.Row{"Start", "End", "Mean Value",
@@ -53,9 +53,7 @@ func NewStdoutWriter(variant string) (Table, error) {
 
 func (c CostAndUsageTable) Writer(output interface{}) {
 	outputType := output.(CostAndUsageStdoutType)
-	c.Table.SetOutputMirror(os.Stdout)
-	c.Table.SetStyle(table.StyleColoredCyanWhiteOnBlack)
-	c.Table.SuppressEmptyColumns()
+	c.Style()
 	c.Header()
 	rows := CostUsageToRows(outputType.Services, outputType.Granularity)
 
@@ -65,20 +63,14 @@ func (c CostAndUsageTable) Writer(output interface{}) {
 	c.Table.Render()
 }
 
-func (f ForecastTable) Writer(output interface{}) {
-	outputType := output.(ForecastStdoutType)
-	f.Table.SetOutputMirror(os.Stdout)
-	f.Table.SetOutputMirror(os.Stdout)
-	f.Table.SetStyle(table.StyleColoredCyanWhiteOnBlack)
-	//f.Table.SuppressEmptyColumns()
-	f.Header()
-	rows := ForecastToRows(outputType)
-	f.AddRows(rows)
-
-	f.Footer(forecastedTableFooter(outputType.FilteredBy,
-		outputType.Total.Unit, outputType.Total.Amount))
-
-	f.Table.Render()
+func (c CostAndUsageTable) Style() {
+	c.Table.SetOutputMirror(os.Stdout)
+	c.Table.SetColumnConfigs(
+		[]table.ColumnConfig{
+			{Number: 6, WidthMax: 8},
+		})
+	c.Table.SetStyle(table.StyleColoredGreenWhiteOnBlack)
+	c.Table.SuppressEmptyColumns()
 }
 
 func (c CostAndUsageTable) Header() {
@@ -91,6 +83,25 @@ func (c CostAndUsageTable) AddRows(rows []table.Row) {
 
 func (c CostAndUsageTable) Footer(row table.Row) {
 	c.Table.AppendFooter(row)
+}
+
+func (f ForecastTable) Writer(output interface{}) {
+	outputType := output.(ForecastStdoutType)
+	//f.Table.SuppressEmptyColumns()
+	f.Style()
+	f.Header()
+	rows := ForecastToRows(outputType)
+	f.AddRows(rows)
+
+	f.Footer(forecastedTableFooter(outputType.FilteredBy,
+		outputType.Total.Unit, outputType.Total.Amount))
+
+	f.Table.Render()
+}
+
+func (f ForecastTable) Style() {
+	f.Table.SetOutputMirror(os.Stdout)
+	f.Table.SetStyle(table.StyleColoredGreenWhiteOnBlack)
 }
 
 func (f ForecastTable) Footer(row table.Row) {
@@ -120,8 +131,8 @@ func CostUsageToRows(s []Service, granularity string) CostAndUsage {
 			}
 
 			tempRow := table.Row{index, v.Keys[0], ReturnIfPresent(v.Keys),
-				m.Name, fmt.Sprintf("%f10",
-					m.NumericAmount), m.Amount,
+				m.Name, m.Amount, fmt.Sprintf("%.2f",
+					m.NumericAmount),
 				m.Unit,
 				granularity,
 				v.Start, v.End}
@@ -129,7 +140,7 @@ func CostUsageToRows(s []Service, granularity string) CostAndUsage {
 			rows = append(rows, tempRow)
 		}
 	}
-	totalFormatted := fmt.Sprintf("%f10", total)
+	totalFormatted := fmt.Sprintf("$%.2f", total)
 	return CostAndUsage{Rows: rows, Total: totalFormatted}
 }
 
