@@ -1,8 +1,8 @@
 package aws_presets
 
 import (
-	aws2 "github.com/cduggn/ccexplorer/pkg/helpers"
-	"github.com/cduggn/ccexplorer/pkg/service/aws"
+	aws2 "github.com/cduggn/ccexplorer/internal/commands/get/aws"
+	"github.com/cduggn/ccexplorer/pkg/domain/model"
 	"testing"
 )
 
@@ -13,7 +13,7 @@ func TestGeneratePresetQuery(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    aws.CostAndUsageRequestType
+		want    model.CostAndUsageRequestType
 		wantErr bool
 	}{
 
@@ -31,7 +31,7 @@ func TestGeneratePresetQuery(t *testing.T) {
 					Granularity:       "MONTHLY",
 				},
 			},
-			want: aws.CostAndUsageRequestType{
+			want: model.CostAndUsageRequestType{
 				GroupBy: []string{
 					"SERVICE",
 					"USAGE_TYPE",
@@ -39,7 +39,7 @@ func TestGeneratePresetQuery(t *testing.T) {
 				DimensionFilter:            map[string]string{"SERVICE": "Amazon Elastic Compute Cloud - Compute"},
 				IsFilterByTagEnabled:       true,
 				IsFilterByDimensionEnabled: true,
-				Time: aws.Time{
+				Time: model.Time{
 					Start: aws2.DefaultStartDate(aws2.DayOfCurrentMonth, aws2.SubtractDays),
 					End:   aws2.DefaultEndDate(aws2.Format),
 				},

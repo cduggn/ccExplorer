@@ -4,7 +4,7 @@ import (
 	"fmt"
 	aws_presets "github.com/cduggn/ccexplorer/internal/commands/aws-presets"
 	"github.com/cduggn/ccexplorer/internal/commands/get"
-	"github.com/cduggn/ccexplorer/pkg/logger"
+	"github.com/cduggn/ccexplorer/internal/logger"
 	"github.com/common-nighthawk/go-figure"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

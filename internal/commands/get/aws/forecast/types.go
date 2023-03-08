@@ -1,6 +1,8 @@
 package forecast
 
-import aws2 "github.com/cduggn/ccexplorer/pkg/service/aws"
+import (
+	aws2 "github.com/cduggn/ccexplorer/pkg/domain/model"
+)
 
 type CommandLineInput struct {
 	FilterByValues          aws2.Filter

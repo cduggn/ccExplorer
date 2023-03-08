@@ -3,9 +3,9 @@ package aws_presets
 import (
 	"fmt"
 	"github.com/AlecAivazis/survey/v2"
+	aws2 "github.com/cduggn/ccexplorer/internal/commands/get/aws"
 	aws3 "github.com/cduggn/ccexplorer/internal/commands/get/aws/cost_and_usage"
-	aws2 "github.com/cduggn/ccexplorer/pkg/helpers"
-	"github.com/cduggn/ccexplorer/pkg/service/aws"
+	"github.com/cduggn/ccexplorer/pkg/domain/model"
 	"github.com/spf13/cobra"
 )
 
@@ -69,14 +69,14 @@ func Selected(p []PresetParams, s int) PresetParams {
 	return p[s]
 }
 
-func SynthesizeQuery(p PresetParams) (aws.CostAndUsageRequestType,
+func SynthesizeQuery(p PresetParams) (model.CostAndUsageRequestType,
 	error) {
-	return aws.CostAndUsageRequestType{
+	return model.CostAndUsageRequestType{
 		GroupBy:                    p.Dimension,
 		DimensionFilter:            p.Filter,
 		IsFilterByTagEnabled:       p.FilterByTag,
 		IsFilterByDimensionEnabled: p.FilterByDimension,
-		Time: aws.Time{
+		Time: model.Time{
 			Start: aws2.DefaultStartDate(aws2.DayOfCurrentMonth, aws2.SubtractDays),
 			End:   aws2.DefaultEndDate(aws2.Format),
 		},
@@ -94,7 +94,7 @@ func DisplaySynthesizedQuery(p PresetParams) {
 	fmt.Println("")
 }
 
-func execute(q aws.CostAndUsageRequestType) error {
+func execute(q model.CostAndUsageRequestType) error {
 	err := aws3.ExecutePreset(q)
 	if err != nil {
 		err := PresetError{
