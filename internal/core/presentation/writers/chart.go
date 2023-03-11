@@ -3,11 +3,11 @@ package writers
 import (
 	"fmt"
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"
+	"github.com/cduggn/ccexplorer/internal/core/util"
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/components"
 	"github.com/go-echarts/go-echarts/v2/opts"
 	"io"
-	"os"
 )
 
 var (
@@ -16,7 +16,7 @@ var (
 
 func WriteToChart(p *components.Page) error {
 
-	f, err := newFile(OutputDir, chartFileName)
+	f, err := util.NewFile(OutputDir, chartFileName)
 	if err != nil {
 		return model.Error{
 			Msg: "Failed creating chart HTML file: " + err.Error(),
@@ -91,17 +91,6 @@ func definePieChartProperties(s []model.Service, d string, index int,
 	)
 
 	return pie
-}
-
-// todo remove duplication
-func newFile(dir string, file string) (*os.File, error) {
-	filePath := buildOutputFilePath(dir, file)
-	return os.Create(filePath)
-}
-
-// todo remove duplication
-func buildOutputFilePath(dir string, fileName string) string {
-	return dir + "/" + fileName
 }
 
 func PopulatePieDate(services []model.Service, key int) []opts.

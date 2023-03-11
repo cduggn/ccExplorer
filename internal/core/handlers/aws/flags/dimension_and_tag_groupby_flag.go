@@ -2,6 +2,7 @@ package flags
 
 import (
 	"fmt"
+	"github.com/cduggn/ccexplorer/internal/core/util"
 	"strings"
 )
 
@@ -10,16 +11,16 @@ var (
 )
 
 func (e DimensionAndTagFlagError) Error() string {
-	return e.msg
+	return e.Msg
 }
 
 func (f *DimensionAndTagFlag) Set(value string) error {
 
-	args := SplitCommaSeparatedString(value)
+	args := util.SplitCommaSeparatedString(value)
 
 	for _, arg := range args {
 
-		parts, err := SplitNameValuePair(arg)
+		parts, err := util.SplitNameValuePair(arg)
 		if err != nil {
 			return err
 		}
@@ -28,7 +29,7 @@ func (f *DimensionAndTagFlag) Set(value string) error {
 
 			if ok := IsValidDimension(parts[1]); !ok {
 				return DimensionAndTagFlagError{
-					msg: fmt.Sprintf("Invalid dimension: %s . "+
+					Msg: fmt.Sprintf("Invalid dimension: %s . "+
 						"Must be one of %s", parts[1], DIMENSIONS),
 				}
 			}
@@ -38,7 +39,7 @@ func (f *DimensionAndTagFlag) Set(value string) error {
 			f.Tags = append(f.Tags, parts[1])
 		default:
 			return DimensionAndTagFlagError{
-				msg: fmt.Sprintf("invalid groupBy type selected: %s must be"+
+				Msg: fmt.Sprintf("invalid groupBy type selected: %s must be"+
 					" one of: %s ",
 					value, validTypes),
 			}

@@ -3,6 +3,7 @@ package writers
 import (
 	"encoding/csv"
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"
+	"github.com/cduggn/ccexplorer/internal/core/util"
 	"io"
 	"os"
 )
@@ -32,7 +33,7 @@ func NewCSVWriter(f io.Writer, header []string) (*csv.Writer, error) {
 }
 
 func NewCSVFile(dir string, file string) (*os.File, error) {
-	path := buildOutputFilePath(dir, file)
+	path := util.BuildOutputFilePath(dir, file)
 	f, err := os.Create(path)
 	if err != nil {
 		return nil, model.Error{

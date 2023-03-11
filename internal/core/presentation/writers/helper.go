@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
-	aws2 "github.com/cduggn/ccexplorer/internal/core/domain/model"
+	model "github.com/cduggn/ccexplorer/internal/core/domain/model"
+	"github.com/cduggn/ccexplorer/internal/core/util"
 	"sort"
-	"strconv"
 	"time"
 )
 
@@ -17,15 +17,15 @@ func CreateSubTitle(granularity string, start string, end string) string {
 }
 
 func ToCostAndUsageOutputType(r *costexplorer.GetCostAndUsageOutput,
-	u aws2.CostAndUsageRequestType) aws2.CostAndUsageOutputType {
+	u model.CostAndUsageRequestType) model.CostAndUsageOutputType {
 	return CurateCostAndUsageReport(r, u)
 }
 
 func CurateCostAndUsageReport(
-	d *costexplorer.GetCostAndUsageOutput, query aws2.CostAndUsageRequestType) aws2.CostAndUsageOutputType {
+	d *costexplorer.GetCostAndUsageOutput, query model.CostAndUsageRequestType) model.CostAndUsageOutputType {
 
-	c := aws2.CostAndUsageOutputType{
-		Services:     make(map[int]aws2.Service),
+	c := model.CostAndUsageOutputType{
+		Services:     make(map[int]model.Service),
 		Granularity:  query.Granularity,
 		Dimensions:   query.GroupBy,
 		Tags:         query.GroupByTag,
@@ -38,13 +38,13 @@ func CurateCostAndUsageReport(
 	return c
 }
 
-func ResultsToServicesMap(res []types.ResultByTime) map[int]aws2.Service {
-	services := make(map[int]aws2.Service)
+func ResultsToServicesMap(res []types.ResultByTime) map[int]model.Service {
+	services := make(map[int]model.Service)
 	count := 0
 	for _, v := range res {
 		for _, g := range v.Groups {
 			keys := append(make([]string, 0), g.Keys...)
-			service := aws2.Service{
+			service := model.Service{
 				Start: *v.TimePeriod.Start,
 				End:   *v.TimePeriod.End,
 				Keys:  keys,
@@ -58,41 +58,23 @@ func ResultsToServicesMap(res []types.ResultByTime) map[int]aws2.Service {
 	return services
 }
 
-func MetricsToService(m map[string]types.MetricValue) []aws2.Metrics {
-	var metrics []aws2.Metrics
+func MetricsToService(m map[string]types.MetricValue) []model.Metrics {
+	var metrics []model.Metrics
 	for k, v := range m {
-		metrics = append(metrics, aws2.Metrics{
+		metrics = append(metrics, model.Metrics{
 			Name:          k,
 			Amount:        *v.Amount,
-			NumericAmount: ConvertToFloat(*v.Amount),
+			NumericAmount: util.ConvertToFloat(*v.Amount),
 			Unit:          *v.Unit,
 		})
 	}
 	return metrics
 }
 
-func ConvertToFloat(amount string) float64 {
-	f, err := strconv.ParseFloat(amount, 64)
-	if err != nil {
-		panic(err)
-	}
-	return f
-}
-
-func ReturnIfPresent(s []string) string {
-	if len(s) == 1 {
-		return ""
-	} else {
-		return s[1]
-	}
-
-}
-
-func ConvertServiceToSlice(s aws2.Service, granularity string) [][]string {
-
+func ConvertServiceToSlice(s model.Service, granularity string) [][]string {
 	var r [][]string
 	for _, v := range s.Metrics {
-		t := []string{s.Keys[0], ReturnIfPresent(s.Keys), v.Name,
+		t := []string{s.Keys[0], util.ReturnIfPresent(s.Keys), v.Name,
 			granularity, s.Start, s.End,
 			v.Amount, v.Unit}
 		r = append(r, t)
@@ -100,38 +82,7 @@ func ConvertServiceToSlice(s aws2.Service, granularity string) [][]string {
 	return r
 }
 
-func ToPrintWriterType(s string) aws2.PrintWriterType {
-	switch s {
-	case "csv":
-		return aws2.CSV
-	case "stdout":
-		return aws2.Stdout
-	case "chart":
-		return aws2.Chart
-	case "gpt3":
-		return aws2.OpenAPI
-	default:
-		return aws2.Stdout
-	}
-}
-
-//func CreateOutputDir(outputDir string) (string, error) {
-//
-//	dir, err := os.Getwd()
-//	if err != nil {
-//		return "", err
-//	}
-//	dir = dir + outputDir
-//	if _, err := os.Stat(dir); os.IsNotExist(err) {
-//		err = os.Mkdir(dir, 0755)
-//		if err != nil {
-//			return "", err
-//		}
-//	}
-//	return dir, nil
-//}
-
-func SortFunction(sortBy string) func(r map[int]aws2.Service) []aws2.Service {
+func SortFunction(sortBy string) func(r map[int]model.Service) []model.Service {
 	switch sortBy {
 	case "date":
 		return SortServicesByStartDate
@@ -142,17 +93,17 @@ func SortFunction(sortBy string) func(r map[int]aws2.Service) []aws2.Service {
 	}
 }
 
-func SortServicesByStartDate(r map[int]aws2.Service) []aws2.Service {
+func SortServicesByStartDate(r map[int]model.Service) []model.Service {
 	// Create a slice of key-value pairs
 	pairs := make([]struct {
 		Key   int
-		Value aws2.Service
+		Value model.Service
 	}, len(r))
 	i := 0
 	for k, v := range r {
 		pairs[i] = struct {
 			Key   int
-			Value aws2.Service
+			Value model.Service
 		}{k, v}
 		i++
 	}
@@ -164,24 +115,24 @@ func SortServicesByStartDate(r map[int]aws2.Service) []aws2.Service {
 		return t1.After(t2)
 	})
 
-	result := make([]aws2.Service, len(pairs))
+	result := make([]model.Service, len(pairs))
 	for i, pair := range pairs {
 		result[i] = pair.Value
 	}
 	return result
 }
 
-func SortServicesByMetricAmount(r map[int]aws2.Service) []aws2.Service {
+func SortServicesByMetricAmount(r map[int]model.Service) []model.Service {
 	// Create a slice of key-value pairs
 	pairs := make([]struct {
 		Key   int
-		Value aws2.Service
+		Value model.Service
 	}, len(r))
 	i := 0
 	for k, v := range r {
 		pairs[i] = struct {
 			Key   int
-			Value aws2.Service
+			Value model.Service
 		}{k, v}
 		i++
 	}
@@ -192,14 +143,14 @@ func SortServicesByMetricAmount(r map[int]aws2.Service) []aws2.Service {
 			Metrics[0].NumericAmount
 	})
 
-	result := make([]aws2.Service, len(pairs))
+	result := make([]model.Service, len(pairs))
 	for i, pair := range pairs {
 		result[i] = pair.Value
 	}
 	return result
 }
 
-func ConvertServiceMapToArray(s map[int]aws2.Service,
+func ConvertServiceMapToArray(s map[int]model.Service,
 	granularity string) [][]string {
 	var rows [][]string
 	for _, v := range s {
@@ -208,7 +159,7 @@ func ConvertServiceMapToArray(s map[int]aws2.Service,
 	return rows
 }
 
-func ConvertServiceSliceToArray(s []aws2.Service, granularity string) [][]string {
+func ConvertServiceSliceToArray(s []model.Service, granularity string) [][]string {
 	var rows [][]string
 	for _, v := range s {
 		rows = append(rows, ConvertServiceToSlice(v, granularity)...)
@@ -216,25 +167,25 @@ func ConvertServiceSliceToArray(s []aws2.Service, granularity string) [][]string
 	return rows
 }
 
-func ConvertToStdoutType(s []aws2.Service,
-	granularity string) aws2.CostAndUsageStdoutType {
+func ConvertToStdoutType(s []model.Service,
+	granularity string) model.CostAndUsageStdoutType {
 
-	outputType := aws2.CostAndUsageStdoutType{
+	outputType := model.CostAndUsageStdoutType{
 		Granularity: granularity,
 	}
 
-	var services []aws2.Service
+	var services []model.Service
 	for _, v := range s {
-		var metrics []aws2.Metrics
+		var metrics []model.Metrics
 		for _, m := range v.Metrics {
-			metrics = append(metrics, aws2.Metrics{
+			metrics = append(metrics, model.Metrics{
 				Name:          m.Name,
 				Amount:        m.Amount,
 				Unit:          m.Unit,
 				NumericAmount: m.NumericAmount,
 			})
 		}
-		services = append(services, aws2.Service{
+		services = append(services, model.Service{
 			Name:    v.Keys[0],
 			Keys:    v.Keys,
 			Start:   v.Start,
@@ -247,10 +198,10 @@ func ConvertToStdoutType(s []aws2.Service,
 	return outputType
 }
 
-func ConvertToChartInputType(r aws2.CostAndUsageOutputType,
-	s []aws2.Service) aws2.InputType {
+func ConvertToChartInputType(r model.CostAndUsageOutputType,
+	s []model.Service) model.InputType {
 
-	input := aws2.InputType{
+	input := model.InputType{
 		Granularity: r.Granularity,
 		Start:       r.Start,
 		End:         r.End,
@@ -258,11 +209,11 @@ func ConvertToChartInputType(r aws2.CostAndUsageOutputType,
 		Tags:        r.Tags,
 	}
 
-	var services []aws2.Service
+	var services []model.Service
 	for _, service := range s {
-		var metrics []aws2.Metrics
+		var metrics []model.Metrics
 		for _, metric := range service.Metrics {
-			metrics = append(metrics, aws2.Metrics{
+			metrics = append(metrics, model.Metrics{
 				Name:          metric.Name,
 				Amount:        metric.Amount,
 				Unit:          metric.Unit,
@@ -271,7 +222,7 @@ func ConvertToChartInputType(r aws2.CostAndUsageOutputType,
 			})
 		}
 
-		services = append(services, aws2.Service{
+		services = append(services, model.Service{
 			Name:    service.Name,
 			Keys:    service.Keys,
 			Start:   service.Start,
@@ -286,12 +237,12 @@ func ConvertToChartInputType(r aws2.CostAndUsageOutputType,
 
 }
 
-func ConvertToForecastStdoutType(r aws2.ForecastPrintData,
-	filteredBy string) aws2.ForecastStdoutType {
-	var forecast []aws2.ForecastResults
+func ConvertToForecastStdoutType(r model.ForecastPrintData,
+	filteredBy string) model.ForecastStdoutType {
+	var forecast []model.ForecastResults
 	for _, v := range r.Forecast.ForecastResultsByTime {
-		forecast = append(forecast, aws2.ForecastResults{
-			TimePeriod: aws2.DateInterval{
+		forecast = append(forecast, model.ForecastResults{
+			TimePeriod: model.DateInterval{
 				Start: *v.TimePeriod.Start,
 				End:   *v.TimePeriod.End,
 			},
@@ -301,9 +252,9 @@ func ConvertToForecastStdoutType(r aws2.ForecastPrintData,
 		})
 	}
 
-	return aws2.ForecastStdoutType{
+	return model.ForecastStdoutType{
 		Forecast: forecast,
-		Total: aws2.Total{
+		Total: model.Total{
 			Amount: *r.Forecast.Total.Amount,
 			Unit:   *r.Forecast.Total.Unit,
 		},

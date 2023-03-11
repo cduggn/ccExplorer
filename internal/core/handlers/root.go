@@ -3,7 +3,7 @@ package handlers
 import (
 	"fmt"
 	handlers "github.com/cduggn/ccexplorer/internal/core/handlers/aws"
-	"github.com/cduggn/ccexplorer/internal/logger"
+	"github.com/cduggn/ccexplorer/internal/core/logger"
 	"github.com/common-nighthawk/go-figure"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

@@ -1,11 +1,11 @@
 package flags
 
 type FlagError struct {
-	msg string
+	Msg string
 }
 
 type DimensionAndTagFlagError struct {
-	msg string
+	Msg string
 }
 
 type DimensionAndTagFlag DimensionAndTagFlagType

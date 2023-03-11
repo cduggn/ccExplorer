@@ -3,6 +3,7 @@ package writers
 import (
 	"fmt"
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"
+	"github.com/cduggn/ccexplorer/internal/core/util"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"os"
 )
@@ -139,7 +140,7 @@ func CostUsageToRows(s []model.Service, granularity string) model.CostAndUsage {
 				total += m.NumericAmount
 			}
 
-			tempRow := table.Row{index, v.Keys[0], ReturnIfPresent(v.Keys),
+			tempRow := table.Row{index, v.Keys[0], util.ReturnIfPresent(v.Keys),
 				m.Name, m.Amount, fmt.Sprintf("%.2f",
 					m.NumericAmount),
 				m.Unit,

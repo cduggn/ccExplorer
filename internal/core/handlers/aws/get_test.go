@@ -2,6 +2,7 @@ package aws
 
 import (
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"
+	"github.com/cduggn/ccexplorer/internal/core/util"
 	"testing"
 )
 
@@ -42,8 +43,9 @@ func TestGeneratePresetQuery(t *testing.T) {
 				IsFilterByTagEnabled:       true,
 				IsFilterByDimensionEnabled: true,
 				Time: model.Time{
-					Start: DefaultStartDate(DayOfCurrentMonth, SubtractDays),
-					End:   DefaultEndDate(Format),
+					Start: util.DefaultStartDate(util.DayOfCurrentMonth,
+						util.SubtractDays),
+					End: util.DefaultEndDate(util.Format),
 				},
 				Granularity:      "MONTHLY",
 				ExcludeDiscounts: true,

@@ -83,7 +83,7 @@ func CostAndUsageToOpenAI(sortFn func(r map[int]model.Service) []model.Service,
 	sortedData := sortFn(r.Services)
 	rows := ConvertServiceSliceToArray(sortedData, r.Granularity)
 
-	maxRows := MaxRows(rows, maxDisplayRows)
+	maxRows := MaxSupportedRows(rows, maxDisplayRows)
 	data := BuildPromptText(rows[:maxRows])
 	resp, err := Summarize(r.OpenAIAPIKey, data)
 	if err != nil {
@@ -97,7 +97,7 @@ func CostAndUsageToOpenAI(sortFn func(r map[int]model.Service) []model.Service,
 	return nil
 }
 
-func MaxRows(rows [][]string, maxRows int) int {
+func MaxSupportedRows(rows [][]string, maxRows int) int {
 	if len(rows) > maxRows {
 		return maxRows
 	}

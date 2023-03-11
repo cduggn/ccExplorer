@@ -12,6 +12,7 @@ import (
 	"github.com/cduggn/ccexplorer/internal/core/presentation"
 	writer "github.com/cduggn/ccexplorer/internal/core/presentation/writers"
 	"github.com/cduggn/ccexplorer/internal/core/service/aws"
+	"github.com/cduggn/ccexplorer/internal/core/util"
 	"github.com/common-nighthawk/go-figure"
 	"github.com/spf13/cobra"
 	"time"
@@ -143,10 +144,10 @@ func (c *CostCommandType) DefineFlags() {
 			"default is to sort by cost in descending order)")
 
 	c.Cmd.Flags().StringVarP(&costUsageStartDate, "startDate", "s",
-		DefaultStartDate(DayOfCurrentMonth, SubtractDays),
+		util.DefaultStartDate(util.DayOfCurrentMonth, util.SubtractDays),
 		"Start date (defaults to the start of the current month)")
 	c.Cmd.Flags().StringVarP(&costUsageEndDate, "endDate", "e",
-		DefaultEndDate(Format),
+		util.DefaultEndDate(util.Format),
 		"End date *(defaults to the present day)")
 
 	c.Cmd.Flags().StringVarP(&costAndUsagePrintFormat, "printFormat", "p", "stdout",
@@ -165,10 +166,11 @@ func (f *ForecastCommandType) DefineFlags() {
 		"Filter by DIMENSION  (default: none)")
 
 	f.Cmd.Flags().StringVarP(&forecastStartDate, "start", "s",
-		Format(time.Now()), "Start date (defaults to the present day)")
+		util.Format(time.Now()), "Start date (defaults to the present day)")
 
 	f.Cmd.Flags().StringVarP(&forecastEndDate, "end", "e",
-		LastDayOfMonth(), "End date (defaults to one month from the start date)")
+		util.LastDayOfMonth(),
+		"End date (defaults to one month from the start date)")
 
 	// Optional flag to dictate the granularity of the data returned
 	f.Cmd.Flags().StringVarP(&forecastGranularity, "granularity", "g", "MONTHLY",
@@ -272,10 +274,10 @@ func (c *CostCommandType) Execute(req model.CostAndUsageRequestType) error {
 
 	report := writer.ToCostAndUsageOutputType(costAndUsageResponse, req)
 
-	w := presentation.NewPrintWriter(writer.ToPrintWriterType(req.PrintFormat),
+	w := presentation.NewPrintWriter(util.ToPrintWriterType(req.PrintFormat),
 		"costAndUsage")
 
-	err = w.Print(SortByFn(req.SortByDate), report)
+	err = w.Print(util.SortByFn(req.SortByDate), report)
 	if err != nil {
 		return err
 	}
@@ -299,7 +301,8 @@ func (f *ForecastCommandType) RunE(cmd *cobra.Command, args []string) error {
 	filters := filterList(req)
 	printData.Filters = filters
 
-	p := presentation.NewPrintWriter(writer.ToPrintWriterType("stdout"), "forecast")
+	p := presentation.NewPrintWriter(util.ToPrintWriterType("stdout"),
+		"forecast")
 	err = p.Print(printData, filters)
 	if err != nil {
 		return err
@@ -396,8 +399,9 @@ func (p *PresetCommandType) SynthesizeRequest(m model.PresetParams) (model.
 		IsFilterByTagEnabled:       m.FilterByTag,
 		IsFilterByDimensionEnabled: m.FilterByDimension,
 		Time: model.Time{
-			Start: DefaultStartDate(DayOfCurrentMonth, SubtractDays),
-			End:   DefaultEndDate(Format),
+			Start: util.DefaultStartDate(util.DayOfCurrentMonth,
+				util.SubtractDays),
+			End: util.DefaultEndDate(util.Format),
 		},
 		Granularity:      m.Granularity,
 		ExcludeDiscounts: m.ExcludeDiscounts,

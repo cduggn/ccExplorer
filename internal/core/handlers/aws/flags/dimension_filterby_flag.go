@@ -2,6 +2,7 @@ package flags
 
 import (
 	"fmt"
+	"github.com/cduggn/ccexplorer/internal/core/util"
 	"strings"
 )
 
@@ -17,11 +18,11 @@ func NewForecastFilterBy() DimensionFilterByFlag {
 
 func (f *DimensionFilterByFlag) Set(value string) error {
 
-	args := SplitCommaSeparatedString(value)
+	args := util.SplitCommaSeparatedString(value)
 
 	for _, arg := range args {
 
-		parts, err := SplitNameValuePair(arg)
+		parts, err := util.SplitNameValuePair(arg)
 		if err != nil {
 			return err
 		}

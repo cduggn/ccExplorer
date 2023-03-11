@@ -1,6 +1,7 @@
 package flags
 
 import (
+	"github.com/cduggn/ccexplorer/internal/core/util"
 	"reflect"
 	"testing"
 )
@@ -158,7 +159,8 @@ func TestSplitByIndividualArgument(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := SplitCommaSeparatedString(tt.args); !reflect.DeepEqual(got, tt.want) {
+			if got := util.SplitCommaSeparatedString(tt.args); !reflect.
+				DeepEqual(got, tt.want) {
 				t.Errorf("splitByIndividualArgument() = %v, want %v", got, tt.want)
 			}
 		})
@@ -194,7 +196,7 @@ func TestSplitIndividualArgument(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := SplitNameValuePair(tt.args.value)
+			got, err := util.SplitNameValuePair(tt.args.value)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("splitIndividualArgument() error = %v, wantErr %v", err, tt.wantErr)
 				return

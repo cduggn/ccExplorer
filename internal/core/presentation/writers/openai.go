@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"
+	"github.com/cduggn/ccexplorer/internal/core/util"
 	gogpt "github.com/sashabaranov/go-gpt3"
 	"strings"
 )
@@ -18,7 +19,7 @@ var (
 )
 
 func WriteToHTML(completions string) error {
-	f, err := newFile(OutputDir, aiFileName)
+	f, err := util.NewFile(OutputDir, aiFileName)
 	if err != nil {
 		return model.Error{
 			Msg: "Failed creating AI HTML: " + err.Error(),
