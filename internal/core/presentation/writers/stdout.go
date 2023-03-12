@@ -123,7 +123,6 @@ func (f ForecastTable) AddRows(rows []table.Row) {
 }
 
 func (f ForecastTable) Header() {
-	//t.SetOutputMirror(os.Stdout)
 	f.Table.AppendHeader(forecastedHeader)
 }
 

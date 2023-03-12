@@ -4,7 +4,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
-	model2 "github.com/cduggn/ccexplorer/internal/core/domain/model"
+	model "github.com/cduggn/ccexplorer/internal/core/domain/model"
 )
 
 var (
@@ -86,7 +86,7 @@ func ToSlice(d costexplorer.GetDimensionValuesOutput) []string {
 	return servicesSlice
 }
 
-func CostAndUsageFilterGenerator(req model2.CostAndUsageRequestType) *types.
+func CostAndUsageFilterGenerator(req model.CostAndUsageRequestType) *types.
 	Expression {
 	expression := &types.Expression{}
 	var filters []types.Expression
@@ -114,7 +114,7 @@ func CostAndUsageFilterGenerator(req model2.CostAndUsageRequestType) *types.
 	return expression
 }
 
-func CostForecastFilterGenerator(req model2.GetCostForecastRequest) *types.
+func CostForecastFilterGenerator(req model.GetCostForecastRequest) *types.
 	Expression {
 	var filterExpression types.Expression
 	var expList []types.Expression
@@ -155,7 +155,7 @@ func CostForecastFilterGenerator(req model2.GetCostForecastRequest) *types.
 	return &filterExpression
 }
 
-func CostAndUsageGroupByGenerator(req model2.CostAndUsageRequestType) []types.GroupDefinition {
+func CostAndUsageGroupByGenerator(req model.CostAndUsageRequestType) []types.GroupDefinition {
 	if len(req.GroupByTag) == 1 && len(req.GroupBy) == 1 {
 		return groupByTagAndDimension(req.GroupByTag, req.GroupBy)
 	} else if len(req.GroupByTag) >= 1 {
@@ -166,27 +166,27 @@ func CostAndUsageGroupByGenerator(req model2.CostAndUsageRequestType) []types.Gr
 
 }
 
-func ExtractForecastFilters(d map[string]string) model2.Filter {
+func ExtractForecastFilters(d map[string]string) model.Filter {
 
 	if len(d) == 0 {
-		return model2.Filter{}
+		return model.Filter{}
 	}
 
 	dimensions := CreateForecastDimensionFilter(d)
 
-	return model2.Filter{
+	return model.Filter{
 		Dimensions: dimensions,
 	}
 }
 
-func CreateForecastDimensionFilter(m map[string]string) []model2.Dimension {
+func CreateForecastDimensionFilter(m map[string]string) []model.Dimension {
 
 	if len(m) == 0 {
 		return nil
 	}
-	var dimensions []model2.Dimension
+	var dimensions []model.Dimension
 	for k, v := range m {
-		dimensions = append(dimensions, model2.Dimension{
+		dimensions = append(dimensions, model.Dimension{
 			Key:   k,
 			Value: []string{v},
 		})
