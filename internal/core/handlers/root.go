@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	handlers "github.com/cduggn/ccexplorer/internal/core/handlers/aws"
 	"github.com/cduggn/ccexplorer/internal/core/logger"
 	"github.com/common-nighthawk/go-figure"
@@ -44,9 +43,6 @@ func init() {
 
 func LoadConfig(path string) {
 	viper.AutomaticEnv()
-	if err := viper.ReadInConfig(); err != nil {
-		fmt.Println("No config file specified:", err.Error())
-	}
 }
 
 func paintRootHeader() string {
