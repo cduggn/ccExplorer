@@ -33,10 +33,9 @@ func TestDefaultEndDate(t *testing.T) {
 
 func TestDefaultStartDate(t *testing.T) {
 	type args struct {
-		d func(time time.Time) int
-		s func(time time.Time, days int) string
+		dayOfCurrentMonth func(time time.Time) int
+		subtractDays      func(time time.Time, days int) string
 	}
-
 	tests := []struct {
 		name string
 		args args
@@ -45,15 +44,15 @@ func TestDefaultStartDate(t *testing.T) {
 		{
 			name: "Today",
 			args: args{
-				d: DayOfCurrentMonth,
-				s: SubtractDays,
+				dayOfCurrentMonth: DayOfCurrentMonth,
+				subtractDays:      SubtractDays,
 			},
-			want: SubtractDays(time.Now(), DayOfCurrentMonth(time.Now())-1),
+			want: DefaultStartDate(DayOfCurrentMonth, SubtractDays),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := DefaultStartDate(tt.args.d, tt.args.s); got != tt.want {
+			if got := DefaultStartDate(tt.args.dayOfCurrentMonth, tt.args.subtractDays); got != tt.want {
 				t.Errorf("DefaultStartDate() = %v, want %v", got, tt.want)
 			}
 		})

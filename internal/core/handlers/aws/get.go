@@ -145,7 +145,7 @@ func (c *CostCommandType) DefineFlags() {
 
 	c.Cmd.Flags().StringVarP(&costUsageStartDate, "startDate", "s",
 		util.DefaultStartDate(util.DayOfCurrentMonth, util.SubtractDays),
-		"Start date (defaults to the start of the current month)")
+		"Start date (defaults to the start of the previous month)")
 	c.Cmd.Flags().StringVarP(&costUsageEndDate, "endDate", "e",
 		util.DefaultEndDate(util.Format),
 		"End date *(defaults to the present day)")
@@ -242,7 +242,7 @@ func (c *CostCommandType) InputHandler(validatorFn func(input model.CommandLineI
 }
 
 func (c *CostCommandType) SynthesizeRequest(input model.CommandLineInput) model.
-	CostAndUsageRequestType {
+CostAndUsageRequestType {
 
 	return model.CostAndUsageRequestType{
 		Granularity: input.Interval,
@@ -330,8 +330,8 @@ func (f *ForecastCommandType) InputHandler() model.ForecastCommandLineInput {
 }
 
 func (f *ForecastCommandType) SynthesizeRequest(input model.
-	ForecastCommandLineInput) (model.
-	GetCostForecastRequest, error) {
+ForecastCommandLineInput) (model.
+GetCostForecastRequest, error) {
 
 	return model.GetCostForecastRequest{
 		Granularity:             input.Granularity,
@@ -391,7 +391,7 @@ func (p *PresetCommandType) RunE(cmd *cobra.Command, args []string) error {
 }
 
 func (p *PresetCommandType) SynthesizeRequest(m model.PresetParams) (model.
-	CostAndUsageRequestType,
+CostAndUsageRequestType,
 	error) {
 	return model.CostAndUsageRequestType{
 		GroupBy:                    m.Dimension,
@@ -452,7 +452,7 @@ func selectedPreset(p []model.PresetParams, s int) model.PresetParams {
 }
 
 func prepareResponseForRendering(res *costexplorer.
-	GetCostForecastOutput) model.ForecastPrintData {
+GetCostForecastOutput) model.ForecastPrintData {
 	return model.ForecastPrintData{
 		Forecast: res,
 	}
