@@ -36,6 +36,7 @@ func TestDefaultStartDate(t *testing.T) {
 		d func(time time.Time) int
 		s func(time time.Time, days int) string
 	}
+
 	tests := []struct {
 		name string
 		args args

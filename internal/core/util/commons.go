@@ -33,7 +33,7 @@ func ToPrintWriterType(s string) model.PrintWriterType {
 		return model.Stdout
 	case "chart":
 		return model.Chart
-	case "gpt3":
+	case "gpt":
 		return model.OpenAPI
 	default:
 		return model.Stdout
@@ -60,6 +60,11 @@ func Format(date time.Time) string {
 func DefaultStartDate(d func(time time.Time) int, s func(time time.Time, days int) string) string {
 	today := time.Now()
 	dayOfMonth := d(today)
+
+	// if today is the first day of the month, then we want to start at the end of the previous month
+	if dayOfMonth == 1 {
+		return s(today, 1)
+	}
 	return s(today, dayOfMonth-1) // subtract 1 to get the first day of the month
 }
 

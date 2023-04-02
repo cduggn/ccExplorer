@@ -26,20 +26,20 @@ func ValidateInput(input model.CommandLineInput) error {
 	if !isValidPrintFormat {
 		return ValidationError{
 			Message: "Invalid print format. " +
-				"Please use one of the following: stdout, csv, chart, gpt3",
+				"Please use one of the following: stdout, csv, chart, gpt",
 		}
 	}
 
-	if input.PrintFormat == "gpt3" && input.OpenAIAPIKey == "" {
+	if input.PrintFormat == "gpt" && input.OpenAIAPIKey == "" {
 		return ValidationError{
 			Message: "OpenAI API key not set. Please set the open_ai_api_key in the config file or environment variable",
 		}
 	}
 
-	if input.PrintFormat == "gpt3" && input.OpenAIAPIKey != "" {
+	if input.PrintFormat == "gpt" && input.OpenAIAPIKey != "" {
 		if HasAccountInformation(input.GroupByDimension) {
 			return ValidationError{
-				Message: "Cannot use GPT-3 with account information. Please remove the account dimension",
+				Message: "Cannot use GPT with account information. Please remove the account dimension",
 			}
 		}
 	}
@@ -99,7 +99,7 @@ func ValidateEndDate(endDate, startDate string) error {
 }
 
 func IsValidPrintFormat(f string) bool {
-	return f == "stdout" || f == "csv" || f == "chart" || f == "gpt3"
+	return f == "stdout" || f == "csv" || f == "chart" || f == "gpt"
 }
 
 func IsValidGranularity(g string) bool {

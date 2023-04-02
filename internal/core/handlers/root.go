@@ -29,7 +29,10 @@ func RootCommand() *cobra.Command {
 		panic(err.Error())
 	}
 
-	cobra.OnInitialize(LoadConfigFunc("."))
+	LoadConfigFunc(".")()
+	handlers.Initialize()
+
+	//cobra.OnInitialize(LoadConfigFunc("."))
 	return rootCmd
 }
 
@@ -38,6 +41,8 @@ func init() {
 	rootCmd.AddCommand(handlers.Presets())
 	_ = viper.BindPFlag("open_ai_api_key", rootCmd.PersistentFlags().Lookup(
 		"OPEN_AI_API_KEY"))
+	_ = viper.BindPFlag("aws_profile", rootCmd.PersistentFlags().Lookup(
+		"AWS_PROFILE"))
 }
 
 func LoadConfig(path string) {

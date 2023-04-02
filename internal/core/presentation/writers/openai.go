@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"
 	"github.com/cduggn/ccexplorer/internal/core/util"
-	gogpt "github.com/sashabaranov/go-gpt3"
+	gogpt "github.com/sashabaranov/go-openai"
 	"strings"
 )
 
@@ -39,7 +39,7 @@ func WriteToHTML(completions string) error {
 func Summarize(apiKey string, userMessage string) (gogpt.ChatCompletionResponse,
 	error) {
 
-	fmt.Println("Generating costAndUsage report with gpt3...")
+	fmt.Println("Generating costAndUsage report with gpt...")
 
 	c := gogpt.NewClient(apiKey)
 	ctx := context.Background()
@@ -56,7 +56,7 @@ func Summarize(apiKey string, userMessage string) (gogpt.ChatCompletionResponse,
 	resp, err := c.CreateChatCompletion(ctx, req)
 	if err != nil {
 		return gogpt.ChatCompletionResponse{}, model.Error{
-			Msg: "GPT-3 failed to generate report: " + err.Error(),
+			Msg: "GPT failed to generate report: " + err.Error(),
 		}
 	}
 
