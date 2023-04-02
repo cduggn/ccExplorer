@@ -15,7 +15,6 @@ var (
 		Short: "A CLI tool to explore cloud costs and usage",
 		Long:  paintRootHeader(),
 	}
-	cfgFile        string
 	LoadConfigFunc = func(path string) func() {
 		return func() {
 			LoadConfig(path)
@@ -31,8 +30,6 @@ func RootCommand() *cobra.Command {
 
 	LoadConfigFunc(".")()
 	handlers.Initialize()
-
-	//cobra.OnInitialize(LoadConfigFunc("."))
 	return rootCmd
 }
 
@@ -46,14 +43,6 @@ func init() {
 }
 
 func LoadConfig(path string) {
-	if cfgFile != "" {
-		viper.SetConfigFile(cfgFile)
-	} else {
-		viper.AddConfigPath(path)
-		viper.SetConfigType("env")
-		viper.SetConfigName(".ccexplorer")
-	}
-
 	viper.AutomaticEnv()
 	if err := viper.ReadInConfig(); err != nil {
 		fmt.Println("No config file specified:", err.Error())

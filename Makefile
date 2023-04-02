@@ -49,3 +49,7 @@ release: $(GORELEASER)
 
 git-secrets:
 	git secrets --register-aws --global
+
+tag:
+	git tag -a v$(VERSION) -m "Release v$(VERSION)"
+	git push origin v$(VERSION)

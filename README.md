@@ -63,7 +63,7 @@ $ go run .\cmd\ccexplorer\ccexplorer.go get aws -g DIMENSION=SERVICE,DIMENSION=O
 
 ```console
 # download
-$ docker pull ghcr.io/cduggn/ccexplorer:v0.4.11
+$ docker pull ghcr.io/cduggn/ccexplorer:v0.4.12
 
 # Container requires AWS Access key, secret, and region
 $ docker run -it \
@@ -71,7 +71,7 @@ $ docker run -it \
   -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
   -e AWS_REGION=<AWS-REGION> \
   --mount type=bind,source="$(pwd)"/output/,target=/app/output \
-  ghcr.io/cduggn/ccexplorer:v0.4.11 get aws -g DIMENSION=OPERATION,
+  ghcr.io/cduggn/ccexplorer:v0.4.12 get aws -g DIMENSION=OPERATION,
   DIMENSION=SERVICE \
   -l -p chart
   
@@ -98,21 +98,27 @@ $ ccexplorer run-query
 
 For more advanced usage, you can use the `get` command to query AWS Cost and Usage Reports.
 
-#### AWS Authentication
+#### Authentication
 
-##### Profiles
+##### AWS Profiles
 `ccExplorer` supports AWS profiles. You can set the profile to use by setting the `AWS_PROFILE` environment variable.
 
 ```console
 $ export AWS_PROFILE=profile-name
 ```
 
-##### Credentials
+##### AWS Credentials
 
 `ccExplorer` supports AWS credentials. You can set the credentials to use by 
 setting the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` and `AWS_REGION` 
 environment variables.
 
+```console
+$ export AWS_ACCESS_KEY_ID=access-key-id
+$ export AWS_SECRET_ACCESS_KEY=secret-access-key
+$ export AWS_REGION=region
+```
+   
 
 Examples
 -------------
@@ -193,13 +199,12 @@ Print Writers
 -------------
 The `ccExplorer` supports the following output formats: stdout, csv, chart 
 and gpt. When using GPT, the `ccExplorer` will look for the 
-`OPEN_AI_API_KEY` environment variable. This can be set in an env file 
-called `.ccexplorer`. To reduce the possibility of sending identification 
+`OPEN_AI_API_KEY` environment variable. To reduce the possibility of sending identification 
 to GPT, the `-p gpt` flag does not support grouping by `LINKED_ACCOUNT`.
 
-```.ccexplorer
-OPEN_AI_API_KEY=<openai_key>
-````
+```console
+$ export OPEN_AI_API_KEY=your-api-key
+```
 
 
 System Defaults
