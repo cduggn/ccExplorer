@@ -55,7 +55,7 @@ type PresetCommandType struct {
 	Cmd *cobra.Command
 }
 
-func init() {
+func Initialize() {
 	var err error
 	srv, err = configureServices()
 	if err != nil {
@@ -145,13 +145,13 @@ func (c *CostCommandType) DefineFlags() {
 
 	c.Cmd.Flags().StringVarP(&costUsageStartDate, "startDate", "s",
 		util.DefaultStartDate(util.DayOfCurrentMonth, util.SubtractDays),
-		"Start date (defaults to the start of the current month)")
+		"Start date (defaults to the start of the previous month)")
 	c.Cmd.Flags().StringVarP(&costUsageEndDate, "endDate", "e",
 		util.DefaultEndDate(util.Format),
 		"End date *(defaults to the present day)")
 
 	c.Cmd.Flags().StringVarP(&costAndUsagePrintFormat, "printFormat", "p", "stdout",
-		"Valid values: stdout, csv, chart, gpt3 (default: stdout)")
+		"Valid values: stdout, csv, chart, gpt (default: stdout)")
 
 	c.Cmd.Flags().StringVarP(&costAndUsageMetric, "metric", "i", "UnblendedCost",
 		"Valid values: AmortizedCost, BlendedCost, NetAmortizedCost, "+

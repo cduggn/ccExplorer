@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"
+	"github.com/spf13/viper"
 )
 
 type Service struct {
@@ -14,7 +15,17 @@ type Service struct {
 }
 
 func New() (*Service, error) {
-	cfg, err := config.LoadDefaultConfig(context.TODO())
+
+	var err error
+	var cfg aws.Config
+
+	if profile := Profile(); profile == "not-provided" {
+		cfg, err = config.LoadDefaultConfig(context.TODO())
+	} else {
+		cfg, err = config.LoadDefaultConfig(context.TODO(),
+			config.WithSharedConfigProfile(profile))
+	}
+
 	if err != nil {
 		return nil, model.APIError{
 			Msg: "unable to load SDK config, " + err.Error(),
@@ -23,6 +34,15 @@ func New() (*Service, error) {
 	return &Service{
 		Client: costexplorer.NewFromConfig(cfg),
 	}, nil
+}
+
+func Profile() string {
+	awsProfile := viper.GetString("aws_profile")
+	if awsProfile == "" {
+		awsProfile = "not-provided"
+	}
+
+	return awsProfile
 }
 
 func (srv *Service) GetCostAndUsage(ctx context.Context,
@@ -53,7 +73,7 @@ func (srv *Service) GetCostAndUsage(ctx context.Context,
 func (srv *Service) GetCostForecast(ctx context.Context,
 	req model.GetCostForecastRequest) (
 	*costexplorer.
-		GetCostForecastOutput, error) {
+	GetCostForecastOutput, error) {
 
 	result, err := srv.Client.GetCostForecast(context.TODO(),
 		&costexplorer.GetCostForecastInput{

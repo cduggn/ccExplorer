@@ -33,7 +33,7 @@ func ToPrintWriterType(s string) model.PrintWriterType {
 		return model.Stdout
 	case "chart":
 		return model.Chart
-	case "gpt3":
+	case "gpt":
 		return model.OpenAPI
 	default:
 		return model.Stdout
@@ -57,11 +57,27 @@ func Format(date time.Time) string {
 	return date.Format("2006-01-02")
 }
 
-func DefaultStartDate(d func(time time.Time) int, s func(time time.Time, days int) string) string {
+// DefaultStartDate function which returns  the first day of the previous month
+
+func DefaultStartDate(dayOfCurrentMonth func(time time.Time) int,
+	subtractDays func(time time.Time, days int) string) string {
 	today := time.Now()
-	dayOfMonth := d(today)
-	return s(today, dayOfMonth-1) // subtract 1 to get the first day of the month
+	firstDayOfCurrentMonth := time.Date(today.Year(), today.Month(), 1, 0, 0, 0, 0, today.Location())
+	firstDayOfPreviousMonth := firstDayOfCurrentMonth.AddDate(0, -1, 0)
+	dayOfMonth := dayOfCurrentMonth(firstDayOfPreviousMonth)
+
+	return subtractDays(firstDayOfPreviousMonth, dayOfMonth-1)
 }
+
+//func DefaultStartDate(d func(time time.Time) int, s func(time time.Time, days int) string) string {
+//	today := time.Now()
+//	dayOfMonth := d(today)
+//
+//	if dayOfMonth == 1 {
+//		return s(today, 1)
+//	}
+//	return s(today, dayOfMonth-1) // subtract 1 to get the first day of the month
+//}
 
 func DayOfCurrentMonth(time time.Time) int {
 	return time.Day()
