@@ -98,13 +98,20 @@ $ ccexplorer run-query
 
 For more advanced usage, you can use the `get` command to query AWS Cost and Usage Reports.
 
-#### AWS Profiles
+#### AWS Authentication
 
+##### Profiles
 `ccExplorer` supports AWS profiles. You can set the profile to use by setting the `AWS_PROFILE` environment variable.
 
 ```console
 $ export AWS_PROFILE=profile-name
 ```
+
+##### Credentials
+
+`ccExplorer` supports AWS credentials. You can set the credentials to use by 
+setting the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` and `AWS_REGION` 
+environment variables.
 
 
 Examples
