@@ -25,8 +25,7 @@ alt="release status">
 
 `ccExplorer` (Cloud cost explorer) is a simple command line tool to explore the 
 cost of your cloud resources. It's built on opensource tools like [cobra](https://github.com/spf13/cobra),
-[go-echarts](https://github.com/go-echarts/go-echarts), [go-openai]
-(https://github.com/sashabaranov/go-openai) and [go-pretty](https://github.com/jedib0t/go-pretty).
+[go-echarts](https://github.com/go-echarts/go-echarts), [go-openai](https://github.com/sashabaranov/go-openai) and [go-pretty](https://github.com/jedib0t/go-pretty).
 It lets you quickly surface cost and usage metrics associated with your AWS 
 account and visualize them in a human-readable format like a table, csv file, 
 or chart.  It was created so I could quickly explore and reason about service costs without switching context from the command line.
@@ -63,7 +62,7 @@ $ go run .\cmd\ccexplorer\ccexplorer.go get aws -g DIMENSION=SERVICE,DIMENSION=O
 
 ```console
 # download
-$ docker pull ghcr.io/cduggn/ccexplorer:v0.4.12
+$ docker pull ghcr.io/cduggn/ccexplorer:v0.4.13
 
 # Container requires AWS Access key, secret, and region
 $ docker run -it \
@@ -71,7 +70,7 @@ $ docker run -it \
   -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
   -e AWS_REGION=<AWS-REGION> \
   --mount type=bind,source="$(pwd)"/output/,target=/app/output \
-  ghcr.io/cduggn/ccexplorer:v0.4.12 get aws -g DIMENSION=OPERATION,
+  ghcr.io/cduggn/ccexplorer:v0.4.13 get aws -g DIMENSION=OPERATION,
   DIMENSION=SERVICE \
   -l -p chart
   
