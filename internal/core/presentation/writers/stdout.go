@@ -139,7 +139,8 @@ func CostUsageToRows(s []model.Service, granularity string) model.CostAndUsage {
 				total += m.NumericAmount
 			}
 
-			tempRow := table.Row{index, v.Keys[0], util.ReturnIfPresent(v.Keys),
+			tempRow := table.Row{index + 1, v.Keys[0],
+				util.ReturnIfPresent(v.Keys),
 				m.Name, m.Amount, fmt.Sprintf("%.2f",
 					m.NumericAmount),
 				m.Unit,
