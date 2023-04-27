@@ -122,6 +122,8 @@ func (c *CostCommandType) DefineFlags() {
 
 	c.Cmd.Flags().VarP(&costUsageGroupBy, "groupBy", "g",
 		"Group by DIMENSION and/or TAG ")
+	// add required flag for groupBy
+	_ = c.Cmd.MarkFlagRequired("groupBy")
 
 	costUsageFilterBy := flags.NewFilterBy()
 	c.Cmd.Flags().VarP(&costUsageFilterBy, "filterBy", "f",
@@ -242,7 +244,7 @@ func (c *CostCommandType) InputHandler(validatorFn func(input model.CommandLineI
 }
 
 func (c *CostCommandType) SynthesizeRequest(input model.CommandLineInput) model.
-	CostAndUsageRequestType {
+CostAndUsageRequestType {
 
 	return model.CostAndUsageRequestType{
 		Granularity: input.Interval,
@@ -330,8 +332,8 @@ func (f *ForecastCommandType) InputHandler() model.ForecastCommandLineInput {
 }
 
 func (f *ForecastCommandType) SynthesizeRequest(input model.
-	ForecastCommandLineInput) (model.
-	GetCostForecastRequest, error) {
+ForecastCommandLineInput) (model.
+GetCostForecastRequest, error) {
 
 	return model.GetCostForecastRequest{
 		Granularity:             input.Granularity,
@@ -391,7 +393,7 @@ func (p *PresetCommandType) RunE(cmd *cobra.Command, args []string) error {
 }
 
 func (p *PresetCommandType) SynthesizeRequest(m model.PresetParams) (model.
-	CostAndUsageRequestType,
+CostAndUsageRequestType,
 	error) {
 	return model.CostAndUsageRequestType{
 		GroupBy:                    m.Dimension,
@@ -452,7 +454,7 @@ func selectedPreset(p []model.PresetParams, s int) model.PresetParams {
 }
 
 func prepareResponseForRendering(res *costexplorer.
-	GetCostForecastOutput) model.ForecastPrintData {
+GetCostForecastOutput) model.ForecastPrintData {
 	return model.ForecastPrintData{
 		Forecast: res,
 	}
