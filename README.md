@@ -19,7 +19,7 @@ alt="CodeQL status">
 alt="release status">
 <img src="https://img.shields.io/github/v/release/cduggn/ccExplorer">
 </a>
-
+<a href="https://bestpractices.coreinfrastructure.org/projects/7276"><img src="https://bestpractices.coreinfrastructure.org/projects/7276/badge"></a>
 
 </div>
 
