@@ -244,3 +244,8 @@ flags
 - Credits and refunds are automatically applied to Cost Explorer results.
 - Cost Explorer API calls can be tracked using CloudTrail. 
 - Requests are issued against the `us-east-1` region.
+
+## Contributing
+ccexplorer is an open source project and built on the top of other open-source projects, hence we are always very happy to have contributions, whether for typo fix, bug fix or big new features. Please do not ever hesitate to ask a question or send a pull request.
+
+We strongly value documentation and integration with other projects so we are very glad to accept improvements for these aspects.
