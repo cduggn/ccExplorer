@@ -21,7 +21,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -o ccexplorer \
     ./cmd/ccexplorer
 
 # Run stage
-FROM alpine:3.17 as run-stage
+FROM alpine:3 as run-stage
 
 # Copy the binary from build-stage
 COPY --from=build-stage /app/ccexplorer .
