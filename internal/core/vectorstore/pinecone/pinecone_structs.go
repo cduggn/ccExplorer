@@ -1,10 +1,14 @@
 package pinecone
 
-import "github.com/cduggn/ccexplorer/internal/core/requestbuilder"
+import (
+	"github.com/cduggn/ccexplorer/internal/core/requestbuilder"
+	"github.com/cduggn/ccexplorer/internal/core/service/openai"
+)
 
-type PineconeClient struct {
+type ClientAPI struct {
 	RequestBuilder requestbuilder.Builder
 	Config         ClientConfig
+	LLMClient      openai.OpenAI
 }
 
 type PineconeStruct struct {

@@ -6,11 +6,23 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"
+	"github.com/cduggn/ccexplorer/internal/core/requestbuilder"
+	"github.com/cduggn/ccexplorer/internal/core/service/openai"
 	"io"
 	"net/http"
 )
 
-func (p *PineconeClient) Upsert(ctx context.Context,
+func NewVectorStoreClient(builder requestbuilder.Builder,
+	apiKey string, indexURL string, openAIAPIKey string) PineconeDB {
+
+	return &ClientAPI{
+		RequestBuilder: builder,
+		Config:         DefaultConfig(indexURL, apiKey),
+		LLMClient:      openai.NewClient(openAIAPIKey),
+	}
+}
+
+func (p *ClientAPI) Upsert(ctx context.Context,
 	data []PineconeStruct) error {
 
 	batches := splitIntoBatches(data)
@@ -40,7 +52,7 @@ func splitIntoBatches(data []PineconeStruct) [][]PineconeStruct {
 	return batches
 }
 
-func (p *PineconeClient) sendBatchRequest(ctx context.Context,
+func (p *ClientAPI) sendBatchRequest(ctx context.Context,
 	message UpsertVectorsRequest) error {
 
 	payload, err := json.Marshal(message)
@@ -61,7 +73,7 @@ func (p *PineconeClient) sendBatchRequest(ctx context.Context,
 	return nil
 }
 
-func (p *PineconeClient) ConvertToPineconeStruct(
+func (p *ClientAPI) ConvertToPineconeStruct(
 	data []*model.CostAndUsage) []PineconeStruct {
 
 	var pineconeSlice []PineconeStruct
@@ -77,7 +89,7 @@ func (p *PineconeClient) ConvertToPineconeStruct(
 	return pineconeSlice
 }
 
-func (p *PineconeClient) sendRequest(req *http.Request, v any) error {
+func (p *ClientAPI) sendRequest(req *http.Request, v any) error {
 	req.Header.Set("accept", "application/json")
 	req.Header.Set("content-type", "application/json")
 	req.Header.Set("Api-Key", p.Config.apiKey)
