@@ -11,7 +11,6 @@ import (
 	"github.com/cduggn/ccexplorer/internal/core/ports"
 	"github.com/cduggn/ccexplorer/internal/core/service/aws"
 	"github.com/cduggn/ccexplorer/internal/core/usecases"
-	writer "github.com/cduggn/ccexplorer/internal/core/usecases/writers"
 	"github.com/cduggn/ccexplorer/internal/core/util"
 	"github.com/common-nighthawk/go-figure"
 	"github.com/spf13/cobra"
@@ -153,7 +152,7 @@ func (c *CostCommandType) DefineFlags() {
 		"End date *(defaults to the present day)")
 
 	c.Cmd.Flags().StringVarP(&costAndUsagePrintFormat, "printFormat", "p", "stdout",
-		"Valid values: stdout, csv, chart, gpt (default: stdout)")
+		"Valid values: stdout, csv, chart, pinecone (default: stdout)")
 
 	c.Cmd.Flags().StringVarP(&costAndUsageMetric, "metric", "i", "UnblendedCost",
 		"Valid values: AmortizedCost, BlendedCost, NetAmortizedCost, "+
@@ -274,7 +273,7 @@ func (c *CostCommandType) Execute(req model.CostAndUsageRequestType) error {
 		return err
 	}
 
-	report := writer.ToCostAndUsageOutputType(costAndUsageResponse, req)
+	report := util.ToCostAndUsageOutputType(costAndUsageResponse, req)
 
 	w := usecases.NewPrintWriter(util.ToPrintWriterType(req.PrintFormat),
 		"costAndUsage")

@@ -22,6 +22,7 @@ const (
 	CSV
 	Chart
 	OpenAPI
+	Pinecone
 )
 
 type InputType struct {

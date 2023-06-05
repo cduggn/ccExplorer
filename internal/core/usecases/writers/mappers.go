@@ -1,15 +1,17 @@
 package writers
 
 import (
+	"fmt"
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"
+	"github.com/cduggn/ccexplorer/internal/core/service/openai"
+	"github.com/cduggn/ccexplorer/internal/core/util"
 	"os"
 	"strings"
 )
 
 var (
-	maxDisplayRows = 10
-	csvFileName    = "ccexplorer.csv"
-	csvHeader      = []string{"Dimension/Tag", "Dimension/Tag", "Metric",
+	csvFileName = "ccexplorer.csv"
+	csvHeader   = []string{"Dimension/Tag", "Dimension/Tag", "Metric",
 		"Granularity",
 		"Start",
 		"End", "USD Amount", "Unit"}
@@ -19,11 +21,31 @@ var (
 type Builder struct {
 }
 
-func CostAndUsageToStdout(sortFn func(r map[int]model.Service) []model.Service,
+func CostAndUsageToPineconeMapper(r model.CostAndUsageOutputType) error {
+
+	embeddingClient := openai.NewClient(r.OpenAIAPIKey)
+
+	e, err := embeddingClient.GenerateEmbeddings("test")
+	if err != nil {
+		return model.Error{
+			Msg: "Error generating embeddings for pinecone : " + err.Error()}
+	}
+
+	fmt.Print(e)
+	//dbclient := NewVectorStoreClient(requestbuilder.NewRequestBuilder(),
+	//	"ccexplorer","")
+	//
+	//r.OpenAIAPIKey = ""
+	//
+	return nil
+}
+
+func CostAndUsageToStdoutMapper(sortFn func(r map[int]model.Service) []model.
+Service,
 	r model.CostAndUsageOutputType) error {
 
 	sortedServices := sortFn(r.Services)
-	output := ConvertToStdoutType(sortedServices, r.Granularity)
+	output := util.ConvertToStdoutType(sortedServices, r.Granularity)
 
 	w, err := NewStdoutWriter("costAndUsage")
 	if err != nil {
@@ -34,7 +56,8 @@ func CostAndUsageToStdout(sortFn func(r map[int]model.Service) []model.Service,
 	return nil
 }
 
-func CostAndUsageToCSV(sortFn func(r map[int]model.Service) []model.Service,
+func CostAndUsageToCSVMapper(sortFn func(r map[int]model.Service) []model.
+Service,
 	r model.CostAndUsageOutputType) error {
 
 	f, err := NewCSVFile(OutputDir, csvFileName)
@@ -49,7 +72,7 @@ func CostAndUsageToCSV(sortFn func(r map[int]model.Service) []model.Service,
 		}
 	}(f)
 
-	rows := ConvertServiceMapToArray(r.Services, r.Granularity)
+	rows := util.ConvertServiceMapToArray(r.Services, r.Granularity)
 	err = WriteToCSV(f, csvHeader, rows)
 	if err != nil {
 		return model.Error{
@@ -58,12 +81,13 @@ func CostAndUsageToCSV(sortFn func(r map[int]model.Service) []model.Service,
 	return nil
 }
 
-func CostAndUsageToChart(sortFn func(r map[int]model.Service) []model.Service,
+func CostAndUsageToChartMapper(sortFn func(r map[int]model.Service) []model.
+Service,
 	r model.CostAndUsageOutputType) error {
 
 	builder := Builder{}
 	s := sortFn(r.Services)
-	input := ConvertToChartInputType(r, s)
+	input := util.ConvertToChartInputType(r, s)
 
 	charts, err := builder.NewCharts(input)
 	if err != nil {
@@ -77,38 +101,11 @@ func CostAndUsageToChart(sortFn func(r map[int]model.Service) []model.Service,
 	return nil
 }
 
-func CostAndUsageToOpenAI(sortFn func(r map[int]model.Service) []model.Service,
-	r model.CostAndUsageOutputType) error {
-
-	sortedData := sortFn(r.Services)
-	rows := ConvertServiceSliceToArray(sortedData, r.Granularity)
-
-	maxRows := MaxSupportedRows(rows, maxDisplayRows)
-	data := BuildPromptText(rows[:maxRows])
-	resp, err := Summarize(r.OpenAIAPIKey, data)
-	if err != nil {
-		return err
-	}
-	err = WriteToHTML(resp.Choices[0].Message.Content)
-
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func MaxSupportedRows(rows [][]string, maxRows int) int {
-	if len(rows) > maxRows {
-		return maxRows
-	}
-	return len(rows)
-}
-
-func ForecastToStdout(r model.ForecastPrintData,
+func ForecastToStdoutMapper(r model.ForecastPrintData,
 	dimensions []string) {
 
 	filteredBy := strings.Join(dimensions, " | ")
-	output := ConvertToForecastStdoutType(r, filteredBy)
+	output := util.ConvertToForecastStdoutType(r, filteredBy)
 	w, err := NewStdoutWriter("forecast")
 	if err != nil {
 		return

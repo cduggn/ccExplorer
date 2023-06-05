@@ -15,3 +15,7 @@ type OpenAIPrinter struct {
 type ChartPrinter struct {
 	Variant string
 }
+
+type PineconePrinter struct {
+	Variant string
+}

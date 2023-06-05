@@ -200,9 +200,10 @@ $ ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=USAGE_TYPE -l -s 2023-02-15 
 Print Writers
 -------------
 The `ccExplorer` supports the following output formats: stdout, csv, chart 
-and gpt. When using GPT, the `ccExplorer` will look for the 
+and pinecone. When using pinecone, the `ccExplorer` will look for the 
 `OPEN_AI_API_KEY` environment variable. To reduce the possibility of sending identification 
-to GPT, the `-p gpt` flag does not support grouping by `LINKED_ACCOUNT`.
+to pinecone, the `-p pinecone` flag does not support grouping by 
+`LINKED_ACCOUNT`.
 
 ```console
 $ export OPEN_AI_API_KEY=your-api-key
@@ -222,8 +223,9 @@ flags
   using the `-i` flag.
 - `ccExplorer` prints to stdout by default. The `-p` flag can be used to 
   specify the output format (csv, chart, stdout).
-- HTML results can be generated using the `-p gpt` flag. This will use the 
-  OpenAI GPT API to generate a report. 
+- Results can be persisted to the Pinecone vector datastore using 
+  the `-p  pinecone` flag. This will use OpenAI API to generate embeddings 
+  and write to pinecone. 
 - Results are sorted by default by cost in descending order. The `-d` flag 
   can be used to specify date sorting in descending order.
 - Refunds, discounts and credits are applied automatically. The `-l` flag 
