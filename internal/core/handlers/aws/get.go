@@ -9,9 +9,9 @@ import (
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"
 	flags "github.com/cduggn/ccexplorer/internal/core/handlers/aws/flags"
 	"github.com/cduggn/ccexplorer/internal/core/ports"
-	"github.com/cduggn/ccexplorer/internal/core/presentation"
-	writer "github.com/cduggn/ccexplorer/internal/core/presentation/writers"
 	"github.com/cduggn/ccexplorer/internal/core/service/aws"
+	"github.com/cduggn/ccexplorer/internal/core/usecases"
+	writer "github.com/cduggn/ccexplorer/internal/core/usecases/writers"
 	"github.com/cduggn/ccexplorer/internal/core/util"
 	"github.com/common-nighthawk/go-figure"
 	"github.com/spf13/cobra"
@@ -244,7 +244,7 @@ func (c *CostCommandType) InputHandler(validatorFn func(input model.CommandLineI
 }
 
 func (c *CostCommandType) SynthesizeRequest(input model.CommandLineInput) model.
-CostAndUsageRequestType {
+	CostAndUsageRequestType {
 
 	return model.CostAndUsageRequestType{
 		Granularity: input.Interval,
@@ -276,10 +276,10 @@ func (c *CostCommandType) Execute(req model.CostAndUsageRequestType) error {
 
 	report := writer.ToCostAndUsageOutputType(costAndUsageResponse, req)
 
-	w := presentation.NewPrintWriter(util.ToPrintWriterType(req.PrintFormat),
+	w := usecases.NewPrintWriter(util.ToPrintWriterType(req.PrintFormat),
 		"costAndUsage")
 
-	err = w.Print(util.SortByFn(req.SortByDate), report)
+	err = w.Write(util.SortByFn(req.SortByDate), report)
 	if err != nil {
 		return err
 	}
@@ -303,9 +303,9 @@ func (f *ForecastCommandType) RunE(cmd *cobra.Command, args []string) error {
 	filters := filterList(req)
 	printData.Filters = filters
 
-	p := presentation.NewPrintWriter(util.ToPrintWriterType("stdout"),
+	p := usecases.NewPrintWriter(util.ToPrintWriterType("stdout"),
 		"forecast")
-	err = p.Print(printData, filters)
+	err = p.Write(printData, filters)
 	if err != nil {
 		return err
 	}
@@ -332,8 +332,8 @@ func (f *ForecastCommandType) InputHandler() model.ForecastCommandLineInput {
 }
 
 func (f *ForecastCommandType) SynthesizeRequest(input model.
-ForecastCommandLineInput) (model.
-GetCostForecastRequest, error) {
+	ForecastCommandLineInput) (model.
+	GetCostForecastRequest, error) {
 
 	return model.GetCostForecastRequest{
 		Granularity:             input.Granularity,
@@ -393,7 +393,7 @@ func (p *PresetCommandType) RunE(cmd *cobra.Command, args []string) error {
 }
 
 func (p *PresetCommandType) SynthesizeRequest(m model.PresetParams) (model.
-CostAndUsageRequestType,
+	CostAndUsageRequestType,
 	error) {
 	return model.CostAndUsageRequestType{
 		GroupBy:                    m.Dimension,
@@ -454,7 +454,7 @@ func selectedPreset(p []model.PresetParams, s int) model.PresetParams {
 }
 
 func prepareResponseForRendering(res *costexplorer.
-GetCostForecastOutput) model.ForecastPrintData {
+	GetCostForecastOutput) model.ForecastPrintData {
 	return model.ForecastPrintData{
 		Forecast: res,
 	}

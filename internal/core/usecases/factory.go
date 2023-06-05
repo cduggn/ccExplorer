@@ -1,8 +1,8 @@
-package presentation
+package usecases
 
 import (
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"
-	"github.com/cduggn/ccexplorer/internal/core/presentation/writers"
+	"github.com/cduggn/ccexplorer/internal/core/usecases/writers"
 	"os"
 )
 
@@ -34,7 +34,7 @@ func NewPrintWriter(printType model.PrintWriterType, variant string) Printer {
 	}
 }
 
-func (p *StdoutPrinter) Print(f interface{}, c interface{}) error {
+func (p *StdoutPrinter) Write(f interface{}, c interface{}) error {
 	switch p.Variant {
 	case "forecast":
 		writers.ForecastToStdout(f.(model.ForecastPrintData), c.([]string))
@@ -48,7 +48,7 @@ func (p *StdoutPrinter) Print(f interface{}, c interface{}) error {
 	return nil
 }
 
-func (p *CsvPrinter) Print(f interface{}, c interface{}) error {
+func (p *CsvPrinter) Write(f interface{}, c interface{}) error {
 	switch p.Variant {
 	case "costAndUsage":
 		fn := writers.SortFunction(f.(string))
@@ -60,7 +60,7 @@ func (p *CsvPrinter) Print(f interface{}, c interface{}) error {
 	return nil
 }
 
-func (p *ChartPrinter) Print(f interface{}, c interface{}) error {
+func (p *ChartPrinter) Write(f interface{}, c interface{}) error {
 	switch p.Variant {
 	case "costAndUsage":
 		fn := writers.SortFunction(f.(string))
@@ -72,7 +72,7 @@ func (p *ChartPrinter) Print(f interface{}, c interface{}) error {
 	return nil
 }
 
-func (p *OpenAIPrinter) Print(f interface{}, c interface{}) error {
+func (p *OpenAIPrinter) Write(f interface{}, c interface{}) error {
 	switch p.Variant {
 	case "costAndUsage":
 		fn := writers.SortFunction(f.(string))

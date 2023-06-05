@@ -1,4 +1,4 @@
-package presentation
+package usecases
 
 type StdoutPrinter struct {
 	Variant string
