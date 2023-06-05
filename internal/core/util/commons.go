@@ -269,14 +269,6 @@ func ConvertServiceMapToArray(s map[int]model.Service,
 	return rows
 }
 
-func ConvertServiceSliceToArray(s []model.Service, granularity string) [][]string {
-	var rows [][]string
-	for _, v := range s {
-		rows = append(rows, ConvertServiceToSlice(v, granularity)...)
-	}
-	return rows
-}
-
 func ConvertToStdoutType(s []model.Service,
 	granularity string) model.CostAndUsageStdoutType {
 
@@ -371,4 +363,33 @@ func ConvertToForecastStdoutType(r model.ForecastPrintData,
 		FilteredBy: filteredBy,
 	}
 
+}
+
+func ConvertToVectorStruct(r model.CostAndUsageOutputType) {
+
+	fmt.Println(r)
+
+	//var p []pinecone.PineconeStruct
+	//
+	//for index, d := range r.Services {
+	//	s := pinecone.PineconeStruct{
+	//		ID:     strconv.Itoa(index),
+	//		Values: strings.Join(d, ","),
+	//	}
+	//}
+
+}
+
+func ServiceToString(s model.Service) string {
+	var r string
+	for _, v := range s.Keys {
+		r += v + ","
+	}
+	r += s.Start + "," + s.End + "," + s.Name + ","
+
+	for _, v := range s.Metrics {
+		r += v.Amount + "," + v.Unit
+	}
+
+	return r
 }

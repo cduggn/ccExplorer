@@ -38,8 +38,7 @@ func NewPrintWriter(printType model.PrintWriterType, variant string) Printer {
 func (p *PineconePrinter) Write(f interface{}, c interface{}) error {
 	switch p.Variant {
 	case "costAndUsage":
-		err := writers.CostAndUsageToPineconeMapper(c.(model.
-			CostAndUsageOutputType))
+		err := writers.CostAndUsageToVectorMapper(c.(model.CostAndUsageOutputType))
 		if err != nil {
 			return err
 		}

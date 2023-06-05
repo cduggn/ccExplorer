@@ -21,9 +21,11 @@ var (
 type Builder struct {
 }
 
-func CostAndUsageToPineconeMapper(r model.CostAndUsageOutputType) error {
+func CostAndUsageToVectorMapper(r model.CostAndUsageOutputType) error {
 
 	embeddingClient := openai.NewClient(r.OpenAIAPIKey)
+
+	util.ConvertToVectorStruct(r)
 
 	e, err := embeddingClient.GenerateEmbeddings("test")
 	if err != nil {
