@@ -36,13 +36,18 @@ func CostAndUsageToVectorMapper(r model.CostAndUsageOutputType) error {
 		return model.Error{
 			Msg: "Error writing to vector store: " + err.Error()}
 	}
-	fmt.Println("Vectors: ", vectors)
 
+	for index, m := range vectors {
+		items[index].EmbeddingVector = m.Embedding
+		items[index].Index = util.EncodeString(items[index].EmbeddingText)
+	}
+	//client.Upsert()
+	fmt.Println("Done writing to vector store")
 	return nil
 }
 
 func CostAndUsageToStdoutMapper(sortFn func(r map[int]model.Service) []model.
-	Service,
+Service,
 	r model.CostAndUsageOutputType) error {
 
 	sortedServices := sortFn(r.Services)
@@ -58,7 +63,7 @@ func CostAndUsageToStdoutMapper(sortFn func(r map[int]model.Service) []model.
 }
 
 func CostAndUsageToCSVMapper(sortFn func(r map[int]model.Service) []model.
-	Service,
+Service,
 	r model.CostAndUsageOutputType) error {
 
 	f, err := NewCSVFile(OutputDir, csvFileName)
@@ -83,7 +88,7 @@ func CostAndUsageToCSVMapper(sortFn func(r map[int]model.Service) []model.
 }
 
 func CostAndUsageToChartMapper(sortFn func(r map[int]model.Service) []model.
-	Service,
+Service,
 	r model.CostAndUsageOutputType) error {
 
 	builder := Builder{}

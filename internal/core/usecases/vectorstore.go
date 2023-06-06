@@ -11,6 +11,7 @@ type VectorStore interface {
 	CreateVectorStoreInput(r model.CostAndUsageOutputType) ([]*model.
 		VectorStoreItem, error)
 	CreateEmbeddings(items []*model.VectorStoreItem) ([]gogpt.Embedding, error)
+	Upsert(data []*model.VectorStoreItem) error
 }
 
 type VectorStoreClient struct {
@@ -44,9 +45,9 @@ func (v *VectorStoreClient) CreateEmbeddings(items []*model.VectorStoreItem) (
 	[]gogpt.Embedding,
 	error) {
 
-	var batch []string
-	for _, item := range items {
-		batch = append(batch, item.EmbeddingText)
+	batch := make([]string, len(items))
+	for index, item := range items {
+		batch[index] = item.EmbeddingText
 	}
 
 	vectors, err := v.client.LLMClient.GenerateEmbeddings(batch)
@@ -55,4 +56,10 @@ func (v *VectorStoreClient) CreateEmbeddings(items []*model.VectorStoreItem) (
 	}
 
 	return vectors, nil
+}
+
+func (v *VectorStoreClient) Upsert(data []*model.VectorStoreItem) error {
+
+	//return v.client.Upsert(data)
+	return nil
 }

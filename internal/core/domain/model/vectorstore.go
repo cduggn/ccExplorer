@@ -5,6 +5,7 @@ type VectorStoreInput struct {
 }
 
 type VectorStoreItem struct {
+	Index           string
 	EmbeddingText   string
 	EmbeddingVector []float32
 	Metadata        VectorStoreItemMetadata

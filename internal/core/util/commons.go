@@ -1,6 +1,8 @@
 package util
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
@@ -363,4 +365,12 @@ func ConvertToForecastStdoutType(r model.ForecastPrintData,
 		FilteredBy: filteredBy,
 	}
 
+}
+
+func EncodeString(s string) string {
+	h := sha256.New()
+	h.Write([]byte(s))
+	hashed := h.Sum(nil)
+	hashedString := hex.EncodeToString(hashed)
+	return hashedString
 }
