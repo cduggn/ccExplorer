@@ -8,9 +8,9 @@ type ClientConfig struct {
 	HTTPClient *http.Client
 }
 
-func DefaultConfig(apiKey, baseUrl string) ClientConfig {
+func DefaultConfig(indexUrl, apiKey string) ClientConfig {
 	return ClientConfig{
-		BaseURL:    baseUrl,
+		BaseURL:    indexUrl,
 		HTTPClient: &http.Client{},
 		apiKey:     apiKey,
 	}
