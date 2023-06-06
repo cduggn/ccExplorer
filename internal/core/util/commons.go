@@ -381,15 +381,28 @@ func ConvertToVectorStruct(r model.CostAndUsageOutputType) {
 }
 
 func ServiceToString(s model.Service) string {
-	var r string
-	for _, v := range s.Keys {
-		r += v + ","
-	}
-	r += s.Start + "," + s.End + "," + s.Name + ","
+	var r strings.Builder
 
-	for _, v := range s.Metrics {
-		r += v.Amount + "," + v.Unit
-	}
+	// append keys
+	keys := strings.Join(s.Keys, ",")
+	r.WriteString(keys)
+	r.WriteString(",")
 
-	return r
+	// append start, end, and name
+	r.WriteString(s.Start)
+	r.WriteString(",")
+	r.WriteString(s.End)
+	r.WriteString(",")
+	r.WriteString(s.Name)
+	r.WriteString(",")
+
+	// append metrics
+	metrics := make([]string, len(s.Metrics))
+	for i, v := range s.Metrics {
+		metrics[i] = fmt.Sprintf("%s,%s", v.Amount, v.Unit)
+	}
+	r.WriteString(strings.Join(metrics, ","))
+
+	return r.String()
+
 }
