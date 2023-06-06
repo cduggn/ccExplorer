@@ -1,30 +1,42 @@
 package openai
 
 import (
+	"context"
 	"fmt"
 	gogpt "github.com/sashabaranov/go-openai"
 )
 
-var (
-	OutputDir = "./output"
-	//maxModelTokens = 4097
-)
-
 type OpenAI interface {
-	GenerateEmbeddings(text string) (string, error)
+	GenerateEmbeddings(items []string) ([]gogpt.Embedding,
+		error)
 }
 
-type OpenAIClient struct {
+type Client struct {
 	client *gogpt.Client
 }
 
 func NewClient(apiKey string) OpenAI {
-	return &OpenAIClient{
+	return &Client{
 		client: gogpt.NewClient(apiKey),
 	}
 }
 
-func (o *OpenAIClient) GenerateEmbeddings(text string) (string, error) {
-	fmt.Print("Generate Embeddings....")
-	return "nil", nil
+func (o *Client) GenerateEmbeddings(items []string) ([]gogpt.
+	Embedding,
+	error) {
+
+	req := gogpt.EmbeddingRequest{
+		Input: items,
+		Model: gogpt.AdaEmbeddingV2,
+	}
+
+	resp, err := o.client.CreateEmbeddings(context.Background(),
+		req)
+
+	if err != nil {
+		fmt.Printf("Embedding error: %v\n", err)
+		return nil, err
+	}
+
+	return resp.Data, nil
 }
