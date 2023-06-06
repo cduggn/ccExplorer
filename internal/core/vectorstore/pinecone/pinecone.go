@@ -10,6 +10,7 @@ import (
 	"github.com/cduggn/ccexplorer/internal/core/service/openai"
 	"io"
 	"net/http"
+	"strings"
 )
 
 func NewVectorStoreClient(builder requestbuilder.Builder,
@@ -73,20 +74,48 @@ func (p *ClientAPI) sendBatchRequest(ctx context.Context,
 	return nil
 }
 
-func (p *ClientAPI) ConvertToPineconeStruct(
-	data []*model.CostAndUsage) []PineconeStruct {
+func (p *ClientAPI) ConvertToVectorStoreItem(r model.CostAndUsageOutputType) []model.
+	VectorStoreItem {
+	var s []model.VectorStoreItem
+	for _, d := range r.Services {
 
-	var pineconeSlice []PineconeStruct
+		item := model.VectorStoreItem{
+			EmbeddingText: ServiceToString(d),
+			Metadata: model.VectorStoreItemMetadata{
+				StartDate:   r.Start,
+				Granularity: r.Granularity,
+				Dimensions:  strings.Join(r.Dimensions, ","),
+				Tags:        strings.Join(r.Tags, ","),
+			},
+		}
+		s = append(s, item)
+	}
+	return s
+}
 
-	//for index, d := range data {
-	//	pinecone := PineconeStruct{
-	//		ID:       strconv.Itoa(index),
-	//		Values:   d.Embeddings,
-	//		Metadata: Metadata{PageContent: d.Combined, Source: "AWS"},
-	//	}
-	//	pineconeSlice = append(pineconeSlice, pinecone)
-	//}
-	return pineconeSlice
+func ServiceToString(s model.Service) string {
+	var r strings.Builder
+
+	// append keys
+	keys := strings.Join(s.Keys, ",")
+	r.WriteString(keys)
+	r.WriteString(",")
+
+	// append start, end, and name
+	r.WriteString(s.Start)
+	r.WriteString(",")
+	r.WriteString(s.End)
+	r.WriteString(",")
+	r.WriteString(s.Name)
+	r.WriteString(",")
+
+	// append metrics
+	metrics := make([]string, len(s.Metrics))
+	for i, v := range s.Metrics {
+		metrics[i] = fmt.Sprintf("%s,%s", v.Amount, v.Unit)
+	}
+	r.WriteString(strings.Join(metrics, ","))
+	return r.String()
 }
 
 func (p *ClientAPI) sendRequest(req *http.Request, v any) error {

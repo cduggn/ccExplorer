@@ -6,6 +6,7 @@ import (
 )
 
 type PineconeDB interface {
-	ConvertToPineconeStruct(data []*model.CostAndUsage) []PineconeStruct
+	ConvertToVectorStoreItem(r model.CostAndUsageOutputType) []model.
+		VectorStoreItem
 	Upsert(ctx context.Context, data []PineconeStruct) error
 }

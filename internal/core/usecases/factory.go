@@ -2,13 +2,8 @@ package usecases
 
 import (
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"
-	"github.com/cduggn/ccexplorer/internal/core/usecases/writers"
 	"github.com/cduggn/ccexplorer/internal/core/util"
 	"os"
-)
-
-var (
-	OutputDir = "./output"
 )
 
 func init() {
@@ -38,7 +33,7 @@ func NewPrintWriter(printType model.PrintWriterType, variant string) Printer {
 func (p *PineconePrinter) Write(f interface{}, c interface{}) error {
 	switch p.Variant {
 	case "costAndUsage":
-		err := writers.CostAndUsageToVectorMapper(c.(model.CostAndUsageOutputType))
+		err := CostAndUsageToVectorMapper(c.(model.CostAndUsageOutputType))
 		if err != nil {
 			return err
 		}
@@ -50,11 +45,11 @@ func (p *PineconePrinter) Write(f interface{}, c interface{}) error {
 func (p *StdoutPrinter) Write(f interface{}, c interface{}) error {
 	switch p.Variant {
 	case "forecast":
-		writers.ForecastToStdoutMapper(f.(model.ForecastPrintData),
+		ForecastToStdoutMapper(f.(model.ForecastPrintData),
 			c.([]string))
 	case "costAndUsage":
 		fn := util.SortFunction(f.(string))
-		err := writers.CostAndUsageToStdoutMapper(fn,
+		err := CostAndUsageToStdoutMapper(fn,
 			c.(model.CostAndUsageOutputType))
 		if err != nil {
 			return err
@@ -67,7 +62,7 @@ func (p *CsvPrinter) Write(f interface{}, c interface{}) error {
 	switch p.Variant {
 	case "costAndUsage":
 		fn := util.SortFunction(f.(string))
-		err := writers.CostAndUsageToCSVMapper(fn,
+		err := CostAndUsageToCSVMapper(fn,
 			c.(model.CostAndUsageOutputType))
 		if err != nil {
 			return err
@@ -80,7 +75,7 @@ func (p *ChartPrinter) Write(f interface{}, c interface{}) error {
 	switch p.Variant {
 	case "costAndUsage":
 		fn := util.SortFunction(f.(string))
-		err := writers.CostAndUsageToChartMapper(fn,
+		err := CostAndUsageToChartMapper(fn,
 			c.(model.CostAndUsageOutputType))
 		if err != nil {
 			return err
