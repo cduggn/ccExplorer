@@ -206,16 +206,16 @@ Print Writers
 The `ccExplorer` supports the following output formats: stdout, csv, chart 
 and Pinecone. 
 
-### stdout and csv
+#### stdout and csv
 Output to stdout and csv using the `-p stdout` and `-p csv` flags 
 respectively. 
 
-### chart
+#### chart
 Generates a chart using the `-p chart` flag. The chart is generated using
 the [go-echarts](https://github.com/go-echarts/go-echarts) API. The 
 resulting HTML file can be opened in a browser.
 
-### Pinecone
+#### Pinecone
 The Pinecone target requires the following environment variables to be set: 
 - `OPEN_AI_API_KEY` - The API key for the OpenAI API is required to generate 
   embeddings for the Cost Explorer results.
