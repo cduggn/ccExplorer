@@ -33,7 +33,9 @@ It lets you quickly surface cost and usage metrics associated with your AWS
 account and visualize them in a human-readable format like a table, csv file, 
 or chart.  It was created so I could quickly explore and reason about service costs without switching context from the command line.
 It's not designed as a replacement for the official AWS COST Explorer CLI 
-but does provide some nice features for visualization and sorting. The CLI 
+but does provide some nice features for visualization and sorting. 
+
+The CLI 
 now supports writing cost reports to Pinecone vector database using the flag 
 `-p pinecone`. The resulting index can be easily integrated with [langchain](https://github.com/tmc/langchaingo) for more interesting ways to explore 
 the data. 
