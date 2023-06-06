@@ -202,20 +202,26 @@ $ ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=USAGE_TYPE -l -s 2023-02-15 
 Print Writers
 -------------
 The `ccExplorer` supports the following output formats: stdout, csv, chart 
-and pinecone. In order to use the Pinecone target, `ccExplorer` looks for 
-the following environment variables: 
-- `OPEN_AI_API_KEY` - the API key for the OpenAI API is required to generate 
+and Pinecone. 
+
+### stdout and csv
+Output to stdout and csv using the `-p stdout` and `-p csv` flags 
+respectively. 
+
+### chart
+Generates a chart using the `-p chart` flag. The chart is generated using
+the [go-echarts](https://github.com/go-echarts/go-echarts) API. The 
+resulting HTML file can be opened in a browser.
+
+### Pinecone
+The Pinecone target requires the following environment variables to be set: 
+- `OPEN_AI_API_KEY` - The API key for the OpenAI API is required to generate 
   embeddings for the Cost Explorer results.
-- `PINECONE_INDEX_NAME` - The name of the Pinecone index to write to.
+- `PINECONE_INDEX_NAME` - The name of the Pinecone index being written to.
 - `PINECONE_API_KEY` - The API key for the Pinecone API.
+
 To reduce the possibility of sending sensitive data to OpenAI or Pinecone, the 
   `-p pinecone` flag does not support the `LINKED_ACCOUNT` dimension type.
-
-```console
-$ export OPEN_AI_API_KEY=your-api-key
-$ export PINECONE_INDEX_NAME=your-index-name
-$ export PINECONE_API_KEY=your-api-key
-```
 
 
 System Defaults
