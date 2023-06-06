@@ -34,7 +34,9 @@ account and visualize them in a human-readable format like a table, csv file,
 or chart.  It was created so I could quickly explore and reason about service costs without switching context from the command line.
 It's not designed as a replacement for the official AWS COST Explorer CLI 
 but does provide some nice features for visualization and sorting. The CLI 
-now also supports experimental HTML report generation using OPEN AI GPT models.
+now supports writing cost reports to Pinecone vector database using the flag 
+`-p pinecone`. The resulting index can be easily integrated with [langchain](https://github.com/tmc/langchaingo) for more interesting ways to explore 
+the data. 
 
 
 Installation
@@ -65,7 +67,7 @@ $ go run .\cmd\ccexplorer\ccexplorer.go get aws -g DIMENSION=SERVICE,DIMENSION=O
 
 ```console
 # download
-$ docker pull ghcr.io/cduggn/ccexplorer:v0.4.14
+$ docker pull ghcr.io/cduggn/ccexplorer:v0.5.0
 
 # Container requires AWS Access key, secret, and region
 $ docker run -it \
@@ -73,7 +75,7 @@ $ docker run -it \
   -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
   -e AWS_REGION=<AWS-REGION> \
   --mount type=bind,source="$(pwd)"/output/,target=/app/output \
-  ghcr.io/cduggn/ccexplorer:v0.4.14 get aws -g DIMENSION=OPERATION,
+  ghcr.io/cduggn/ccexplorer:v0.5.0 get aws -g DIMENSION=OPERATION,
   DIMENSION=SERVICE \
   -l -p chart
   
@@ -192,21 +194,27 @@ $ ccexplorer get aws -g DIMENSION=SERVICE, DIMENSION=OPERATION -l -e 2023-01-27 
 # Costs grouped by MONTH by OPERATION and USAGE_TYPE and printed to chart
 $ ccexplorer get aws -g DIMENSION=OPERATION,DIMENSION=USAGE_TYPE -l -e 2023-01-27 -s 2023-01-26 -m MONTHLY -p chart
 
-# Costs grouped by MONTH by SERVICE and USAGE_TYPE and printed to HTML using GPT model
-$ ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=USAGE_TYPE -l -s 2023-02-15 -p gpt
+# Costs grouped by MONTH by SERVICE and USAGE_TYPE and written to Pinecone index
+$ ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=USAGE_TYPE -l -s 2023-02-15 -p pinecone
 
 ```
 
 Print Writers
 -------------
 The `ccExplorer` supports the following output formats: stdout, csv, chart 
-and pinecone. When using pinecone, the `ccExplorer` will look for the 
-`OPEN_AI_API_KEY` environment variable. To reduce the possibility of sending identification 
-to pinecone, the `-p pinecone` flag does not support grouping by 
-`LINKED_ACCOUNT`.
+and pinecone. In order to use the Pinecone target, `ccExplorer` looks for 
+the following environment variables: 
+- `OPEN_AI_API_KEY` - the API key for the OpenAI API is required to generate 
+  embeddings for the Cost Explorer results.
+- `PINECONE_INDEX_NAME` - The name of the Pinecone index to write to.
+- `PINECONE_API_KEY` - The API key for the Pinecone API.
+To reduce the possibility of sending sensitive data to OpenAI or Pinecone, the 
+  `-p pinecone` flag does not support the `LINKED_ACCOUNT` dimension type.
 
 ```console
 $ export OPEN_AI_API_KEY=your-api-key
+$ export PINECONE_INDEX_NAME=your-index-name
+$ export PINECONE_API_KEY=your-api-key
 ```
 
 

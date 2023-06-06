@@ -1,8 +1,8 @@
-package aws
+package commandline
 
 import (
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"
-	"github.com/cduggn/ccexplorer/internal/core/handlers/aws/flags"
+	"github.com/cduggn/ccexplorer/internal/core/handlers/commandline/flags"
 	"github.com/spf13/viper"
 	"strings"
 )
@@ -28,7 +28,7 @@ func (c *CostCommandType) ExtractGroupBySelections() ([]string, []string) {
 }
 
 func (c *CostCommandType) ExtractFilterBySelection() (model.
-FilterBySelections, error) {
+	FilterBySelections, error) {
 
 	var filterSelections model.FilterBySelections
 
@@ -75,7 +75,7 @@ func (c *CostCommandType) ExtractStartAndEndDates() (
 }
 
 func (c *CostCommandType) ExtractPrintPreferences() model.
-PrintOptions {
+	PrintOptions {
 
 	var printOptions model.PrintOptions
 

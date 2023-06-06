@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"github.com/cduggn/ccexplorer/internal/core/config"
-	handlers "github.com/cduggn/ccexplorer/internal/core/handlers/aws"
+	handlers "github.com/cduggn/ccexplorer/internal/core/handlers/commandline"
 	"github.com/cduggn/ccexplorer/internal/core/logger"
 	"github.com/common-nighthawk/go-figure"
 	"github.com/spf13/cobra"

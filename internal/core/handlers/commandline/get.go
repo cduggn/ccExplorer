@@ -1,4 +1,4 @@
-package aws
+package commandline
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/cduggn/ccexplorer/internal/core/domain"
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"
-	flags "github.com/cduggn/ccexplorer/internal/core/handlers/aws/flags"
+	flags "github.com/cduggn/ccexplorer/internal/core/handlers/commandline/flags"
 	"github.com/cduggn/ccexplorer/internal/core/ports"
 	"github.com/cduggn/ccexplorer/internal/core/service/aws"
 	"github.com/cduggn/ccexplorer/internal/core/usecases"
