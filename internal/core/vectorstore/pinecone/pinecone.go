@@ -14,7 +14,7 @@ import (
 )
 
 func NewVectorStoreClient(builder requestbuilder.Builder,
-	apiKey string, indexURL string, openAIAPIKey string) PineconeDB {
+	apiKey string, indexURL string, openAIAPIKey string) *ClientAPI {
 
 	return &ClientAPI{
 		RequestBuilder: builder,
@@ -74,9 +74,10 @@ func (p *ClientAPI) sendBatchRequest(ctx context.Context,
 	return nil
 }
 
-func (p *ClientAPI) ConvertToVectorStoreItem(r model.CostAndUsageOutputType) []model.
+func (p *ClientAPI) ConvertToVectorStoreItem(r model.
+	CostAndUsageOutputType) []*model.
 	VectorStoreItem {
-	var s []model.VectorStoreItem
+	var s []*model.VectorStoreItem
 	for _, d := range r.Services {
 
 		item := model.VectorStoreItem{
@@ -88,7 +89,7 @@ func (p *ClientAPI) ConvertToVectorStoreItem(r model.CostAndUsageOutputType) []m
 				Tags:        strings.Join(r.Tags, ","),
 			},
 		}
-		s = append(s, item)
+		s = append(s, &item)
 	}
 	return s
 }

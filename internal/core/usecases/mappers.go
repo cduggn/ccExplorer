@@ -1,7 +1,9 @@
 package usecases
 
 import (
+	"fmt"
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"
+	"github.com/cduggn/ccexplorer/internal/core/requestbuilder"
 	"github.com/cduggn/ccexplorer/internal/core/util"
 	"os"
 	"strings"
@@ -20,11 +22,22 @@ type Builder struct {
 }
 
 func CostAndUsageToVectorMapper(r model.CostAndUsageOutputType) error {
-	err := WriteToVectorStore(r, r.OpenAIAPIKey, "", r.OpenAIAPIKey)
+
+	client := NewVectorStoreClient(requestbuilder.NewRequestBuilder(),
+		r.OpenAIAPIKey, "", r.OpenAIAPIKey)
+	items, err := client.CreateVectorStoreInput(r)
 	if err != nil {
 		return model.Error{
 			Msg: "Error writing to vector store: " + err.Error()}
 	}
+
+	vectors, err := client.CreateEmbeddings(items)
+	if err != nil {
+		return model.Error{
+			Msg: "Error writing to vector store: " + err.Error()}
+	}
+	fmt.Println("Vectors: ", vectors)
+
 	return nil
 }
 
