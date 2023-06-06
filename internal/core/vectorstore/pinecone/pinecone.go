@@ -24,7 +24,7 @@ func NewVectorStoreClient(builder requestbuilder.Builder,
 }
 
 func (p *ClientAPI) Upsert(ctx context.Context,
-	data []PineconeStruct) error {
+	data []PineconeStruct) (resp model.UpsertResponse, err error) {
 
 	batches := splitIntoBatches(data)
 
@@ -32,12 +32,12 @@ func (p *ClientAPI) Upsert(ctx context.Context,
 		message := UpsertVectorsRequest{
 			Message: batch,
 		}
-		err := p.sendBatchRequest(ctx, message)
+		resp, err = p.sendBatchRequest(ctx, message)
 		if err != nil {
-			return err
+			return model.UpsertResponse{}, err
 		}
 	}
-	return nil
+	return resp, nil
 }
 
 func splitIntoBatches(data []PineconeStruct) [][]PineconeStruct {
@@ -54,24 +54,24 @@ func splitIntoBatches(data []PineconeStruct) [][]PineconeStruct {
 }
 
 func (p *ClientAPI) sendBatchRequest(ctx context.Context,
-	message UpsertVectorsRequest) error {
+	message UpsertVectorsRequest) (resp model.UpsertResponse, err error) {
 
 	payload, err := json.Marshal(message)
 	if err != nil {
-		return err
+		return model.UpsertResponse{}, err
 	}
 
 	req, err := p.RequestBuilder.Build(ctx, http.MethodPost,
 		p.Config.BaseURL+"/vectors/upsert", bytes.NewReader(payload))
 	if err != nil {
-		return err
+		return model.UpsertResponse{}, err
 	}
 
-	err = p.sendRequest(req, nil)
+	err = p.sendRequest(req, &resp)
 	if err != nil {
-		return err
+		return model.UpsertResponse{}, err
 	}
-	return nil
+	return
 }
 
 func (p *ClientAPI) ConvertToVectorStoreItem(r model.

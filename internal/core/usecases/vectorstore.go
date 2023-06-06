@@ -12,7 +12,7 @@ type VectorStore interface {
 	CreateVectorStoreInput(r model.CostAndUsageOutputType) ([]*model.
 		VectorStoreItem, error)
 	CreateEmbeddings(items []*model.VectorStoreItem) ([]gogpt.Embedding, error)
-	Upsert(context context.Context, data []pinecone.PineconeStruct) error
+	Upsert(context context.Context, data []pinecone.PineconeStruct) (resp model.UpsertResponse, err error)
 }
 
 type VectorStoreClient struct {
@@ -62,7 +62,7 @@ func (v *VectorStoreClient) CreateEmbeddings(items []*model.VectorStoreItem) (
 }
 
 func (v *VectorStoreClient) Upsert(context context.Context,
-	items []pinecone.PineconeStruct) error {
+	items []pinecone.PineconeStruct) (resp model.UpsertResponse, err error) {
 
 	return v.client.Upsert(context, items)
 }

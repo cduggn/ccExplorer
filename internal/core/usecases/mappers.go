@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"
+	"github.com/cduggn/ccexplorer/internal/core/logger"
 	"github.com/cduggn/ccexplorer/internal/core/requestbuilder"
 	"github.com/cduggn/ccexplorer/internal/core/util"
 	"os"
@@ -45,13 +46,13 @@ func CostAndUsageToVectorMapper(r model.CostAndUsageOutputType) error {
 
 	input := util.ConvertToPineconeStruct(items)
 
-	err = client.Upsert(context.Background(), input)
+	resp, err := client.Upsert(context.Background(), input)
 	if err != nil {
 		return model.Error{
 			Msg: "Error writing to vector store: " + err.Error()}
 	}
 
-	fmt.Println("Done writing to vector store")
+	logger.Info(fmt.Sprintf("Upserted %d items to vector store", resp.UpsertedCount))
 	return nil
 }
 

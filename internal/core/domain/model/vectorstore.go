@@ -17,3 +17,7 @@ type VectorStoreItemMetadata struct {
 	Dimensions  string
 	Tags        string
 }
+
+type UpsertResponse struct {
+	UpsertedCount int `json:"upsertedCount"`
+}
