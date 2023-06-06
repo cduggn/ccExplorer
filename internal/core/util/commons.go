@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"
+	"github.com/cduggn/ccexplorer/internal/core/vectorstore/pinecone"
 	"os"
 	"sort"
 	"strconv"
@@ -137,13 +138,15 @@ func CurateCostAndUsageReport(
 	d *costexplorer.GetCostAndUsageOutput, query model.CostAndUsageRequestType) model.CostAndUsageOutputType {
 
 	c := model.CostAndUsageOutputType{
-		Services:     make(map[int]model.Service),
-		Granularity:  query.Granularity,
-		Dimensions:   query.GroupBy,
-		Tags:         query.GroupByTag,
-		Start:        query.Time.Start,
-		End:          query.Time.End,
-		OpenAIAPIKey: query.OpenAIAPIKey,
+		Services:       make(map[int]model.Service),
+		Granularity:    query.Granularity,
+		Dimensions:     query.GroupBy,
+		Tags:           query.GroupByTag,
+		Start:          query.Time.Start,
+		End:            query.Time.End,
+		OpenAIAPIKey:   query.OpenAIAPIKey,
+		PineconeAPIKey: query.PineconeAPIKey,
+		PineconeIndex:  query.PineconeIndex,
 	}
 
 	c.Services = ResultsToServicesMap(d.ResultsByTime)
@@ -373,4 +376,22 @@ func EncodeString(s string) string {
 	hashed := h.Sum(nil)
 	hashedString := hex.EncodeToString(hashed)
 	return hashedString
+}
+
+func ConvertToPineconeStruct(items []*model.VectorStoreItem) []pinecone.
+	PineconeStruct {
+	var pineconeStruct []pinecone.PineconeStruct
+	for _, v := range items {
+		pineconeStruct = append(pineconeStruct, pinecone.PineconeStruct{
+			ID:     v.Index,
+			Values: v.EmbeddingVector,
+			Metadata: pinecone.Metadata{
+				PageContent: v.EmbeddingText,
+				Source:      "aws cost explorer",
+				Dimensions:  v.Metadata.Dimensions,
+				Year:        v.Metadata.StartDate,
+			},
+		})
+	}
+	return pineconeStruct
 }

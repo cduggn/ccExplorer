@@ -28,7 +28,7 @@ func (c *CostCommandType) ExtractGroupBySelections() ([]string, []string) {
 }
 
 func (c *CostCommandType) ExtractFilterBySelection() (model.
-	FilterBySelections, error) {
+FilterBySelections, error) {
 
 	var filterSelections model.FilterBySelections
 
@@ -75,7 +75,7 @@ func (c *CostCommandType) ExtractStartAndEndDates() (
 }
 
 func (c *CostCommandType) ExtractPrintPreferences() model.
-	PrintOptions {
+PrintOptions {
 
 	var printOptions model.PrintOptions
 
@@ -87,6 +87,12 @@ func (c *CostCommandType) ExtractPrintPreferences() model.
 
 	openAIKey := viper.GetString("open_ai_api_key")
 	printOptions.OpenAIKey = openAIKey
+
+	pineconeAPIKey := viper.GetString("PINECONE_API_KEY")
+	printOptions.PineconeAPIKey = pineconeAPIKey
+
+	pineconeIndex := viper.GetString("PINECONE_INDEX")
+	printOptions.PineconeIndex = pineconeIndex
 
 	excludeDiscounts, _ := c.Cmd.Flags().GetBool("excludeDiscounts")
 	printOptions.ExcludeDiscounts = excludeDiscounts

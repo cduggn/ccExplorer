@@ -232,6 +232,8 @@ func (c *CostCommandType) InputHandler(validatorFn func(input model.CommandLineI
 		Metrics:             []string{printOptions.Metric},
 		SortByDate:          printOptions.IsSortByDate,
 		OpenAIAPIKey:        printOptions.OpenAIKey,
+		PineconeAPIKey:      printOptions.PineconeAPIKey,
+		PineconeIndex:       printOptions.PineconeIndex,
 	}
 
 	err = validatorFn(input)
@@ -262,6 +264,8 @@ func (c *CostCommandType) SynthesizeRequest(input model.CommandLineInput) model.
 		Metrics:                    input.Metrics,
 		SortByDate:                 input.SortByDate,
 		OpenAIAPIKey:               input.OpenAIAPIKey,
+		PineconeAPIKey:             input.PineconeAPIKey,
+		PineconeIndex:              input.PineconeIndex,
 	}
 }
 

@@ -14,11 +14,11 @@ import (
 )
 
 func NewVectorStoreClient(builder requestbuilder.Builder,
-	apiKey string, indexURL string, openAIAPIKey string) *ClientAPI {
+	indexURL, pineconeAPIKey, openAIAPIKey string) *ClientAPI {
 
 	return &ClientAPI{
 		RequestBuilder: builder,
-		Config:         DefaultConfig(indexURL, apiKey),
+		Config:         DefaultConfig(indexURL, pineconeAPIKey),
 		LLMClient:      openai.NewClient(openAIAPIKey),
 	}
 }

@@ -1,6 +1,7 @@
 package usecases
 
 import (
+	"context"
 	"fmt"
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"
 	"github.com/cduggn/ccexplorer/internal/core/requestbuilder"
@@ -24,7 +25,7 @@ type Builder struct {
 func CostAndUsageToVectorMapper(r model.CostAndUsageOutputType) error {
 
 	client := NewVectorStoreClient(requestbuilder.NewRequestBuilder(),
-		r.OpenAIAPIKey, "", r.OpenAIAPIKey)
+		r.OpenAIAPIKey, r.PineconeIndex, r.PineconeAPIKey)
 	items, err := client.CreateVectorStoreInput(r)
 	if err != nil {
 		return model.Error{
@@ -41,13 +42,21 @@ func CostAndUsageToVectorMapper(r model.CostAndUsageOutputType) error {
 		items[index].EmbeddingVector = m.Embedding
 		items[index].Index = util.EncodeString(items[index].EmbeddingText)
 	}
-	//client.Upsert()
+
+	input := util.ConvertToPineconeStruct(items)
+
+	err = client.Upsert(context.Background(), input)
+	if err != nil {
+		return model.Error{
+			Msg: "Error writing to vector store: " + err.Error()}
+	}
+
 	fmt.Println("Done writing to vector store")
 	return nil
 }
 
 func CostAndUsageToStdoutMapper(sortFn func(r map[int]model.Service) []model.
-Service,
+	Service,
 	r model.CostAndUsageOutputType) error {
 
 	sortedServices := sortFn(r.Services)
@@ -63,7 +72,7 @@ Service,
 }
 
 func CostAndUsageToCSVMapper(sortFn func(r map[int]model.Service) []model.
-Service,
+	Service,
 	r model.CostAndUsageOutputType) error {
 
 	f, err := NewCSVFile(OutputDir, csvFileName)
@@ -88,7 +97,7 @@ Service,
 }
 
 func CostAndUsageToChartMapper(sortFn func(r map[int]model.Service) []model.
-Service,
+	Service,
 	r model.CostAndUsageOutputType) error {
 
 	builder := Builder{}

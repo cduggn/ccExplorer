@@ -1,6 +1,7 @@
 package usecases
 
 import (
+	"context"
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"
 	"github.com/cduggn/ccexplorer/internal/core/requestbuilder"
 	"github.com/cduggn/ccexplorer/internal/core/vectorstore/pinecone"
@@ -11,7 +12,7 @@ type VectorStore interface {
 	CreateVectorStoreInput(r model.CostAndUsageOutputType) ([]*model.
 		VectorStoreItem, error)
 	CreateEmbeddings(items []*model.VectorStoreItem) ([]gogpt.Embedding, error)
-	Upsert(data []*model.VectorStoreItem) error
+	Upsert(context context.Context, data []pinecone.PineconeStruct) error
 }
 
 type VectorStoreClient struct {
@@ -23,14 +24,16 @@ type VectorStoreClient struct {
 	client *pinecone.ClientAPI
 }
 
-func NewVectorStoreClient(builder requestbuilder.Builder, apikey, indexUrl,
-	openAIAPIKey string) VectorStore {
+func NewVectorStoreClient(builder requestbuilder.Builder, openAIAPIKey,
+	indexUrl,
+	pineconeAPIKey string) VectorStore {
 	return &VectorStoreClient{
-		apikey:         apikey,
+		apikey:         openAIAPIKey,
 		indexUrl:       indexUrl,
-		openAIAPIKey:   openAIAPIKey,
+		openAIAPIKey:   pineconeAPIKey,
 		requestbuilder: builder,
-		client:         pinecone.NewVectorStoreClient(builder, indexUrl, apikey, openAIAPIKey),
+		client: pinecone.NewVectorStoreClient(builder, indexUrl,
+			pineconeAPIKey, openAIAPIKey),
 	}
 }
 
@@ -58,8 +61,8 @@ func (v *VectorStoreClient) CreateEmbeddings(items []*model.VectorStoreItem) (
 	return vectors, nil
 }
 
-func (v *VectorStoreClient) Upsert(data []*model.VectorStoreItem) error {
+func (v *VectorStoreClient) Upsert(context context.Context,
+	items []pinecone.PineconeStruct) error {
 
-	//return v.client.Upsert(data)
-	return nil
+	return v.client.Upsert(context, items)
 }
