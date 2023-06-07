@@ -75,8 +75,8 @@ func (p *ClientAPI) sendBatchRequest(ctx context.Context,
 }
 
 func (p *ClientAPI) ConvertToVectorStoreItem(r model.
-	CostAndUsageOutputType) []*model.
-	VectorStoreItem {
+CostAndUsageOutputType) []*model.
+VectorStoreItem {
 	var s []*model.VectorStoreItem
 	for _, d := range r.Services {
 
@@ -113,6 +113,9 @@ func ServiceToString(s model.Service) string {
 	// append metrics
 	metrics := make([]string, len(s.Metrics))
 	for i, v := range s.Metrics {
+
+		// encode amount
+
 		metrics[i] = fmt.Sprintf("%s,%s", v.Amount, v.Unit)
 	}
 	r.WriteString(strings.Join(metrics, ","))
@@ -130,7 +133,8 @@ func (p *ClientAPI) sendRequest(req *http.Request, v any) error {
 	}
 
 	defer res.Body.Close()
-	if res.StatusCode < http.StatusOK || res.StatusCode >= http.StatusBadRequest {
+	if res.StatusCode < http.StatusOK || res.StatusCode >= http.
+		StatusBadRequest {
 		return fmt.Errorf("unexpected status code %d", res.StatusCode)
 	}
 	return decodeResponse(res.Body, v)
