@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"
+	"github.com/cduggn/ccexplorer/internal/core/encoder"
 	"github.com/cduggn/ccexplorer/internal/core/requestbuilder"
 	"github.com/cduggn/ccexplorer/internal/core/service/openai"
 	"io"
@@ -20,6 +21,7 @@ func NewVectorStoreClient(builder requestbuilder.Builder,
 		RequestBuilder: builder,
 		Config:         DefaultConfig(indexURL, pineconeAPIKey),
 		LLMClient:      openai.NewClient(openAIAPIKey),
+		Encoder:        encoder.NewEncoder(),
 	}
 }
 
@@ -75,13 +77,13 @@ func (p *ClientAPI) sendBatchRequest(ctx context.Context,
 }
 
 func (p *ClientAPI) ConvertToVectorStoreItem(r model.
-CostAndUsageOutputType) []*model.
-VectorStoreItem {
+	CostAndUsageOutputType) []*model.
+	VectorStoreItem {
 	var s []*model.VectorStoreItem
 	for _, d := range r.Services {
 
 		item := model.VectorStoreItem{
-			EmbeddingText: ServiceToString(d),
+			EmbeddingText: p.serviceToString(d),
 			Metadata: model.VectorStoreItemMetadata{
 				StartDate:   r.Start,
 				Granularity: r.Granularity,
@@ -94,7 +96,7 @@ VectorStoreItem {
 	return s
 }
 
-func ServiceToString(s model.Service) string {
+func (p *ClientAPI) serviceToString(s model.Service) string {
 	var r strings.Builder
 
 	// append keys
@@ -114,9 +116,8 @@ func ServiceToString(s model.Service) string {
 	metrics := make([]string, len(s.Metrics))
 	for i, v := range s.Metrics {
 
-		// encode amount
-
-		metrics[i] = fmt.Sprintf("%s,%s", v.Amount, v.Unit)
+		encodedAmount := p.Encoder.CategorizeCostsWithBinning(v.NumericAmount)
+		metrics[i] = fmt.Sprintf("%s,%s,%s", v.Amount, v.Unit, encodedAmount)
 	}
 	r.WriteString(strings.Join(metrics, ","))
 	return r.String()

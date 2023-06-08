@@ -6,10 +6,14 @@ import (
 )
 
 type Encode interface {
-	CategorizeCostsWithBinning() string
+	CategorizeCostsWithBinning(cost float64) string
 }
 
 type Encoder struct {
+}
+
+func NewEncoder() Encode {
+	return &Encoder{}
 }
 
 func (e *Encoder) CategorizeCostsWithBinning(cost float64) string {

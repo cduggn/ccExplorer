@@ -2,6 +2,7 @@ package pinecone
 
 import (
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"
+	"github.com/cduggn/ccexplorer/internal/core/encoder"
 	"testing"
 )
 
@@ -34,13 +35,17 @@ func TestServiceToString(t *testing.T) {
 					},
 				},
 			},
-			want: "SERVICE,USAGE_QUANTITY,2021-01-01,2021-01-02,test,0.10," +
-				"USD",
+			want: "SERVICE,USAGE_QUANTITY,2021-01-01,2021-01-02,test,0.10,USD,Free ($0.00)",
 		},
 	}
+
+	client := ClientAPI{
+		Encoder: encoder.NewEncoder(),
+	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			S := ServiceToString(tt.args.service)
+			S := client.serviceToString(tt.args.service)
 			if S != tt.want {
 				t.Errorf("ServiceToString() Got: %v, want: %v", S, tt.want)
 			}
