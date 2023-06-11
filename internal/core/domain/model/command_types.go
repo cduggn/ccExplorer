@@ -36,6 +36,8 @@ type CommandLineInput struct {
 	Metrics             []string
 	SortByDate          bool
 	OpenAIAPIKey        string
+	PineconeIndex       string
+	PineconeAPIKey      string
 }
 
 type FilterBySelections struct {
@@ -52,6 +54,8 @@ type PrintOptions struct {
 	OpenAIKey        string
 	Granularity      string
 	Metric           string
+	PineconeIndex    string
+	PineconeAPIKey   string
 }
 
 type ForecastCommandLineInput struct {
@@ -133,6 +137,8 @@ type CostAndUsageRequestType struct {
 	Metrics                    []string
 	SortByDate                 bool
 	OpenAIAPIKey               string
+	PineconeIndex              string
+	PineconeAPIKey             string
 }
 
 type CostAndUsageRequestWithResourcesType struct {
