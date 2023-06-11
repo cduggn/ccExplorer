@@ -1,7 +1,7 @@
-package handlers
+package commandline
 
 import (
-	handlers "github.com/cduggn/ccexplorer/internal/core/handlers/aws"
+	"github.com/cduggn/ccexplorer/internal/core/config"
 	"github.com/cduggn/ccexplorer/internal/core/logger"
 	"github.com/common-nighthawk/go-figure"
 	"github.com/spf13/cobra"
@@ -14,11 +14,6 @@ var (
 		Short: "A CLI tool to explore cloud costs and usage",
 		Long:  paintRootHeader(),
 	}
-	LoadConfigFunc = func(path string) func() {
-		return func() {
-			LoadConfig(path)
-		}
-	}
 )
 
 func RootCommand() *cobra.Command {
@@ -27,22 +22,22 @@ func RootCommand() *cobra.Command {
 		panic(err.Error())
 	}
 
-	LoadConfigFunc(".")()
-	handlers.Initialize()
+	config.LoadConfigFunc(".")()
+	Initialize()
 	return rootCmd
 }
 
 func init() {
-	rootCmd.AddCommand(handlers.CostAndForecast())
-	rootCmd.AddCommand(handlers.Presets())
-	_ = viper.BindPFlag("open_ai_api_key", rootCmd.PersistentFlags().Lookup(
-		"OPEN_AI_API_KEY"))
+	rootCmd.AddCommand(CostAndForecast())
+	rootCmd.AddCommand(Presets())
+	_ = viper.BindPFlag("openai_api_key", rootCmd.PersistentFlags().Lookup(
+		"OPENAI_API_KEY"))
 	_ = viper.BindPFlag("aws_profile", rootCmd.PersistentFlags().Lookup(
 		"AWS_PROFILE"))
-}
-
-func LoadConfig(path string) {
-	viper.AutomaticEnv()
+	_ = viper.BindPFlag("PINECONE_INDEX", rootCmd.PersistentFlags().Lookup(
+		"PINECONE_INDEX"))
+	_ = viper.BindPFlag("PINECONE_API_KEY", rootCmd.PersistentFlags().Lookup(
+		"PINECONE_API_KEY"))
 }
 
 func paintRootHeader() string {

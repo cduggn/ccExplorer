@@ -1,4 +1,4 @@
-package presentation
+package usecases
 
 type StdoutPrinter struct {
 	Variant string
@@ -13,5 +13,9 @@ type OpenAIPrinter struct {
 }
 
 type ChartPrinter struct {
+	Variant string
+}
+
+type PineconePrinter struct {
 	Variant string
 }

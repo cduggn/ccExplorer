@@ -1,4 +1,4 @@
-package aws
+package commandline
 
 import (
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"
@@ -26,20 +26,22 @@ func ValidateInput(input model.CommandLineInput) error {
 	if !isValidPrintFormat {
 		return ValidationError{
 			Message: "Invalid print format. " +
-				"Please use one of the following: stdout, csv, chart, gpt",
+				"Please use one of the following: stdout, csv, chart, pinecone",
 		}
 	}
 
-	if input.PrintFormat == "gpt" && input.OpenAIAPIKey == "" {
+	if input.PrintFormat == "pinecone" && input.OpenAIAPIKey == "" {
 		return ValidationError{
-			Message: "OpenAI API key not set. Please set the open_ai_api_key in the config file or environment variable",
+			Message: "OpenAI API key not set. " +
+				"Please set the OPENAI_API_KEY in the config file or environment variable",
 		}
 	}
 
-	if input.PrintFormat == "gpt" && input.OpenAIAPIKey != "" {
+	if input.PrintFormat == "pinecone" && input.OpenAIAPIKey != "" {
 		if HasAccountInformation(input.GroupByDimension) {
 			return ValidationError{
-				Message: "Cannot use GPT with account information. Please remove the account dimension",
+				Message: "Cannot use Pinecone with account information. " +
+					"Please remove the account dimension",
 			}
 		}
 	}
@@ -99,7 +101,7 @@ func ValidateEndDate(endDate, startDate string) error {
 }
 
 func IsValidPrintFormat(f string) bool {
-	return f == "stdout" || f == "csv" || f == "chart" || f == "gpt"
+	return f == "stdout" || f == "csv" || f == "chart" || f == "pinecone"
 }
 
 func IsValidGranularity(g string) bool {
