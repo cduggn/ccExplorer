@@ -33,12 +33,8 @@ It lets you quickly surface cost and usage metrics associated with your AWS
 account and visualize them in a human-readable format like a table, csv file, 
 or chart.  It was created so I could quickly explore and reason about service costs without switching context from the command line.
 It's not designed as a replacement for the official AWS COST Explorer CLI 
-but does provide some nice features for visualization and sorting. 
-
-The CLI 
-now supports writing cost reports to Pinecone vector database using the flag 
-`-p pinecone`. The resulting index can be easily integrated with [langchain](https://github.com/tmc/langchaingo) for more interesting ways to explore 
-the data. 
+but does provide some nice features for visualization and sorting. The CLI 
+now also supports experimental HTML report generation using OPEN AI GPT models.
 
 
 Installation
@@ -69,7 +65,7 @@ $ go run .\cmd\ccexplorer\ccexplorer.go get aws -g DIMENSION=SERVICE,DIMENSION=O
 
 ```console
 # download
-$ docker pull ghcr.io/cduggn/ccexplorer:v0.5.0
+$ docker pull ghcr.io/cduggn/ccexplorer:v0.4.14
 
 # Container requires AWS Access key, secret, and region
 $ docker run -it \
@@ -77,7 +73,7 @@ $ docker run -it \
   -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
   -e AWS_REGION=<AWS-REGION> \
   --mount type=bind,source="$(pwd)"/output/,target=/app/output \
-  ghcr.io/cduggn/ccexplorer:v0.5.0 get aws -g DIMENSION=OPERATION,
+  ghcr.io/cduggn/ccexplorer:v0.4.14 get aws -g DIMENSION=OPERATION,
   DIMENSION=SERVICE \
   -l -p chart
   
@@ -125,21 +121,6 @@ $ export AWS_SECRET_ACCESS_KEY=secret-access-key
 $ export AWS_REGION=region
 ```
    
-##### Open AI API Key
-When using the Pinecone writer you will need to set the Open AI API key. 
-This is necessary to generate the vector embeddings for the data. You can
-set the key by setting the `OPENAI_API_KEY` environment variable.
-```console
-$export OPENAI_API_KEY=api-key
-```
-
-##### Pinecone API Key
-When using the Pinecone writer you will need to set the Pinecone API key and index name.
-
-```console
-$ export PINECONE_INDEX=pinecone-index-url
-$ export PINECONE_API_KEY=api-key
-```
 
 Examples
 -------------
@@ -211,34 +192,21 @@ $ ccexplorer get aws -g DIMENSION=SERVICE, DIMENSION=OPERATION -l -e 2023-01-27 
 # Costs grouped by MONTH by OPERATION and USAGE_TYPE and printed to chart
 $ ccexplorer get aws -g DIMENSION=OPERATION,DIMENSION=USAGE_TYPE -l -e 2023-01-27 -s 2023-01-26 -m MONTHLY -p chart
 
-# Costs grouped by MONTH by SERVICE and USAGE_TYPE and written to Pinecone index
-$ ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=USAGE_TYPE -l -s 2023-02-15 -p pinecone
+# Costs grouped by MONTH by SERVICE and USAGE_TYPE and printed to HTML using GPT model
+$ ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=USAGE_TYPE -l -s 2023-02-15 -p gpt
 
 ```
 
 Print Writers
 -------------
 The `ccExplorer` supports the following output formats: stdout, csv, chart 
-and Pinecone. 
+and gpt. When using GPT, the `ccExplorer` will look for the 
+`OPEN_AI_API_KEY` environment variable. To reduce the possibility of sending identification 
+to GPT, the `-p gpt` flag does not support grouping by `LINKED_ACCOUNT`.
 
-#### stdout and csv
-Output to stdout and csv using the `-p stdout` and `-p csv` flags 
-respectively. 
-
-#### chart
-Generates a chart using the `-p chart` flag. The chart is generated using
-the [go-echarts](https://github.com/go-echarts/go-echarts) API. The 
-resulting HTML file can be opened in a browser.
-
-#### Pinecone
-The Pinecone target requires the following environment variables to be set: 
-- `OPENAI_API_KEY` - The API key for the OpenAI API is required to generate 
-  embeddings for the Cost Explorer results.
-- `PINECONE_INDEX_NAME` - The name of the Pinecone index being written to.
-- `PINECONE_API_KEY` - The API key for the Pinecone API.
-
-To reduce the possibility of sending sensitive data to OpenAI or Pinecone, the 
-  `-p pinecone` flag does not support the `LINKED_ACCOUNT` dimension type.
+```console
+$ export OPEN_AI_API_KEY=your-api-key
+```
 
 
 System Defaults
@@ -254,9 +222,8 @@ flags
   using the `-i` flag.
 - `ccExplorer` prints to stdout by default. The `-p` flag can be used to 
   specify the output format (csv, chart, stdout).
-- Results can be persisted to the Pinecone vector datastore using 
-  the `-p  pinecone` flag. This will use OpenAI API to generate embeddings 
-  and write to pinecone. 
+- HTML results can be generated using the `-p gpt` flag. This will use the 
+  OpenAI GPT API to generate a report. 
 - Results are sorted by default by cost in descending order. The `-d` flag 
   can be used to specify date sorting in descending order.
 - Refunds, discounts and credits are applied automatically. The `-l` flag 

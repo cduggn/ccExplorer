@@ -22,7 +22,6 @@ const (
 	CSV
 	Chart
 	OpenAPI
-	Pinecone
 )
 
 type InputType struct {
@@ -93,16 +92,14 @@ type DateInterval struct {
 	Start string
 }
 type CostAndUsageOutputType struct {
-	Services       map[int]Service
-	Granularity    string
-	Start          string
-	End            string
-	Dimensions     []string
-	Tags           []string
-	SortBy         string
-	OpenAIAPIKey   string
-	PineconeAPIKey string
-	PineconeIndex  string
+	Services     map[int]Service
+	Granularity  string
+	Start        string
+	End          string
+	Dimensions   []string
+	Tags         []string
+	SortBy       string
+	OpenAIAPIKey string
 }
 
 type ForecastPrintData struct {

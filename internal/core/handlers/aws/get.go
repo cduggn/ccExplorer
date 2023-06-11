@@ -1,4 +1,4 @@
-package commandline
+package aws
 
 import (
 	"context"
@@ -7,10 +7,11 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/cduggn/ccexplorer/internal/core/domain"
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"
-	flags "github.com/cduggn/ccexplorer/internal/core/handlers/commandline/flags"
+	flags "github.com/cduggn/ccexplorer/internal/core/handlers/aws/flags"
 	"github.com/cduggn/ccexplorer/internal/core/ports"
+	"github.com/cduggn/ccexplorer/internal/core/presentation"
+	writer "github.com/cduggn/ccexplorer/internal/core/presentation/writers"
 	"github.com/cduggn/ccexplorer/internal/core/service/aws"
-	"github.com/cduggn/ccexplorer/internal/core/usecases"
 	"github.com/cduggn/ccexplorer/internal/core/util"
 	"github.com/common-nighthawk/go-figure"
 	"github.com/spf13/cobra"
@@ -152,7 +153,7 @@ func (c *CostCommandType) DefineFlags() {
 		"End date *(defaults to the present day)")
 
 	c.Cmd.Flags().StringVarP(&costAndUsagePrintFormat, "printFormat", "p", "stdout",
-		"Valid values: stdout, csv, chart, pinecone (default: stdout)")
+		"Valid values: stdout, csv, chart, gpt (default: stdout)")
 
 	c.Cmd.Flags().StringVarP(&costAndUsageMetric, "metric", "i", "UnblendedCost",
 		"Valid values: AmortizedCost, BlendedCost, NetAmortizedCost, "+
@@ -232,8 +233,6 @@ func (c *CostCommandType) InputHandler(validatorFn func(input model.CommandLineI
 		Metrics:             []string{printOptions.Metric},
 		SortByDate:          printOptions.IsSortByDate,
 		OpenAIAPIKey:        printOptions.OpenAIKey,
-		PineconeAPIKey:      printOptions.PineconeAPIKey,
-		PineconeIndex:       printOptions.PineconeIndex,
 	}
 
 	err = validatorFn(input)
@@ -245,7 +244,7 @@ func (c *CostCommandType) InputHandler(validatorFn func(input model.CommandLineI
 }
 
 func (c *CostCommandType) SynthesizeRequest(input model.CommandLineInput) model.
-	CostAndUsageRequestType {
+CostAndUsageRequestType {
 
 	return model.CostAndUsageRequestType{
 		Granularity: input.Interval,
@@ -264,8 +263,6 @@ func (c *CostCommandType) SynthesizeRequest(input model.CommandLineInput) model.
 		Metrics:                    input.Metrics,
 		SortByDate:                 input.SortByDate,
 		OpenAIAPIKey:               input.OpenAIAPIKey,
-		PineconeAPIKey:             input.PineconeAPIKey,
-		PineconeIndex:              input.PineconeIndex,
 	}
 }
 
@@ -277,12 +274,12 @@ func (c *CostCommandType) Execute(req model.CostAndUsageRequestType) error {
 		return err
 	}
 
-	report := util.ToCostAndUsageOutputType(costAndUsageResponse, req)
+	report := writer.ToCostAndUsageOutputType(costAndUsageResponse, req)
 
-	w := usecases.NewPrintWriter(util.ToPrintWriterType(req.PrintFormat),
+	w := presentation.NewPrintWriter(util.ToPrintWriterType(req.PrintFormat),
 		"costAndUsage")
 
-	err = w.Write(util.SortByFn(req.SortByDate), report)
+	err = w.Print(util.SortByFn(req.SortByDate), report)
 	if err != nil {
 		return err
 	}
@@ -306,9 +303,9 @@ func (f *ForecastCommandType) RunE(cmd *cobra.Command, args []string) error {
 	filters := filterList(req)
 	printData.Filters = filters
 
-	p := usecases.NewPrintWriter(util.ToPrintWriterType("stdout"),
+	p := presentation.NewPrintWriter(util.ToPrintWriterType("stdout"),
 		"forecast")
-	err = p.Write(printData, filters)
+	err = p.Print(printData, filters)
 	if err != nil {
 		return err
 	}
@@ -335,8 +332,8 @@ func (f *ForecastCommandType) InputHandler() model.ForecastCommandLineInput {
 }
 
 func (f *ForecastCommandType) SynthesizeRequest(input model.
-	ForecastCommandLineInput) (model.
-	GetCostForecastRequest, error) {
+ForecastCommandLineInput) (model.
+GetCostForecastRequest, error) {
 
 	return model.GetCostForecastRequest{
 		Granularity:             input.Granularity,
@@ -396,7 +393,7 @@ func (p *PresetCommandType) RunE(cmd *cobra.Command, args []string) error {
 }
 
 func (p *PresetCommandType) SynthesizeRequest(m model.PresetParams) (model.
-	CostAndUsageRequestType,
+CostAndUsageRequestType,
 	error) {
 	return model.CostAndUsageRequestType{
 		GroupBy:                    m.Dimension,
@@ -457,7 +454,7 @@ func selectedPreset(p []model.PresetParams, s int) model.PresetParams {
 }
 
 func prepareResponseForRendering(res *costexplorer.
-	GetCostForecastOutput) model.ForecastPrintData {
+GetCostForecastOutput) model.ForecastPrintData {
 	return model.ForecastPrintData{
 		Forecast: res,
 	}
