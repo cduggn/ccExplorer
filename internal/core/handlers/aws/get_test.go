@@ -1,4 +1,4 @@
-package commandline
+package aws
 
 import (
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"

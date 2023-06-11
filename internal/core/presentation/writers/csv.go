@@ -1,4 +1,4 @@
-package usecases
+package writers
 
 import (
 	"encoding/csv"

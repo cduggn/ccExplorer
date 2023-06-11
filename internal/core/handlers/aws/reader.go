@@ -1,8 +1,8 @@
-package commandline
+package aws
 
 import (
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"
-	"github.com/cduggn/ccexplorer/internal/core/handlers/commandline/flags"
+	"github.com/cduggn/ccexplorer/internal/core/handlers/aws/flags"
 	"github.com/spf13/viper"
 	"strings"
 )
@@ -85,14 +85,8 @@ func (c *CostCommandType) ExtractPrintPreferences() model.
 	sortByDate, _ := c.Cmd.Flags().GetBool("sortByDate")
 	printOptions.IsSortByDate = sortByDate
 
-	openAIKey := viper.GetString("openai_api_key")
+	openAIKey := viper.GetString("open_ai_api_key")
 	printOptions.OpenAIKey = openAIKey
-
-	pineconeAPIKey := viper.GetString("PINECONE_API_KEY")
-	printOptions.PineconeAPIKey = pineconeAPIKey
-
-	pineconeIndex := viper.GetString("PINECONE_INDEX")
-	printOptions.PineconeIndex = pineconeIndex
 
 	excludeDiscounts, _ := c.Cmd.Flags().GetBool("excludeDiscounts")
 	printOptions.ExcludeDiscounts = excludeDiscounts
