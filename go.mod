@@ -1,6 +1,6 @@
 module github.com/cduggn/ccexplorer
 
-go 1.19
+go 1.20
 
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.6
@@ -10,7 +10,6 @@ require (
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be
 	github.com/go-echarts/go-echarts/v2 v2.2.6
 	github.com/jedib0t/go-pretty/v6 v6.4.6
-	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/sashabaranov/go-openai v1.9.0
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.15.0

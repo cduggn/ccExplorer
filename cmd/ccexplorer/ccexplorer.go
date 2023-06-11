@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/cduggn/ccexplorer/internal/core/handlers/commandline"
-	_ "github.com/mattn/go-sqlite3"
 	"os"
 )
 
