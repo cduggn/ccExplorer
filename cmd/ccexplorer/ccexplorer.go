@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/cduggn/ccexplorer/internal/core/handlers/commandline"
+	"github.com/cduggn/ccexplorer/internal/core/handlers"
 	_ "github.com/mattn/go-sqlite3"
 	"os"
 )
 
 func main() {
-	root := commandline.RootCommand()
+	root := handlers.RootCommand()
 
 	if err := root.Execute(); err != nil {
 		fmt.Println(err)
