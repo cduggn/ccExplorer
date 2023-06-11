@@ -33,7 +33,7 @@ func ValidateInput(input model.CommandLineInput) error {
 	if input.PrintFormat == "pinecone" && input.OpenAIAPIKey == "" {
 		return ValidationError{
 			Message: "OpenAI API key not set. " +
-				"Please set the OPEN_AI_API_KEY in the config file or environment variable",
+				"Please set the OPENAI_API_KEY in the config file or environment variable",
 		}
 	}
 

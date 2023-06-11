@@ -125,6 +125,21 @@ $ export AWS_SECRET_ACCESS_KEY=secret-access-key
 $ export AWS_REGION=region
 ```
    
+##### Open AI API Key
+When using the Pinecone writer you will need to set the Open AI API key. 
+This is necessary to generate the vector embeddings for the data. You can
+set the key by setting the `OPENAI_API_KEY` environment variable.
+```console
+$export OPENAI_API_KEY=api-key
+```
+
+##### Pinecone API Key
+When using the Pinecone writer you will need to set the Pinecone API key and index name.
+
+```console
+$ export PINECONE_INDEX=pinecone-index-url
+$ export PINECONE_API_KEY=api-key
+```
 
 Examples
 -------------
@@ -217,7 +232,7 @@ resulting HTML file can be opened in a browser.
 
 #### Pinecone
 The Pinecone target requires the following environment variables to be set: 
-- `OPEN_AI_API_KEY` - The API key for the OpenAI API is required to generate 
+- `OPENAI_API_KEY` - The API key for the OpenAI API is required to generate 
   embeddings for the Cost Explorer results.
 - `PINECONE_INDEX_NAME` - The name of the Pinecone index being written to.
 - `PINECONE_API_KEY` - The API key for the Pinecone API.

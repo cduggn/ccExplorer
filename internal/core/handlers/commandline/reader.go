@@ -85,7 +85,7 @@ func (c *CostCommandType) ExtractPrintPreferences() model.
 	sortByDate, _ := c.Cmd.Flags().GetBool("sortByDate")
 	printOptions.IsSortByDate = sortByDate
 
-	openAIKey := viper.GetString("open_ai_api_key")
+	openAIKey := viper.GetString("openai_api_key")
 	printOptions.OpenAIKey = openAIKey
 
 	pineconeAPIKey := viper.GetString("PINECONE_API_KEY")

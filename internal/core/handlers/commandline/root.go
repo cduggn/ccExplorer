@@ -30,8 +30,8 @@ func RootCommand() *cobra.Command {
 func init() {
 	rootCmd.AddCommand(CostAndForecast())
 	rootCmd.AddCommand(Presets())
-	_ = viper.BindPFlag("open_ai_api_key", rootCmd.PersistentFlags().Lookup(
-		"OPEN_AI_API_KEY"))
+	_ = viper.BindPFlag("openai_api_key", rootCmd.PersistentFlags().Lookup(
+		"OPENAI_API_KEY"))
 	_ = viper.BindPFlag("aws_profile", rootCmd.PersistentFlags().Lookup(
 		"AWS_PROFILE"))
 	_ = viper.BindPFlag("PINECONE_INDEX", rootCmd.PersistentFlags().Lookup(
