@@ -1,7 +1,7 @@
 package commandline
 
 import (
-	"github.com/cduggn/ccexplorer/internal/core/config"
+	"github.com/cduggn/ccexplorer/internal/core"
 	"github.com/cduggn/ccexplorer/internal/core/logger"
 	"github.com/common-nighthawk/go-figure"
 	"github.com/spf13/cobra"
@@ -22,7 +22,7 @@ func RootCommand() *cobra.Command {
 		panic(err.Error())
 	}
 
-	config.LoadConfigFunc(".")()
+	core.LoadConfigFunc(".")()
 	Initialize()
 	return rootCmd
 }
