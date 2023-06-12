@@ -6,7 +6,7 @@ require (
 	github.com/AlecAivazis/survey/v2 v2.3.6
 	github.com/aws/aws-sdk-go-v2 v1.18.0
 	github.com/aws/aws-sdk-go-v2/config v1.18.25
-	github.com/aws/aws-sdk-go-v2/service/costexplorer v1.25.8
+	github.com/aws/aws-sdk-go-v2/service/costexplorer v1.25.10
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be
 	github.com/go-echarts/go-echarts/v2 v2.2.6
 	github.com/jedib0t/go-pretty/v6 v6.4.6
