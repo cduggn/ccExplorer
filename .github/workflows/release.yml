@@ -3,7 +3,14 @@ name: goreleaser
 on:
   push:
     tags:
-      - "*"
+      - "v*"
+    branches:
+      - main
+    tags-ignore:
+      - "v*-dev"
+      - "v*-alpha"
+      - "v*-beta"
+      - "v*-rc"
 
 permissions:
   contents: write
