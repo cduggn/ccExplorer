@@ -26,15 +26,18 @@ func NewVectorStoreClient(builder requestbuilder.Builder,
 }
 
 func (p *ClientAPI) Upsert(ctx context.Context,
-	data []PineconeStruct) (resp model.UpsertResponse, err error) {
+	data []PineconeStruct) (model.UpsertResponse, error) {
 
 	batches := splitIntoBatches(data)
+
+	var resp model.UpsertResponse
 
 	for _, batch := range batches {
 		message := UpsertVectorsRequest{
 			Message: batch,
 		}
-		resp, err = p.sendBatchRequest(ctx, message)
+		res, err := p.sendBatchRequest(ctx, message)
+		resp.UpsertedCount += res.UpsertedCount
 		if err != nil {
 			return model.UpsertResponse{}, err
 		}

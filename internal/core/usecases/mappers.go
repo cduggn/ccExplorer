@@ -41,7 +41,7 @@ func CostAndUsageToVectorMapper(r model.CostAndUsageOutputType) error {
 
 	for index, m := range vectors {
 		items[index].EmbeddingVector = m.Embedding
-		items[index].Index = util.EncodeString(items[index].EmbeddingText)
+		items[index].ID = util.EncodeString(items[index].EmbeddingText)
 	}
 
 	input := util.ConvertToPineconeStruct(items)

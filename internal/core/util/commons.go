@@ -383,7 +383,7 @@ func ConvertToPineconeStruct(items []*model.VectorStoreItem) []pinecone.
 	var pineconeStruct []pinecone.PineconeStruct
 	for _, v := range items {
 		pineconeStruct = append(pineconeStruct, pinecone.PineconeStruct{
-			ID:     v.Index,
+			ID:     v.ID,
 			Values: v.EmbeddingVector,
 			Metadata: pinecone.Metadata{
 				PageContent: v.EmbeddingText,
