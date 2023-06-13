@@ -80,8 +80,8 @@ func (p *ClientAPI) sendBatchRequest(ctx context.Context,
 }
 
 func (p *ClientAPI) ConvertToVectorStoreItem(r model.
-	CostAndUsageOutputType) []*model.
-	VectorStoreItem {
+CostAndUsageOutputType) []*model.
+VectorStoreItem {
 	var s []*model.VectorStoreItem
 	for _, d := range r.Services {
 
@@ -120,7 +120,8 @@ func (p *ClientAPI) serviceToString(s model.Service) string {
 	for i, v := range s.Metrics {
 
 		encodedAmount := p.Encoder.CategorizeCostsWithBinning(v.NumericAmount)
-		metrics[i] = fmt.Sprintf("%s,%s,%s", v.Amount, v.Unit, encodedAmount)
+		metrics[i] = fmt.Sprintf("%s,%s,%s,%s", v.Name, v.Amount, v.Unit,
+			encodedAmount)
 	}
 	r.WriteString(strings.Join(metrics, ","))
 	return r.String()

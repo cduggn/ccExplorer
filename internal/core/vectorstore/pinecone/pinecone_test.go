@@ -24,7 +24,7 @@ func TestServiceToString(t *testing.T) {
 					End:   "2021-01-02",
 					Metrics: []model.Metrics{
 						{
-							Name:          "test",
+							Name:          "UnblndedCost",
 							Amount:        "0.10",
 							Unit:          "USD",
 							UsageQuantity: 0.10,
@@ -35,7 +35,8 @@ func TestServiceToString(t *testing.T) {
 					},
 				},
 			},
-			want: "SERVICE,USAGE_QUANTITY,2021-01-01,2021-01-02,test,0.10,USD,Free ($0.00)",
+			want: "SERVICE,USAGE_QUANTITY,2021-01-01,2021-01-02,test," +
+				"UnblndedCost,0.10,USD,Free ($0.00)",
 		},
 	}
 
