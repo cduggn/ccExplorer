@@ -22,7 +22,7 @@ type PineconeStruct struct {
 type Metadata struct {
 	PageContent string `json:"page_content"`
 	Source      string `json:"source"`
-	Dimensions  string `json:"service"`
+	Dimensions  string `json:"dimensions"`
 	Year        string `json:"year"`
 }
 
