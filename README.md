@@ -76,9 +76,8 @@ $ docker run -it \
   -e AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID> \
   -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
   -e AWS_REGION=<AWS-REGION> \
-  --mount type=bind,source="$(pwd)"/output/,target=/app/output \
-  ghcr.io/cduggn/ccexplorer:v0.5.10 get aws -g DIMENSION=OPERATION,
-  DIMENSION=SERVICE \
+  --mount type=bind,source="$(pwd)"/output/,target=/app/output \ 
+  ghcr.io/cduggn/ccexplorer:v0.5.10 get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE \
   -l -p chart
   
 ```
