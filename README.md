@@ -69,7 +69,7 @@ $ go run .\cmd\ccexplorer\ccexplorer.go get aws -g DIMENSION=SERVICE,DIMENSION=O
 
 ```console
 # download
-$ docker pull ghcr.io/cduggn/ccexplorer:v0.5.12
+$ docker pull ghcr.io/cduggn/ccexplorer:v0.5.13
 
 # Container requires AWS Access key, secret, and region
 $ docker run -it \
@@ -77,7 +77,7 @@ $ docker run -it \
   -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
   -e AWS_REGION=<AWS-REGION> \
   --mount type=bind,source="$(pwd)"/output/,target=/app/output \ 
-  ghcr.io/cduggn/ccexplorer:v0.5.12 get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE \
+  ghcr.io/cduggn/ccexplorer:v0.5.13 get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE \
   -l -p chart
   
 ```
@@ -86,37 +86,17 @@ Quick Start
 -----------
 <hr>
 
-Once `ccExplorer` is installed you can run the help command to see the 
-available commands.
-
-```console
-$ ccexplorer --help
-```
-When you invoke a command, `ccExplorer` will use the AWS 
-credential chain to authenticate with AWS.
-
-Use the `run-query` command to view and execute a list of preset commands when getting started.
-
-```console
-$ ccexplorer run-query
-```
-
-For more advanced usage, you can use the `get` command to query AWS Cost and Usage Reports.
-
 #### Authentication
+When you invoke a command, `ccExplorer` will use the AWS
+credential chain to authenticate with AWS. Use one of the following methods when running `ccExplorer` locally..
 
 ##### AWS Profiles
-`ccExplorer` supports AWS profiles. You can set the profile to use by setting the `AWS_PROFILE` environment variable.
 
 ```console
 $ export AWS_PROFILE=profile-name
 ```
 
 ##### AWS Credentials
-
-`ccExplorer` supports AWS credentials. You can set the credentials to use by 
-setting the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` and `AWS_REGION` 
-environment variables.
 
 ```console
 $ export AWS_ACCESS_KEY_ID=access-key-id
@@ -125,23 +105,20 @@ $ export AWS_REGION=region
 ```
    
 ##### Open AI API Key
-When using the Pinecone writer you will need to set the Open AI API key. 
-This is necessary to generate the vector embeddings for the data. You can
+When using the Pinecone writer you will need to set both the Open AI and Pinecone API keys. 
+This is necessary to generate and upload your vector embeddings to Pinecone. You can
 set the key by setting the `OPENAI_API_KEY` environment variable.
 ```console
 $export OPENAI_API_KEY=api-key
-```
-
-##### Pinecone API Key
-When using the Pinecone writer you will need to set the Pinecone API key and index name.
-
-```console
 $ export PINECONE_INDEX=pinecone-index-url
 $ export PINECONE_API_KEY=api-key
 ```
 
 Examples
 -------------
+
+<details>
+<summary>GroupBy examples</summary>
 
 ```console
 # Costs grouped by LINKED_ACCOUNT 
@@ -171,6 +148,19 @@ $ ccexplorer get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE -s 2022-04-04  -f 
 # Costs grpuped by ApplicationName Cost Allocation Tag
 $ ccexplorer get aws -g TAG=ApplicationName,DIMENSION=OPERATION -s 2022-12-10 -l
 
+# Costs grouped by HOUR and by SERVICE and OPERATION DIMENSIONS
+$ ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -l -e 2023-01-27T15:04:05Z -s 2023-01-26T15:04:05Z -m HOURLY
+
+# Costs grouped by DAY and by SERVICE and OPERATION DIMEBSIONS
+$ ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -l -e 2023-01-27 -s 2023-01-26 -m DAILY
+```
+
+</details>
+
+<details>
+<summary>Filter examples</summary>
+
+```console
 # Costs grpuped by ApplicationName Cost Allocation Tag and filtered by specific name
 $ ccexplorer get aws -g TAG=ApplicationName,DIMENSION=OPERATION -s 2022-12-10 -f TAG="my-project" -l
 
@@ -191,13 +181,15 @@ $ ccexplorer get aws -g TAG=ApplicationName,DIMENSION=OPERATION -s 2022-12-10 -f
 
 # Costs grouped by GetCostAndUsage operation and LINKED_ACCOUNT dimension
 $ ccexplorer get aws -g DIMENSION=OPERATION,DIMENSION=LINKED_ACCOUNT -s 2022-12-10 -f OPERATION="GetCostAndUsage" -l
+```
 
-# Costs grouped by HOUR and by SERVICE and OPERATION DIMENSIONS
-$ ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -l -e 2023-01-27T15:04:05Z -s 2023-01-26T15:04:05Z -m HOURLY
+</details>
 
-# Costs grouped by DAY and by SERVICE and OPERATION DIMEBSIONS
-$ ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -l -e 2023-01-27 -s 2023-01-26 -m DAILY
 
+<details>
+<summary>Target output examples</summary>
+
+```console
 # Costs exported in CSV format
 $ ccexplorer get aws -g DIMENSION=LINKED_ACCOUNT,DIMENSION=OPERATION -l -m DAILY -p csv
 
@@ -212,8 +204,12 @@ $ ccexplorer get aws -g DIMENSION=OPERATION,DIMENSION=USAGE_TYPE -l -e 2023-01-2
 
 # Costs grouped by MONTH by SERVICE and USAGE_TYPE and written to Pinecone index
 $ ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=USAGE_TYPE -l -s 2023-02-15 -p pinecone
-
 ```
+
+</details>
+
+
+
 
 Print Writers
 -------------
