@@ -14,7 +14,7 @@ echo "------------------------------------------------"
     echo "Pre-commit: Clean build of project"
 echo "------------------------------------------------"
 
-if (make checks); then
+if (make lint test build); then
     echo "------------------------------------------------"
         echo "Pre-commit: All checks passed"
     echo "------------------------------------------------"
