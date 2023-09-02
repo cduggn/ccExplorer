@@ -134,5 +134,5 @@ Once your PR is merged, your contributions will be publicly visible on the repos
 
 Now you are part of the community!
 
-## Credits
-The contribution guide is based on the original work by [Travis Cline](https://github.com/tmc)
+## Attribution
+The contribution guide is adapted from [@tmc](https://github.com/tmc/langchaingo/blob/main/CONTRIBUTING.md)
