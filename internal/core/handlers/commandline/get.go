@@ -2,8 +2,6 @@ package commandline
 
 import (
 	"context"
-	"fmt"
-	"github.com/AlecAivazis/survey/v2"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/cduggn/ccexplorer/internal/core/domain"
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"
@@ -47,10 +45,6 @@ type CostCommandType struct {
 }
 
 type ForecastCommandType struct {
-	Cmd *cobra.Command
-}
-
-type PresetCommandType struct {
 	Cmd *cobra.Command
 }
 
@@ -106,19 +100,7 @@ you can set the environment variables AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY a
 	return getCmd
 }
 
-func Presets() *cobra.Command {
-	presetCommand := PresetCommandType{
-		Cmd: &cobra.Command{
-			Use:   "run-query",
-			Short: "Predefined AWS Cost and Usage queries",
-		},
-	}
-	presetCommand.Cmd.RunE = presetCommand.RunE
-	return presetCommand.Cmd
-}
-
 func (c *CostCommandType) DefineFlags() {
-
 	c.Cmd.Flags().VarP(&costUsageGroupBy, "groupBy", "g",
 		"Group by DIMENSION and/or TAG ")
 	// add required flag for groupBy
@@ -360,102 +342,6 @@ func (f *ForecastCommandType) Execute(r model.GetCostForecastRequest) (
 	return res, nil
 }
 
-func (p *PresetCommandType) RunE(cmd *cobra.Command, args []string) error {
-	var presets = domain.PresetList()
-	optionsNameList := presetQueryList(presets)
-
-	var prompt = displayPresetPrompt(optionsNameList)
-	selection := 0
-	err := survey.AskOne(prompt, &selection)
-	if err != nil {
-		return model.PresetError{
-			Msg: fmt.Sprintf("Error during query selection %v\n",
-				err),
-		}
-
-	}
-
-	selectedOption := selectedPreset(presets, selection)
-	apiRequest, err := p.SynthesizeRequest(selectedOption)
-	if err != nil {
-		return model.PresetError{
-			Msg: fmt.Sprintf("Error synthesizing query %v\n",
-				err),
-		}
-	}
-
-	displaySynthesizedPresetQuery(selectedOption)
-	err = p.Execute(apiRequest)
-	if err != nil {
-		return model.PresetError{
-			Msg: fmt.Sprintf("Error executing query %v\n",
-				err),
-		}
-	}
-	return nil
-}
-
-func (p *PresetCommandType) SynthesizeRequest(m model.PresetParams) (model.
-	CostAndUsageRequestType,
-	error) {
-	return model.CostAndUsageRequestType{
-		GroupBy:                    m.Dimension,
-		DimensionFilter:            m.Filter,
-		IsFilterByTagEnabled:       m.FilterByTag,
-		IsFilterByDimensionEnabled: m.FilterByDimension,
-		Time: model.Time{
-			Start: util.DefaultStartDate(util.DayOfCurrentMonth,
-				util.SubtractDays),
-			End: util.DefaultEndDate(util.Format),
-		},
-		Granularity:      m.Granularity,
-		ExcludeDiscounts: m.ExcludeDiscounts,
-		PrintFormat:      m.PrintFormat,
-		SortByDate:       false,
-		Metrics:          m.Metric,
-	}, nil
-}
-
-func (p *PresetCommandType) Execute(q model.CostAndUsageRequestType) error {
-	err := executePreset(q)
-	if err != nil {
-		err := model.PresetError{
-			Msg: fmt.Sprintf("Error executing preset query %v\n", err),
-		}
-		return err
-	}
-	return nil
-}
-
-func executePreset(q model.CostAndUsageRequestType) error {
-	// relies on the cost command to execute query
-	costCommand := CostCommandType{}
-
-	err := costCommand.Execute(q)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func displayPresetPrompt(o []string) *survey.Select {
-	return &survey.Select{
-		Message: "Choose a query to execute:",
-		Options: o,
-	}
-}
-func presetQueryList(p []model.PresetParams) []string {
-	queries := make([]string, len(p))
-	for i, preset := range p {
-		queries[i] = preset.Alias
-	}
-	return queries
-}
-
-func selectedPreset(p []model.PresetParams, s int) model.PresetParams {
-	return p[s]
-}
-
 func prepareResponseForRendering(res *costexplorer.
 	GetCostForecastOutput) model.ForecastPrintData {
 	return model.ForecastPrintData{
@@ -469,10 +355,4 @@ func filterList(r model.GetCostForecastRequest) []string {
 		dimensions = append(dimensions, d.Key)
 	}
 	return dimensions
-}
-
-func displaySynthesizedPresetQuery(p model.PresetParams) {
-	fmt.Println("")
-	fmt.Printf("Synthesized Query: %v \n", p.CommandSyntax)
-	fmt.Println("")
 }

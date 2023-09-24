@@ -69,7 +69,7 @@ $ go run .\cmd\ccexplorer\ccexplorer.go get aws -g DIMENSION=SERVICE,DIMENSION=O
 
 ```console
 # download
-$ docker pull ghcr.io/cduggn/ccexplorer:v0.5.13
+$ docker pull ghcr.io/cduggn/ccexplorer:v0.5.14
 
 # Container requires AWS Access key, secret, and region
 $ docker run -it \
@@ -77,7 +77,7 @@ $ docker run -it \
   -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
   -e AWS_REGION=<AWS-REGION> \
   --mount type=bind,source="$(pwd)"/output/,target=/app/output \ 
-  ghcr.io/cduggn/ccexplorer:v0.5.13 get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE \
+  ghcr.io/cduggn/ccexplorer:v0.5.14 get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE \
   -l -p chart
   
 ```
@@ -110,7 +110,7 @@ This is necessary to generate and upload your vector embeddings to Pinecone. You
 set the key by setting the `OPENAI_API_KEY` environment variable.
 ```console
 $export OPENAI_API_KEY=api-key
-$ export PINECONE_INDEX=pinecone-index-url
+$ export PINECONE_INDEX=pinecone-index-url ( eg. https://<index-name>>-<project-name>.svc.us-east-1-aws.pinecone.io )
 $ export PINECONE_API_KEY=api-key
 ```
 
@@ -229,7 +229,7 @@ resulting HTML file can be opened in a browser.
 The Pinecone target requires the following environment variables to be set: 
 - `OPENAI_API_KEY` - The API key for the OpenAI API is required to generate 
   embeddings for the Cost Explorer results.
-- `PINECONE_INDEX_NAME` - The name of the Pinecone index being written to.
+- `PINECONE_INDEX_NAME` - The name of the Pinecone index being written to [E.g. https://<index-name>>-<project-name>>.svc.us-east-1-aws.pinecone.io ]
 - `PINECONE_API_KEY` - The API key for the Pinecone API.
 
 To reduce the possibility of sending sensitive data to OpenAI or Pinecone, the 
