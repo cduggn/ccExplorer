@@ -389,7 +389,8 @@ func ConvertToPineconeStruct(items []*model.VectorStoreItem) []pinecone.
 				PageContent: v.EmbeddingText,
 				Source:      "aws cost explorer",
 				Dimensions:  v.Metadata.Dimensions,
-				Year:        v.Metadata.StartDate,
+				Start:       v.Metadata.StartDate,
+				End:         v.Metadata.EndDate,
 			},
 		})
 	}

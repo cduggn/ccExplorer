@@ -13,6 +13,7 @@ type VectorStoreItem struct {
 
 type VectorStoreItemMetadata struct {
 	StartDate   string
+	EndDate     string
 	Granularity string
 	Dimensions  string
 	Tags        string

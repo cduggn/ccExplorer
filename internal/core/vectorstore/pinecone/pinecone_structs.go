@@ -23,7 +23,8 @@ type Metadata struct {
 	PageContent string `json:"page_content"`
 	Source      string `json:"source"`
 	Dimensions  string `json:"dimensions"`
-	Year        string `json:"year"`
+	Start       string `json:"start"`
+	End         string `json:"end"`
 }
 
 type UpsertVectorsRequest struct {
