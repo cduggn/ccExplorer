@@ -80,15 +80,15 @@ func (p *ClientAPI) sendBatchRequest(ctx context.Context,
 }
 
 func (p *ClientAPI) ConvertToVectorStoreItem(r model.
-CostAndUsageOutputType) []*model.
-VectorStoreItem {
+	CostAndUsageOutputType) []*model.
+	VectorStoreItem {
 	var s []*model.VectorStoreItem
 	for _, d := range r.Services {
-
 		item := model.VectorStoreItem{
 			EmbeddingText: p.serviceToString(d),
 			Metadata: model.VectorStoreItemMetadata{
-				StartDate:   r.Start,
+				StartDate:   d.Start,
+				EndDate:     d.End,
 				Granularity: r.Granularity,
 				Dimensions:  strings.Join(r.Dimensions, ","),
 				Tags:        strings.Join(r.Tags, ","),
