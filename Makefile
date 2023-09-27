@@ -72,4 +72,5 @@ git-secrets:
 .PHONY: tag
 tag:
 	git tag -a v$(VERSION) -m "Release v$(VERSION)"
+	#git tag -a v0.6.0 <commit-id>  -m "Release v0.6.0"
 	git push origin v$(VERSION)
