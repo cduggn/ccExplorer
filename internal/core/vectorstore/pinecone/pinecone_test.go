@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestServiceToString(t *testing.T) {
+func TestAddSemanticMeaning(t *testing.T) {
 	type args struct {
 		service model.Service
 	}
@@ -46,7 +46,7 @@ func TestServiceToString(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			S := client.serviceToString(tt.args.service)
+			S := client.AddSemanticMeaning(tt.args.service)
 			if S != tt.want {
 				t.Errorf("ServiceToString() Got: %v, want: %v", S, tt.want)
 			}
