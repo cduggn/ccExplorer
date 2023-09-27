@@ -17,6 +17,7 @@ type VectorStoreItemMetadata struct {
 	Granularity string
 	Dimensions  string
 	Tags        string
+	Cost        string
 }
 
 type UpsertResponse struct {

@@ -69,7 +69,11 @@ $ go run .\cmd\ccexplorer\ccexplorer.go get aws -g DIMENSION=SERVICE,DIMENSION=O
 
 ```console
 # download
+<<<<<<< Updated upstream
 $ docker pull ghcr.io/cduggn/ccexplorer:v0.6.1
+=======
+$ docker pull ghcr.io/cduggn/ccexplorer:v0.6.3
+>>>>>>> Stashed changes
 
 # Container requires AWS Access key, secret, and region
 $ docker run -it \
@@ -77,7 +81,11 @@ $ docker run -it \
   -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
   -e AWS_REGION=<AWS-REGION> \
   --mount type=bind,source="$(pwd)"/output/,target=/app/output \ 
+<<<<<<< Updated upstream
   ghcr.io/cduggn/ccexplorer:v0.6.1 get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE \
+=======
+  ghcr.io/cduggn/ccexplorer:v0.6.3 get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE \
+>>>>>>> Stashed changes
   -l -p chart
   
 ```
@@ -209,8 +217,6 @@ $ ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=USAGE_TYPE -l -s 2023-02-15 
 </details>
 
 
-
-
 Print Writers
 -------------
 The `ccExplorer` supports the following output formats: stdout, csv, chart 
@@ -235,6 +241,19 @@ The Pinecone target requires the following environment variables to be set:
 To reduce the possibility of sending sensitive data to OpenAI or Pinecone, the 
   `-p pinecone` flag does not support the `LINKED_ACCOUNT` dimension type.
 
+
+<details>
+<summary>Details of the Pinecone Metadata</summary>
+
+When `ccExplorer` writes to Pinecone, it generates a metadata object for each row in the Cost Explorer results. The metadata object contains the following fields:
+- dimensions  ( A map of the dimensions used to group the results )
+- cost ( The cost of the resource )
+- page_content ( The text used to generate the embeddings )
+- source ( The source of the data )
+- start ( The start date of the billing period )
+- end ( The end date of the billing period )
+
+</details>
 
 System Defaults
 ---------------

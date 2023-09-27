@@ -391,6 +391,7 @@ func ConvertToPineconeStruct(items []*model.VectorStoreItem) []pinecone.
 				Dimensions:  v.Metadata.Dimensions,
 				Start:       v.Metadata.StartDate,
 				End:         v.Metadata.EndDate,
+				Cost:        v.Metadata.Cost,
 			},
 		})
 	}
