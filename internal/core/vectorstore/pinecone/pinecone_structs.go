@@ -25,6 +25,7 @@ type Metadata struct {
 	Dimensions  string `json:"dimensions"`
 	Start       string `json:"start"`
 	End         string `json:"end"`
+	Cost        string `json:"cost"`
 }
 
 type UpsertVectorsRequest struct {

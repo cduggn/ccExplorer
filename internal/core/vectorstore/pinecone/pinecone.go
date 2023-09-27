@@ -96,6 +96,7 @@ func (p *ClientAPI) ConvertToVectorStoreItem(r model.
 				Granularity: r.Granularity,
 				Dimensions:  dimensions,
 				Tags:        tags,
+				Cost:        d.Metrics[0].Amount,
 			},
 		}
 		s = append(s, &item)
@@ -123,37 +124,6 @@ func (p *ClientAPI) AddSemanticMeaning(s model.Service, dimensions, tags string)
 	r.WriteString(strings.Join(metrics, ","))
 	return r.String()
 }
-
-//func (p *ClientAPI) AddSemanticMeaning(s model.Service, dimensions, tags string) string {
-//	var r strings.Builder
-//
-//	// append keys
-//	r.WriteString("AWS Cost explorer cost and usage results grouped by dimensions and tags named ")
-//	r.WriteString(dimensions + " " + tags + " ")
-//	r.WriteString(" and with the following key values ")
-//	keys := strings.Join(s.Keys, ",")
-//	r.WriteString(keys)
-//	r.WriteString(",")
-//	r.WriteString(" over the time period which starts and ends at  ")
-//	// append start, end, and name
-//	r.WriteString(s.Start)
-//	r.WriteString(",")
-//	r.WriteString(s.End)
-//	r.WriteString(",")
-//	r.WriteString(s.Name)
-//	r.WriteString(",")
-//
-//	// append metrics
-//	metrics := make([]string, len(s.Metrics))
-//	for i, v := range s.Metrics {
-//
-//		encodedAmount := p.Encoder.CategorizeCostsWithBinning(v.NumericAmount)
-//		metrics[i] = fmt.Sprintf(" the metrics values include the cost category dataset name: %s, the cost associated with this grouped dimension and/or tag for this time period: %s, the currency unit used to represent the cost: %s, and an encoded value to normalize the cost into a binning category: %s", v.Name, v.Amount, v.Unit,
-//			encodedAmount)
-//	}
-//	r.WriteString(strings.Join(metrics, ","))
-//	return r.String()
-//}
 
 func (p *ClientAPI) sendRequest(req *http.Request, v any) error {
 	req.Header.Set("accept", "application/json")
