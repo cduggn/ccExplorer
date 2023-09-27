@@ -69,11 +69,7 @@ $ go run .\cmd\ccexplorer\ccexplorer.go get aws -g DIMENSION=SERVICE,DIMENSION=O
 
 ```console
 # download
-<<<<<<< Updated upstream
-$ docker pull ghcr.io/cduggn/ccexplorer:v0.6.1
-=======
 $ docker pull ghcr.io/cduggn/ccexplorer:v0.6.3
->>>>>>> Stashed changes
 
 # Container requires AWS Access key, secret, and region
 $ docker run -it \
@@ -81,11 +77,7 @@ $ docker run -it \
   -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
   -e AWS_REGION=<AWS-REGION> \
   --mount type=bind,source="$(pwd)"/output/,target=/app/output \ 
-<<<<<<< Updated upstream
-  ghcr.io/cduggn/ccexplorer:v0.6.1 get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE \
-=======
   ghcr.io/cduggn/ccexplorer:v0.6.3 get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE \
->>>>>>> Stashed changes
   -l -p chart
   
 ```
