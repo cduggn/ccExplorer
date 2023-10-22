@@ -69,7 +69,7 @@ clean-lint-cache:
 git-secrets:
 	git secrets --register-aws --global
 
-.PHONY: tag
+.PHONY: tag   # make tag VERSION=0.6.0
 tag:
 	git tag -a v$(VERSION) -m "Release v$(VERSION)"
 	#git tag -a v0.6.0 <commit-id>  -m "Release v0.6.0"
