@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/aws/aws-sdk-go-v2 v1.22.2
 	github.com/aws/aws-sdk-go-v2/config v1.23.0
-	github.com/aws/aws-sdk-go-v2/service/costexplorer v1.28.2
+	github.com/aws/aws-sdk-go-v2/service/costexplorer v1.32.1
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be
 	github.com/go-echarts/go-echarts/v2 v2.3.2
 	github.com/jedib0t/go-pretty/v6 v6.4.9
