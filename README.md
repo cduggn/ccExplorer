@@ -69,7 +69,7 @@ $ go run .\cmd\ccexplorer\ccexplorer.go get aws -g DIMENSION=SERVICE,DIMENSION=O
 
 ```console
 # download
-$ docker pull ghcr.io/cduggn/ccexplorer:v0.6.5
+$ docker pull ghcr.io/cduggn/ccexplorer:v0.7.0
 
 # Container requires AWS Access key, secret, and region
 $ docker run -it \
@@ -77,7 +77,7 @@ $ docker run -it \
   -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
   -e AWS_REGION=<AWS-REGION> \
   --mount type=bind,source="$(pwd)"/output/,target=/app/output \ 
-  ghcr.io/cduggn/ccexplorer:v0.6.5 get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE \
+  ghcr.io/cduggn/ccexplorer:v0.7.0 get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE \
   -l -p chart
   
 ```
@@ -266,7 +266,7 @@ flags
 - Results are sorted by default by cost in descending order. The `-d` flag 
   can be used to specify date sorting in descending order.
 - Refunds, discounts and credits are applied automatically. The `-l` flag 
-  should be used to exclude this behavior.
+  should be used to exclude this behavior. The full list of excluded charge types is: [Credit, Refund, Discount, BundledDiscount, SavingsPlanCoveredUsage, SavingsPlanNegation]
 - When filtering by cost allocation tags (`-f TAG="my-tag"`) a tag must also 
   be specified in the group by flag (`-g TAG=ApplicationName`). This 
   instructs the `ccExplorer` to filter by `ApplicationName=my-tag` .

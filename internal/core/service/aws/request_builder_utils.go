@@ -52,7 +52,7 @@ var (
 			Not: &types.Expression{
 				Dimensions: &types.DimensionValues{
 					Key:    "RECORD_TYPE",
-					Values: []string{"Refund", "Credit", "DiscountedUsage", "BundledDiscount ", "SavingsPlanCoveredUsage", "SavingsPlanNegation"},
+					Values: []string{"Refund", "Credit", "DiscountedUsage", "Discount", "BundledDiscount ", "SavingsPlanCoveredUsage", "SavingsPlanNegation"},
 				},
 			},
 		}
