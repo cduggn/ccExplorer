@@ -118,8 +118,7 @@ func (c *CostCommandType) DefineFlags() {
 
 	c.Cmd.Flags().BoolVarP(&costUsageWithoutDiscounts, "excludeDiscounts", "l",
 		false,
-		"Exclude credit, refunds, "+
-			"and discounts (default is to include)")
+		"Excludes the following charge categories: Credit, Refund, Discount, BundledDiscount, DiscountedUsage, SavingsPlanCoveredUsage, SavingsPlanNegation . ( Exclusions not enabled by default)")
 
 	c.Cmd.Flags().BoolVarP(&costUsageSortByDate, "sortByDate", "d",
 		false,
