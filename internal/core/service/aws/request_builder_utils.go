@@ -51,7 +51,7 @@ var (
 		return &types.Expression{
 			Not: &types.Expression{
 				Dimensions: &types.DimensionValues{
-					Key:    "RECORD_TYPE",
+					Key:    "RECORD_TYPE",  // Note: RECORD_TYPE is the equivalent of CHARGE_TYPE - https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/manage-cost-categories.html#cost-categories-terms
 					Values: []string{"Refund", "Credit", "DiscountedUsage", "Discount", "BundledDiscount ", "SavingsPlanCoveredUsage", "SavingsPlanNegation"},
 				},
 			},
