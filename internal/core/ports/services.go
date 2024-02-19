@@ -14,5 +14,5 @@ type AWSService interface {
 	GetCostForecast(ctx context.Context,
 		req model.GetCostForecastRequest) (
 		*costexplorer.
-			GetCostForecastOutput, error)
+		GetCostForecastOutput, error)
 }

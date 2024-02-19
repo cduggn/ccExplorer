@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"
-	"github.com/cduggn/ccexplorer/internal/core/logger"
 	"github.com/cduggn/ccexplorer/internal/core/requestbuilder"
 	"github.com/cduggn/ccexplorer/internal/core/util"
+	"github.com/sagikazarmark/slog-shim"
 	"os"
 	"strings"
 )
@@ -52,7 +52,7 @@ func CostAndUsageToVectorMapper(r model.CostAndUsageOutputType) error {
 			Msg: "Error writing to vector store: " + err.Error()}
 	}
 
-	logger.Info(fmt.Sprintf("Upserted %d items to vector store", resp.UpsertedCount))
+	slog.Info(fmt.Sprintf("Upserted %d items to vector store", resp.UpsertedCount))
 	return nil
 }
 

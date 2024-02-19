@@ -1,8 +1,7 @@
-package commandline
+package cli_new
 
 import (
 	"github.com/cduggn/ccexplorer/internal/core"
-	"github.com/cduggn/ccexplorer/internal/core/logger"
 	"github.com/common-nighthawk/go-figure"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -18,11 +17,6 @@ var (
 )
 
 func RootCommand() *cobra.Command {
-	_, err := logger.New()
-	if err != nil {
-		panic(err.Error())
-	}
-
 	core.LoadConfigFunc(".")()
 	Initialize()
 	return rootCmd

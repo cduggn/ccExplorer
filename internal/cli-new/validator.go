@@ -1,4 +1,4 @@
-package commandline
+package cli_new
 
 import (
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"

@@ -1,6 +1,8 @@
-package domain
+package cli_new
 
-import "github.com/cduggn/ccexplorer/internal/core/domain/model"
+import (
+	"github.com/cduggn/ccexplorer/internal/core/domain/model"
+)
 
 const (
 	CostAndUsageExamples = `

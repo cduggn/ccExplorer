@@ -1,4 +1,4 @@
-package aws
+package aws_new
 
 import (
 	"github.com/aws/aws-sdk-go-v2/aws"

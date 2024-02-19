@@ -1,10 +1,11 @@
-package aws
+package aws_new
 
 import (
+	"context"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
-	model "github.com/cduggn/ccexplorer/internal/core/domain/model"
+	"github.com/cduggn/ccexplorer/internal/core/domain/model"
 )
 
 var (
@@ -51,7 +52,7 @@ var (
 		return &types.Expression{
 			Not: &types.Expression{
 				Dimensions: &types.DimensionValues{
-					Key:    "RECORD_TYPE",  // Note: RECORD_TYPE is the equivalent of CHARGE_TYPE - https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/manage-cost-categories.html#cost-categories-terms
+					Key:    "RECORD_TYPE", // Note: RECORD_TYPE is the equivalent of CHARGE_TYPE - https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/manage-cost-categories.html#cost-categories-terms
 					Values: []string{"Refund", "Credit", "DiscountedUsage", "Discount", "BundledDiscount ", "SavingsPlanCoveredUsage", "SavingsPlanNegation"},
 				},
 			},
@@ -77,6 +78,31 @@ var (
 		}
 	}
 )
+
+func (srv *Service) GetCostAndUsage(ctx context.Context,
+	req model.CostAndUsageRequestType) (
+	*costexplorer.GetCostAndUsageOutput,
+	error) {
+
+	result, err := srv.Client.GetCostAndUsage(context.TODO(),
+		&costexplorer.GetCostAndUsageInput{
+			Granularity: types.Granularity(req.Granularity), //todo: add option to pass HOURLY granularity as well
+			Metrics:     req.Metrics,
+			TimePeriod: &types.DateInterval{
+				Start: aws.String(req.Time.Start),
+				End:   aws.String(req.Time.End),
+			},
+			GroupBy: CostAndUsageGroupByGenerator(req),
+			Filter:  CostAndUsageFilterGenerator(req),
+		})
+
+	if err != nil {
+		return nil, model.APIError{
+			Msg: err.Error(),
+		}
+	}
+	return result, nil
+}
 
 func ToSlice(d costexplorer.GetDimensionValuesOutput) []string {
 	var servicesSlice []string
@@ -114,47 +140,6 @@ func CostAndUsageFilterGenerator(req model.CostAndUsageRequestType) *types.
 	return expression
 }
 
-func CostForecastFilterGenerator(req model.GetCostForecastRequest) *types.
-	Expression {
-	var filterExpression types.Expression
-	var expList []types.Expression
-	var exp types.Expression
-
-	if req.Filter.Dimensions == nil && req.Filter.Tags == nil {
-		return nil
-	}
-
-	var isMultiFilter bool
-	if len(req.Filter.Dimensions) > 1 {
-		isMultiFilter = true
-	}
-
-	for _, dimension := range req.Filter.Dimensions {
-		temp := &types.DimensionValues{
-			Key:    types.Dimension(dimension.Key),
-			Values: dimension.Value,
-		}
-
-		if len(req.Filter.Dimensions) == 1 {
-			expList = append(expList, types.Expression{
-				Dimensions: temp,
-			})
-		} else if len(req.Filter.Dimensions) > 1 {
-			exp.And = append(exp.And, types.Expression{
-				Dimensions: temp,
-			})
-		}
-	}
-
-	if isMultiFilter {
-		expList = append(expList, exp)
-	}
-
-	filterExpression = expList[0]
-
-	return &filterExpression
-}
-
 func CostAndUsageGroupByGenerator(req model.CostAndUsageRequestType) []types.GroupDefinition {
 	if len(req.GroupByTag) == 1 && len(req.GroupBy) == 1 {
 		return groupByTagAndDimension(req.GroupByTag, req.GroupBy)
@@ -164,32 +149,4 @@ func CostAndUsageGroupByGenerator(req model.CostAndUsageRequestType) []types.Gro
 		return groupByDimension(req.GroupBy)
 	}
 
-}
-
-func ExtractForecastFilters(d map[string]string) model.Filter {
-
-	if len(d) == 0 {
-		return model.Filter{}
-	}
-
-	dimensions := CreateForecastDimensionFilter(d)
-
-	return model.Filter{
-		Dimensions: dimensions,
-	}
-}
-
-func CreateForecastDimensionFilter(m map[string]string) []model.Dimension {
-
-	if len(m) == 0 {
-		return nil
-	}
-	var dimensions []model.Dimension
-	for k, v := range m {
-		dimensions = append(dimensions, model.Dimension{
-			Key:   k,
-			Value: []string{v},
-		})
-	}
-	return dimensions
 }

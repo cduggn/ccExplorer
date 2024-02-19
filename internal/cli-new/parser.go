@@ -1,8 +1,8 @@
-package commandline
+package cli_new
 
 import (
+	"github.com/cduggn/ccexplorer/internal/cli-new/flags"
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"
-	"github.com/cduggn/ccexplorer/internal/core/handlers/commandline/flags"
 	"github.com/spf13/viper"
 	"strings"
 )
@@ -27,8 +27,7 @@ func (c *CostCommandType) ExtractGroupBySelections() ([]string, []string) {
 	return groupByTag, groupByDimension
 }
 
-func (c *CostCommandType) ExtractFilterBySelection() (model.
-	FilterBySelections, error) {
+func (c *CostCommandType) ExtractFilterBySelection() (model.FilterBySelections, error) {
 
 	var filterSelections model.FilterBySelections
 
@@ -74,8 +73,7 @@ func (c *CostCommandType) ExtractStartAndEndDates() (
 	return start, end, nil
 }
 
-func (c *CostCommandType) ExtractPrintPreferences() model.
-	PrintOptions {
+func (c *CostCommandType) ExtractPrintPreferences() model.PrintOptions {
 
 	var printOptions model.PrintOptions
 

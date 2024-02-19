@@ -1,13 +1,12 @@
-package commandline
+package cli_new
 
 import (
 	"context"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
-	"github.com/cduggn/ccexplorer/internal/core/domain"
+	"github.com/cduggn/ccexplorer/internal/aws-new"
+	flags2 "github.com/cduggn/ccexplorer/internal/cli-new/flags"
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"
-	flags "github.com/cduggn/ccexplorer/internal/core/handlers/commandline/flags"
 	"github.com/cduggn/ccexplorer/internal/core/ports"
-	"github.com/cduggn/ccexplorer/internal/core/service/aws"
 	"github.com/cduggn/ccexplorer/internal/core/usecases"
 	"github.com/cduggn/ccexplorer/internal/core/util"
 	"github.com/common-nighthawk/go-figure"
@@ -21,7 +20,7 @@ var (
 		Short: "Cost and usage summary for AWS services",
 		Long:  paintHeader(),
 	}
-	costUsageGroupBy                flags.DimensionAndTagFlag
+	costUsageGroupBy                flags2.DimensionAndTagFlag
 	costUsageGranularity            string
 	costUsageStartDate              string
 	costUsageEndDate                string
@@ -57,7 +56,7 @@ func Initialize() {
 }
 
 func configureServices() (*service, error) {
-	awsService, err := aws.New()
+	awsService, err := aws_new.New()
 	if err != nil {
 		return &service{}, err
 	}
@@ -79,7 +78,7 @@ Description: Cost and usage summary for AWS services.
 Prerequisites:
 - AWS credentials configured in ~/.aws/credentials and default region configured in ~/.aws/config. Alternatively, 
 you can set the environment variables AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY and AWS_REGION.`,
-			Example: domain.CostAndUsageExamples,
+			Example: CostAndUsageExamples,
 		},
 	}
 	costCommand.Cmd.RunE = costCommand.RunE
@@ -90,7 +89,7 @@ you can set the environment variables AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY a
 		Cmd: &cobra.Command{
 			Use:     "forecast",
 			Short:   "Return cost and usage forecasts for your account.",
-			Example: domain.ForecastExamples,
+			Example: ForecastExamples,
 		},
 	}
 	forecastCommand.Cmd.RunE = forecastCommand.RunE
@@ -106,7 +105,7 @@ func (c *CostCommandType) DefineFlags() {
 	// add required flag for groupBy
 	_ = c.Cmd.MarkFlagRequired("groupBy")
 
-	costUsageFilterBy := flags.NewFilterBy()
+	costUsageFilterBy := flags2.NewFilterBy()
 	c.Cmd.Flags().VarP(&costUsageFilterBy, "filterBy", "f",
 		"Filter by DIMENSION and/or TAG")
 
@@ -143,7 +142,7 @@ func (c *CostCommandType) DefineFlags() {
 
 func (f *ForecastCommandType) DefineFlags() {
 
-	forecastFilterBy := flags.NewForecastFilterBy()
+	forecastFilterBy := flags2.NewForecastFilterBy()
 	f.Cmd.Flags().VarP(&forecastFilterBy, "filterBy", "f",
 		"Filter by DIMENSION  (default: none)")
 
@@ -225,8 +224,7 @@ func (c *CostCommandType) InputHandler(validatorFn func(input model.CommandLineI
 	return input, nil
 }
 
-func (c *CostCommandType) SynthesizeRequest(input model.CommandLineInput) model.
-	CostAndUsageRequestType {
+func (c *CostCommandType) SynthesizeRequest(input model.CommandLineInput) model.CostAndUsageRequestType {
 
 	return model.CostAndUsageRequestType{
 		Granularity: input.Interval,
@@ -303,8 +301,8 @@ func (f *ForecastCommandType) InputHandler() model.ForecastCommandLineInput {
 	predictionIntervalLevel, _ := f.Cmd.Flags().GetInt32(
 		"predictionIntervalLevel")
 
-	filterFlag := filterByValues.(*flags.DimensionFilterByFlag)
-	dimensions := aws.ExtractForecastFilters(filterFlag.Dimensions)
+	filterFlag := filterByValues.(*flags2.DimensionFilterByFlag)
+	dimensions := aws_new.ExtractForecastFilters(filterFlag.Dimensions)
 
 	return model.ForecastCommandLineInput{
 		FilterByValues:          dimensions,
@@ -315,9 +313,7 @@ func (f *ForecastCommandType) InputHandler() model.ForecastCommandLineInput {
 	}
 }
 
-func (f *ForecastCommandType) SynthesizeRequest(input model.
-	ForecastCommandLineInput) (model.
-	GetCostForecastRequest, error) {
+func (f *ForecastCommandType) SynthesizeRequest(input model.ForecastCommandLineInput) (model.GetCostForecastRequest, error) {
 
 	return model.GetCostForecastRequest{
 		Granularity:             input.Granularity,
