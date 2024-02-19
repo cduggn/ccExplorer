@@ -5,32 +5,32 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/cduggn/ccexplorer/internal/core/domain/model"
-	"github.com/cduggn/ccexplorer/internal/core/encoder"
-	"github.com/cduggn/ccexplorer/internal/core/requestbuilder"
+	"github.com/cduggn/ccexplorer/internal/codec"
+	http2 "github.com/cduggn/ccexplorer/internal/http"
 	"github.com/cduggn/ccexplorer/internal/openai"
+	"github.com/cduggn/ccexplorer/internal/types"
 	"io"
 	"net/http"
 	"strings"
 )
 
-func NewVectorStoreClient(builder requestbuilder.Builder,
+func NewVectorStoreClient(builder http2.Builder,
 	indexURL, pineconeAPIKey, openAIAPIKey string) *ClientAPI {
 
 	return &ClientAPI{
 		RequestBuilder: builder,
 		Config:         DefaultConfig(indexURL, pineconeAPIKey),
 		LLMClient:      openai.NewClient(openAIAPIKey),
-		Encoder:        encoder.NewEncoder(),
+		Encoder:        codec.NewEncoder(),
 	}
 }
 
 func (p *ClientAPI) Upsert(ctx context.Context,
-	data []PineconeStruct) (model.UpsertResponse, error) {
+	data []PineconeStruct) (types.UpsertResponse, error) {
 
 	batches := splitIntoBatches(data)
 
-	var resp model.UpsertResponse
+	var resp types.UpsertResponse
 
 	for _, batch := range batches {
 		message := UpsertVectorsRequest{
@@ -39,7 +39,7 @@ func (p *ClientAPI) Upsert(ctx context.Context,
 		res, err := p.sendBatchRequest(ctx, message)
 		resp.UpsertedCount += res.UpsertedCount
 		if err != nil {
-			return model.UpsertResponse{}, err
+			return types.UpsertResponse{}, err
 		}
 	}
 	return resp, nil
@@ -59,38 +59,36 @@ func splitIntoBatches(data []PineconeStruct) [][]PineconeStruct {
 }
 
 func (p *ClientAPI) sendBatchRequest(ctx context.Context,
-	message UpsertVectorsRequest) (resp model.UpsertResponse, err error) {
+	message UpsertVectorsRequest) (resp types.UpsertResponse, err error) {
 
 	payload, err := json.Marshal(message)
 	if err != nil {
-		return model.UpsertResponse{}, err
+		return types.UpsertResponse{}, err
 	}
 
 	req, err := p.RequestBuilder.Build(ctx, http.MethodPost,
 		p.Config.BaseURL+"/vectors/upsert", bytes.NewReader(payload))
 	if err != nil {
-		return model.UpsertResponse{}, err
+		return types.UpsertResponse{}, err
 	}
 
 	err = p.sendRequest(req, &resp)
 	if err != nil {
-		return model.UpsertResponse{}, err
+		return types.UpsertResponse{}, err
 	}
 	return
 }
 
-func (p *ClientAPI) ConvertToVectorStoreItem(r model.
-	CostAndUsageOutputType) []*model.
-	VectorStoreItem {
-	var s []*model.VectorStoreItem
+func (p *ClientAPI) ConvertToVectorStoreItem(r types.CostAndUsageOutputType) []*types.VectorStoreItem {
+	var s []*types.VectorStoreItem
 	for _, d := range r.Services {
 
 		dimensions := strings.Join(r.Dimensions, ",")
 		tags := strings.Join(r.Tags, ",")
 
-		item := model.VectorStoreItem{
+		item := types.VectorStoreItem{
 			EmbeddingText: p.AddSemanticMeaning(d, dimensions, tags),
-			Metadata: model.VectorStoreItemMetadata{
+			Metadata: types.VectorStoreItemMetadata{
 				StartDate:   d.Start,
 				EndDate:     d.End,
 				Granularity: r.Granularity,
@@ -104,7 +102,7 @@ func (p *ClientAPI) ConvertToVectorStoreItem(r model.
 	return s
 }
 
-func (p *ClientAPI) AddSemanticMeaning(s model.Service, dimensions, tags string) string {
+func (p *ClientAPI) AddSemanticMeaning(s types.Service, dimensions, tags string) string {
 	var r strings.Builder
 
 	// append keys

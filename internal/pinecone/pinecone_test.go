@@ -1,14 +1,14 @@
 package pinecone
 
 import (
-	"github.com/cduggn/ccexplorer/internal/core/domain/model"
-	"github.com/cduggn/ccexplorer/internal/core/encoder"
+	"github.com/cduggn/ccexplorer/internal/codec"
+	"github.com/cduggn/ccexplorer/internal/types"
 	"testing"
 )
 
 func TestAddSemanticMeaning(t *testing.T) {
 	type args struct {
-		service model.Service
+		service types.Service
 	}
 	tests := []struct {
 		name string
@@ -18,11 +18,11 @@ func TestAddSemanticMeaning(t *testing.T) {
 		{
 			name: "ServiceToString",
 			args: args{
-				service: model.Service{
+				service: types.Service{
 					Name:  "test",
 					Start: "2021-01-01",
 					End:   "2021-01-02",
-					Metrics: []model.Metrics{
+					Metrics: []types.Metrics{
 						{
 							Name:          "UnblndedCost",
 							Amount:        "0.10",
@@ -41,7 +41,7 @@ func TestAddSemanticMeaning(t *testing.T) {
 	}
 
 	client := ClientAPI{
-		Encoder: encoder.NewEncoder(),
+		Encoder: codec.NewEncoder(),
 	}
 
 	for _, tt := range tests {

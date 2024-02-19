@@ -1,16 +1,16 @@
 package pinecone
 
 import (
-	"github.com/cduggn/ccexplorer/internal/core/encoder"
-	"github.com/cduggn/ccexplorer/internal/core/requestbuilder"
+	"github.com/cduggn/ccexplorer/internal/codec"
+	"github.com/cduggn/ccexplorer/internal/http"
 	"github.com/cduggn/ccexplorer/internal/openai"
 )
 
 type ClientAPI struct {
-	RequestBuilder requestbuilder.Builder
+	RequestBuilder http.Builder
 	Config         ClientConfig
 	LLMClient      openai.OpenAI
-	Encoder        encoder.Encode
+	Encoder        codec.Encode
 }
 
 type PineconeStruct struct {

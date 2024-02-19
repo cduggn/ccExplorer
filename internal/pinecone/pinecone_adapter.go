@@ -2,11 +2,10 @@ package pinecone
 
 import (
 	"context"
-	"github.com/cduggn/ccexplorer/internal/core/domain/model"
+	"github.com/cduggn/ccexplorer/internal/types"
 )
 
 type PineconeDB interface {
-	ConvertToVectorStoreItem(r model.CostAndUsageOutputType) []*model.
-		VectorStoreItem
+	ConvertToVectorStoreItem(r types.CostAndUsageOutputType) []*types.VectorStoreItem
 	Upsert(ctx context.Context, data []PineconeStruct) error
 }
