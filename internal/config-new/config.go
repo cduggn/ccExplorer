@@ -1,4 +1,4 @@
-package core
+package config_new
 
 import "github.com/spf13/viper"
 

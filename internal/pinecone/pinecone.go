@@ -8,7 +8,7 @@ import (
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"
 	"github.com/cduggn/ccexplorer/internal/core/encoder"
 	"github.com/cduggn/ccexplorer/internal/core/requestbuilder"
-	"github.com/cduggn/ccexplorer/internal/core/service/openai"
+	"github.com/cduggn/ccexplorer/internal/openai"
 	"io"
 	"net/http"
 	"strings"

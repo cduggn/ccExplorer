@@ -3,7 +3,7 @@ package pinecone
 import (
 	"github.com/cduggn/ccexplorer/internal/core/encoder"
 	"github.com/cduggn/ccexplorer/internal/core/requestbuilder"
-	"github.com/cduggn/ccexplorer/internal/core/service/openai"
+	"github.com/cduggn/ccexplorer/internal/openai"
 )
 
 type ClientAPI struct {

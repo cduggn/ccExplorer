@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
 	"github.com/cduggn/ccexplorer/internal/core/domain/model"
-	"github.com/cduggn/ccexplorer/internal/core/vectorstore/pinecone"
+	"github.com/cduggn/ccexplorer/internal/pinecone"
 	"os"
 	"sort"
 	"strconv"
@@ -378,8 +378,7 @@ func EncodeString(s string) string {
 	return hashedString
 }
 
-func ConvertToPineconeStruct(items []*model.VectorStoreItem) []pinecone.
-	PineconeStruct {
+func ConvertToPineconeStruct(items []*model.VectorStoreItem) []pinecone.PineconeStruct {
 	var pineconeStruct []pinecone.PineconeStruct
 	for _, v := range items {
 		pineconeStruct = append(pineconeStruct, pinecone.PineconeStruct{
