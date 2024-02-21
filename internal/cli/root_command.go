@@ -1,4 +1,4 @@
-package cli_new
+package cli
 
 import (
 	"github.com/cduggn/ccexplorer/internal/config"
@@ -17,7 +17,7 @@ var (
 )
 
 func RootCommand() *cobra.Command {
-	config_new.LoadConfigFunc(".")()
+	config.LoadConfigFunc(".")()
 	Initialize()
 	return rootCmd
 }

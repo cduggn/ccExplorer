@@ -1,4 +1,4 @@
-package aws_new
+package aws
 
 import "github.com/spf13/viper"
 
