@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	root := cli_new.RootCommand()
+	root := cli.RootCommand()
 
 	if err := root.Execute(); err != nil {
 		slog.Error("error", ErrAttr(err))

@@ -18,11 +18,11 @@ func NewForecastFilterBy() DimensionFilterByFlag {
 
 func (f *DimensionFilterByFlag) Set(value string) error {
 
-	args := utils_new.SplitCommaSeparatedString(value)
+	args := utils.SplitCommaSeparatedString(value)
 
 	for _, arg := range args {
 
-		parts, err := utils_new.SplitNameValuePair(arg)
+		parts, err := utils.SplitNameValuePair(arg)
 		if err != nil {
 			return err
 		}

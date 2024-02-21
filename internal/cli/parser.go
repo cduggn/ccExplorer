@@ -1,4 +1,4 @@
-package cli_new
+package cli
 
 import (
 	"github.com/cduggn/ccexplorer/internal/cli/flags"

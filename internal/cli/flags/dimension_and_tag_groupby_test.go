@@ -159,7 +159,7 @@ func TestSplitByIndividualArgument(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := utils_new.SplitCommaSeparatedString(tt.args); !reflect.
+			if got := utils.SplitCommaSeparatedString(tt.args); !reflect.
 				DeepEqual(got, tt.want) {
 				t.Errorf("splitByIndividualArgument() = %v, want %v", got, tt.want)
 			}
@@ -196,7 +196,7 @@ func TestSplitIndividualArgument(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := utils_new.SplitNameValuePair(tt.args.value)
+			got, err := utils.SplitNameValuePair(tt.args.value)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("splitIndividualArgument() error = %v, wantErr %v", err, tt.wantErr)
 				return

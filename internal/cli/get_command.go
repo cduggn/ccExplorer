@@ -1,9 +1,9 @@
-package cli_new
+package cli
 
 import (
 	"context"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
-	"github.com/cduggn/ccexplorer/internal/aws"
+	awsservice "github.com/cduggn/ccexplorer/internal/aws"
 	flags2 "github.com/cduggn/ccexplorer/internal/cli/flags"
 	"github.com/cduggn/ccexplorer/internal/output"
 	"github.com/cduggn/ccexplorer/internal/ports"
@@ -56,7 +56,7 @@ func Initialize() {
 }
 
 func configureServices() (*service, error) {
-	awsService, err := aws_new.New()
+	awsService, err := awsservice.New()
 	if err != nil {
 		return &service{}, err
 	}
@@ -125,10 +125,10 @@ func (c *CostCommandType) DefineFlags() {
 			"default is to sort by cost in descending order)")
 
 	c.Cmd.Flags().StringVarP(&costUsageStartDate, "startDate", "s",
-		utils_new.DefaultStartDate(utils_new.DayOfCurrentMonth, utils_new.SubtractDays),
+		utils.DefaultStartDate(utils.DayOfCurrentMonth, utils.SubtractDays),
 		"Start date (defaults to the start of the previous month)")
 	c.Cmd.Flags().StringVarP(&costUsageEndDate, "endDate", "e",
-		utils_new.DefaultEndDate(utils_new.Format),
+		utils.DefaultEndDate(utils.Format),
 		"End date *(defaults to the present day)")
 
 	c.Cmd.Flags().StringVarP(&costAndUsagePrintFormat, "printFormat", "p", "stdout",
@@ -147,10 +147,10 @@ func (f *ForecastCommandType) DefineFlags() {
 		"Filter by DIMENSION  (default: none)")
 
 	f.Cmd.Flags().StringVarP(&forecastStartDate, "start", "s",
-		utils_new.Format(time.Now()), "Start date (defaults to the present day)")
+		utils.Format(time.Now()), "Start date (defaults to the present day)")
 
 	f.Cmd.Flags().StringVarP(&forecastEndDate, "end", "e",
-		utils_new.LastDayOfMonth(),
+		utils.LastDayOfMonth(),
 		"End date (defaults to one month from the start date)")
 
 	// Optional flag to dictate the granularity of the data returned
@@ -256,12 +256,12 @@ func (c *CostCommandType) Execute(req types.CostAndUsageRequestType) error {
 		return err
 	}
 
-	report := utils_new.ToCostAndUsageOutputType(costAndUsageResponse, req)
+	report := utils.ToCostAndUsageOutputType(costAndUsageResponse, req)
 
-	w := output_new.NewPrintWriter(utils_new.ToPrintWriterType(req.PrintFormat),
+	w := output.NewPrintWriter(utils.ToPrintWriterType(req.PrintFormat),
 		"costAndUsage")
 
-	err = w.Write(utils_new.SortByFn(req.SortByDate), report)
+	err = w.Write(utils.SortByFn(req.SortByDate), report)
 	if err != nil {
 		return err
 	}
@@ -285,7 +285,7 @@ func (f *ForecastCommandType) RunE(cmd *cobra.Command, args []string) error {
 	filters := filterList(req)
 	printData.Filters = filters
 
-	p := output_new.NewPrintWriter(utils_new.ToPrintWriterType("stdout"),
+	p := output.NewPrintWriter(utils.ToPrintWriterType("stdout"),
 		"forecast")
 	err = p.Write(printData, filters)
 	if err != nil {
@@ -302,7 +302,7 @@ func (f *ForecastCommandType) InputHandler() types.ForecastCommandLineInput {
 		"predictionIntervalLevel")
 
 	filterFlag := filterByValues.(*flags2.DimensionFilterByFlag)
-	dimensions := aws_new.ExtractForecastFilters(filterFlag.Dimensions)
+	dimensions := awsservice.ExtractForecastFilters(filterFlag.Dimensions)
 
 	return types.ForecastCommandLineInput{
 		FilterByValues:          dimensions,
