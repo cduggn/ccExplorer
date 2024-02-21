@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/cduggn/ccexplorer/internal/cli"
-	"github.com/sagikazarmark/slog-shim"
+	"log/slog"
 	"os"
 )
 
