@@ -1,4 +1,4 @@
-package aws
+package awsservice
 
 import "github.com/spf13/viper"
 
