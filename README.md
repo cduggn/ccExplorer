@@ -69,7 +69,7 @@ $ go run .\cmd\ccexplorer\ccexplorer.go get aws -g DIMENSION=SERVICE,DIMENSION=O
 
 ```console
 # download
-$ docker pull ghcr.io/cduggn/ccexplorer:v0.7 3.
+$ docker pull ghcr.io/cduggn/ccexplorer:v0.7 4.
 
 # Container requires AWS Access key, secret, and region
 $ docker run -it \
@@ -77,7 +77,7 @@ $ docker run -it \
   -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
   -e AWS_REGION=<AWS-REGION> \
   --mount type=bind,source="$(pwd)"/output/,target=/app/output \
-  ghcr.io/cduggn/ccexplorer:v0.7.3 get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE -l
+  ghcr.io/cduggn/ccexplorer:v0.7.4 get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE -l
   
 ```
 
