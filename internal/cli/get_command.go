@@ -5,10 +5,10 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	awsservice "github.com/cduggn/ccexplorer/internal/awsservice"
 	flags2 "github.com/cduggn/ccexplorer/internal/cli/flags"
-	"github.com/cduggn/ccexplorer/internal/output"
 	"github.com/cduggn/ccexplorer/internal/ports"
 	"github.com/cduggn/ccexplorer/internal/types"
 	"github.com/cduggn/ccexplorer/internal/utils"
+	"github.com/cduggn/ccexplorer/internal/writer"
 	"github.com/common-nighthawk/go-figure"
 	"github.com/spf13/cobra"
 	"time"
@@ -258,7 +258,7 @@ func (c *CostCommandType) Execute(req types.CostAndUsageRequestType) error {
 
 	report := utils.ToCostAndUsageOutputType(costAndUsageResponse, req)
 
-	w := output.NewPrintWriter(utils.ToPrintWriterType(req.PrintFormat),
+	w := writer.NewPrintWriter(utils.ToPrintWriterType(req.PrintFormat),
 		"costAndUsage")
 
 	err = w.Write(utils.SortByFn(req.SortByDate), report)
@@ -285,7 +285,7 @@ func (f *ForecastCommandType) RunE(cmd *cobra.Command, args []string) error {
 	filters := filterList(req)
 	printData.Filters = filters
 
-	p := output.NewPrintWriter(utils.ToPrintWriterType("stdout"),
+	p := writer.NewPrintWriter(utils.ToPrintWriterType("stdout"),
 		"forecast")
 	err = p.Write(printData, filters)
 	if err != nil {
