@@ -207,6 +207,19 @@ $ ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=USAGE_TYPE -l -s 2023-02-15 
 
 </details>
 
+<details>
+<summary>Chart example</summary>
+
+```console
+ # Generates pie chart for costs grouped by SERVICE and OPERATION over a 24 hour period
+ $ ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -p chart -l -m DAILY  -s 2024-02-22 -e 2024-02-23
+```
+
+Generated chart:
+
+![Costs gruped over a 24 hour period](./docs/ccexplorer_chart.png)
+
+</details>
 
 Print Writers
 -------------
