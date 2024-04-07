@@ -38,8 +38,16 @@ jobs:
         # Learn more about CodeQL language support at https://aka.ms/codeql-docs/language-support
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+
+    - id: go_version
+      name: Read go version
+      run: echo "go_version=$(cat .go-version)" >> $GITHUB_OUTPUT
+
+    - name: Install Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22'
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
