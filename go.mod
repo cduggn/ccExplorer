@@ -10,7 +10,7 @@ require (
 	github.com/go-echarts/go-echarts/v2 v2.4.1
 	github.com/jedib0t/go-pretty/v6 v6.5.8
 	github.com/sashabaranov/go-openai v1.26.2
-	github.com/spf13/cobra v1.8.0
+	github.com/spf13/cobra v1.8.1
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.9.0
 )
