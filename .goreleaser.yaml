@@ -4,7 +4,7 @@ before:
     - go generate ./...
 
 builds:
-  - main: ./cmd/ccexplorer
+  - main: ./cmd
     id: all
     binary: ccexplorer
     env:

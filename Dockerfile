@@ -18,7 +18,7 @@ COPY . .
 
 # Build the Go app
 RUN CGO_ENABLED=0 GOOS=linux go build -a -o ccexplorer \
-    ./cmd/ccexplorer
+    ./cmd
 
 # Run stage
 FROM alpine:3 as run-stage

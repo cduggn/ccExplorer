@@ -3,8 +3,8 @@ package cli
 import (
 	"context"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
+	"github.com/cduggn/ccexplorer/cmd/cli/flags"
 	awsservice "github.com/cduggn/ccexplorer/internal/awsservice"
-	flags2 "github.com/cduggn/ccexplorer/internal/cli/flags"
 	"github.com/cduggn/ccexplorer/internal/ports"
 	"github.com/cduggn/ccexplorer/internal/types"
 	"github.com/cduggn/ccexplorer/internal/utils"
@@ -20,7 +20,7 @@ var (
 		Short: "Cost and usage summary for AWS services",
 		Long:  paintHeader(),
 	}
-	costUsageGroupBy                flags2.DimensionAndTagFlag
+	costUsageGroupBy                flags.DimensionAndTagFlag
 	costUsageGranularity            string
 	costUsageStartDate              string
 	costUsageEndDate                string
@@ -105,7 +105,7 @@ func (c *CostCommandType) DefineFlags() {
 	// add required flag for groupBy
 	_ = c.Cmd.MarkFlagRequired("groupBy")
 
-	costUsageFilterBy := flags2.NewFilterBy()
+	costUsageFilterBy := flags.NewFilterBy()
 	c.Cmd.Flags().VarP(&costUsageFilterBy, "filterBy", "f",
 		"Filter by DIMENSION and/or TAG")
 
@@ -142,7 +142,7 @@ func (c *CostCommandType) DefineFlags() {
 
 func (f *ForecastCommandType) DefineFlags() {
 
-	forecastFilterBy := flags2.NewForecastFilterBy()
+	forecastFilterBy := flags.NewForecastFilterBy()
 	f.Cmd.Flags().VarP(&forecastFilterBy, "filterBy", "f",
 		"Filter by DIMENSION  (default: none)")
 
@@ -301,7 +301,7 @@ func (f *ForecastCommandType) InputHandler() types.ForecastCommandLineInput {
 	predictionIntervalLevel, _ := f.Cmd.Flags().GetInt32(
 		"predictionIntervalLevel")
 
-	filterFlag := filterByValues.(*flags2.DimensionFilterByFlag)
+	filterFlag := filterByValues.(*flags.DimensionFilterByFlag)
 	dimensions := awsservice.ExtractForecastFilters(filterFlag.Dimensions)
 
 	return types.ForecastCommandLineInput{

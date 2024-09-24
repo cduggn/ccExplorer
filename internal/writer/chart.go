@@ -2,11 +2,12 @@ package writer
 
 import (
 	"fmt"
-	"github.com/cduggn/ccexplorer/internal/types"
+	cc "github.com/cduggn/ccexplorer/internal/types"
 	"github.com/cduggn/ccexplorer/internal/utils"
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/components"
 	"github.com/go-echarts/go-echarts/v2/opts"
+
 	"io"
 )
 
@@ -18,7 +19,7 @@ func WriteToChart(p *components.Page) error {
 
 	f, err := utils.NewFile(OutputDir, chartFileName)
 	if err != nil {
-		return types.Error{
+		return cc.Error{
 			Msg: "Failed creating chart HTML file: " + err.Error(),
 		}
 	}
@@ -26,7 +27,7 @@ func WriteToChart(p *components.Page) error {
 	return p.Render(io.MultiWriter(f))
 }
 
-func (Builder) NewCharts(r types.InputType) (*components.Page,
+func (Builder) NewCharts(r cc.InputType) (*components.Page,
 	error) {
 	page := components.NewPage()
 	page.PageTitle = "Cost and Usage Report"
@@ -39,7 +40,7 @@ func (Builder) NewCharts(r types.InputType) (*components.Page,
 	return page, nil
 }
 
-func buildPieCharts(r types.InputType) []*charts.Pie {
+func buildPieCharts(r cc.InputType) []*charts.Pie {
 
 	var pieC []*charts.Pie
 	dimensions := r.Dimensions
@@ -55,7 +56,7 @@ func buildPieCharts(r types.InputType) []*charts.Pie {
 
 }
 
-func definePieChartProperties(s []types.Service, d string, index int,
+func definePieChartProperties(s []cc.Service, d string, index int,
 	granularity string, start string, end string) *charts.Pie {
 	pie := charts.NewPie()
 	pie.SetGlobalOptions(
@@ -76,7 +77,7 @@ func definePieChartProperties(s []types.Service, d string, index int,
 	pie.AddSeries("pie", PopulatePieDate(s, index)).
 		SetSeriesOptions(
 			charts.WithLabelOpts(opts.Label{
-				Show:      true,
+				Show:      opts.Bool(true),
 				Formatter: "{b} : {c}",
 			}),
 			charts.WithPieChartOpts(opts.PieChart{
@@ -93,7 +94,7 @@ func definePieChartProperties(s []types.Service, d string, index int,
 	return pie
 }
 
-func PopulatePieDate(services []types.Service, key int) []opts.
+func PopulatePieDate(services []cc.Service, key int) []opts.
 	PieData {
 	items := make([]opts.PieData, 0)
 
