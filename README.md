@@ -62,7 +62,7 @@ $ git clone https://github.com/cduggn/ccExplorer.git
 
 $ cd ccExplorer 
 
-$ go run .\cmd\ccexplorer\ccexplorer.go get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -f SERVICE="Amazon DynamoDB"  -l -p csv
+$ go run .\cmd\ccexplorer.go get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -f SERVICE="Amazon DynamoDB"  -l -p csv
 ```
 
 #### From`docker`:

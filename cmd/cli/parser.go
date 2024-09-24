@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"github.com/cduggn/ccexplorer/internal/cli/flags"
+	"github.com/cduggn/ccexplorer/cmd/cli/flags"
 	"github.com/cduggn/ccexplorer/internal/types"
 	"github.com/spf13/viper"
 	"strings"

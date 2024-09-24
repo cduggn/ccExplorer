@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/cduggn/ccexplorer/internal/cli"
+	"github.com/cduggn/ccexplorer/cmd/cli"
 	"log/slog"
 	"os"
 )
@@ -13,7 +13,6 @@ func main() {
 		slog.Error("error", ErrAttr(err))
 		os.Exit(126)
 	}
-
 }
 
 func ErrAttr(err error) slog.Attr {
