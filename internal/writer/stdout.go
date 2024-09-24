@@ -21,7 +21,7 @@ var (
 		"End"}
 	costAndUsageTableFooter = func(t string) table.Row {
 		return table.
-			Row{"", "",
+		Row{"", "",
 			"",
 			"",
 			"Cost",
@@ -79,7 +79,8 @@ func (c CostAndUsageTable) Style() {
 		[]table.ColumnConfig{
 			{Number: 6, WidthMax: 8},
 		})
-	c.Table.SetStyle(table.StyleColoredCyanWhiteOnBlack)
+	c.Table.SetStyle(table.StyleColoredGreenWhiteOnBlack)
+	
 	c.Table.SuppressEmptyColumns()
 }
 
@@ -111,7 +112,7 @@ func (f ForecastTable) Writer(output interface{}) {
 
 func (f ForecastTable) Style() {
 	f.Table.SetOutputMirror(os.Stdout)
-	f.Table.SetStyle(table.StyleColoredBlackOnBlueWhite)
+	f.Table.SetStyle(table.StyleColoredGreenWhiteOnBlack)
 }
 
 func (f ForecastTable) Footer(row table.Row) {
