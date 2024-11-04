@@ -7,7 +7,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.27.24
 	github.com/aws/aws-sdk-go-v2/service/costexplorer v1.37.1
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be
-	github.com/go-echarts/go-echarts/v2 v2.4.1
+	github.com/go-echarts/go-echarts/v2 v2.4.4
 	github.com/jedib0t/go-pretty/v6 v6.5.8
 	github.com/sashabaranov/go-openai v1.30.3
 	github.com/spf13/cobra v1.8.1
