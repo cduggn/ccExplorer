@@ -9,7 +9,7 @@ require (
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be
 	github.com/go-echarts/go-echarts/v2 v2.4.1
 	github.com/jedib0t/go-pretty/v6 v6.5.8
-	github.com/sashabaranov/go-openai v1.30.3
+	github.com/sashabaranov/go-openai v1.35.6
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.9.0
