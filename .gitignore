@@ -11,17 +11,37 @@
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
-# Dependency directories (remove the comment below to include it)
-# vendor/
-.idea
+# Build artifacts and binary output
+bin/
 dist/
+output/
+
+# Archive files
+*.zip
+*.tar.gz
+*.tar
+*.rar
+*.7z
+
+# AWS and configuration files
 *.db
 *.aws
 *.config
 *credentials
+
+# Output files
 *.html
 *.csv
-dist/
-output/
+
+# IDE and editor files
+.idea
+.vscode/
+*.swp
+*.swo
+*~
+
+# Application specific
 .ccexplorer
-dist/
+
+# Dependency directories (remove the comment below to include it)
+# vendor/
