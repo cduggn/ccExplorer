@@ -6,47 +6,35 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
 	types2 "github.com/cduggn/ccexplorer/internal/types"
+	"github.com/cduggn/ccexplorer/internal/utils"
 )
 
 var (
 	groupByDimension = func(dimensions []string) []types.GroupDefinition {
-		var groups []types.GroupDefinition
-		for _, d := range dimensions {
-			groups = append(groups, types.GroupDefinition{
+		return utils.Transform(dimensions, func(d string) types.GroupDefinition {
+			return types.GroupDefinition{
 				Type: types.GroupDefinitionTypeDimension,
 				Key:  aws.String(d),
-			})
-		}
-		return groups
+			}
+		})
 	}
 	groupByTag = func(tag []string) []types.GroupDefinition {
-
-		var groups []types.GroupDefinition
-		for _, t := range tag {
-			groups = append(groups, types.GroupDefinition{
+		return utils.Transform(tag, func(t string) types.GroupDefinition {
+			return types.GroupDefinition{
 				Type: types.GroupDefinitionTypeTag,
 				Key:  aws.String(t),
-			})
-		}
-		return groups
+			}
+		})
 	}
-	groupByTagAndDimension = func(tag []string, dimensions []string) []types.
-				GroupDefinition {
-		var groups []types.GroupDefinition
-		for _, d := range dimensions {
-			groups = append(groups, types.GroupDefinition{
-				Type: types.GroupDefinitionTypeDimension,
-				Key:  aws.String(d),
-			})
-		}
-		for _, t := range tag {
-			groups = append(groups, types.GroupDefinition{
-				Type: types.GroupDefinitionTypeTag,
-				Key:  aws.String(t),
-			})
-		}
-
-		return groups
+	groupByTagAndDimension = func(tag []string, dimensions []string) []types.GroupDefinition {
+		dimensionGroups := groupByDimension(dimensions)
+		tagGroups := groupByTag(tag)
+		
+		// Combine the two slices using generic utilities
+		combined := make([]types.GroupDefinition, 0, len(dimensionGroups)+len(tagGroups))
+		combined = append(combined, dimensionGroups...)
+		combined = append(combined, tagGroups...)
+		return combined
 	}
 	filterCredits = func() *types.Expression {
 		return &types.Expression{
@@ -104,12 +92,11 @@ func (srv *Service) GetCostAndUsage(ctx context.Context,
 	return result, nil
 }
 
+// ToSlice converts dimension values to string slice using generic transformation
 func ToSlice(d costexplorer.GetDimensionValuesOutput) []string {
-	var servicesSlice []string
-	for _, service := range d.DimensionValues {
-		servicesSlice = append(servicesSlice, *service.Value)
-	}
-	return servicesSlice
+	return utils.Transform(d.DimensionValues, func(dimension types.DimensionValuesWithAttributes) string {
+		return *dimension.Value
+	})
 }
 
 func CostAndUsageFilterGenerator(req types2.CostAndUsageRequestType) *types.

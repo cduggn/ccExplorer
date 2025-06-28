@@ -9,7 +9,6 @@ import (
 	"github.com/cduggn/ccexplorer/internal/pinecone"
 	types2 "github.com/cduggn/ccexplorer/internal/types"
 	"os"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -186,188 +185,134 @@ func MetricsToService(m map[string]types.MetricValue) []types2.Metrics {
 	return metrics
 }
 
+// ConvertServiceToSlice - Improved version using generic utilities
 func ConvertServiceToSlice(s types2.Service, granularity string) [][]string {
-	var r [][]string
-	for _, v := range s.Metrics {
-		t := []string{s.Keys[0], ReturnIfPresent(s.Keys), v.Name,
-			granularity, s.Start, s.End,
-			v.Amount, v.Unit}
-		r = append(r, t)
-	}
-	return r
+	return Transform(s.Metrics, func(v types2.Metrics) []string {
+		return []string{
+			s.Keys[0], 
+			ReturnIfPresent(s.Keys), 
+			v.Name,
+			granularity, 
+			s.Start, 
+			s.End,
+			v.Amount, 
+			v.Unit,
+		}
+	})
 }
 
 func SortFunction(sortBy string) func(r map[int]types2.Service) []types2.Service {
 	switch sortBy {
 	case "date":
-		return SortServicesByStartDate
+		return SortServicesByStartDateGeneric
 	case "cost":
-		return SortServicesByMetricAmount
+		return SortServicesByMetricAmountGeneric
 	default:
-		return SortServicesByMetricAmount
+		return SortServicesByMetricAmountGeneric
 	}
 }
 
-func SortServicesByStartDate(r map[int]types2.Service) []types2.Service {
-	// Create a slice of key-value pairs
-	pairs := make([]struct {
-		Key   int
-		Value types2.Service
-	}, len(r))
-	i := 0
-	for k, v := range r {
-		pairs[i] = struct {
-			Key   int
-			Value types2.Service
-		}{k, v}
-		i++
-	}
-
-	sort.SliceStable(pairs, func(i, j int) bool {
-
-		t1, _ := time.Parse("2006-01-02", pairs[i].Value.Start)
-		t2, _ := time.Parse("2006-01-02", pairs[j].Value.Start)
-		return t1.After(t2)
-	})
-
-	result := make([]types2.Service, len(pairs))
-	for i, pair := range pairs {
-		result[i] = pair.Value
-	}
-	return result
+// Generic sorting functions using the new generic utilities
+func SortServicesByStartDateGeneric(r map[int]types2.Service) []types2.Service {
+	return SortBy(r, func(service types2.Service) string {
+		return service.Start
+	}, true) // true for reverse order (newest first)
 }
 
-func SortServicesByMetricAmount(r map[int]types2.Service) []types2.Service {
-	// Create a slice of key-value pairs
-	pairs := make([]struct {
-		Key   int
-		Value types2.Service
-	}, len(r))
-	i := 0
-	for k, v := range r {
-		pairs[i] = struct {
-			Key   int
-			Value types2.Service
-		}{k, v}
-		i++
-	}
-
-	// Sort the slice by the Value.Metrics[0].Amount field
-	sort.SliceStable(pairs, func(i, j int) bool {
-		return pairs[i].Value.Metrics[0].NumericAmount > pairs[j].Value.
-			Metrics[0].NumericAmount
-	})
-
-	result := make([]types2.Service, len(pairs))
-	for i, pair := range pairs {
-		result[i] = pair.Value
-	}
-	return result
+func SortServicesByMetricAmountGeneric(r map[int]types2.Service) []types2.Service {
+	return SortBy(r, func(service types2.Service) float64 {
+		if len(service.Metrics) > 0 {
+			return service.Metrics[0].NumericAmount
+		}
+		return 0.0
+	}, true) // true for reverse order (highest first)
 }
 
-func ConvertServiceMapToArray(s map[int]types2.Service,
-	granularity string) [][]string {
+// Legacy sorting functions have been removed - replaced with generic versions
+
+// ConvertServiceMapToArray - Generic version using new transformation utilities
+func ConvertServiceMapToArray(s map[int]types2.Service, granularity string) [][]string {
 	var rows [][]string
-	for _, v := range s {
-		rows = append(rows, ConvertServiceToSlice(v, granularity)...)
+	services := ConvertMapToSlice(s)
+	for _, service := range services {
+		serviceRows := ConvertServiceToSlice(service, granularity)
+		rows = append(rows, serviceRows...)
 	}
 	return rows
 }
 
-func ConvertToStdoutType(s []types2.Service,
-	granularity string) types2.CostAndUsageStdoutType {
-
+// ConvertToStdoutType - Generic version using new transformation utilities
+func ConvertToStdoutType(s []types2.Service, granularity string) types2.CostAndUsageStdoutType {
 	outputType := types2.CostAndUsageStdoutType{
 		Granularity: granularity,
+		Services: Transform(s, func(v types2.Service) types2.Service {
+			return types2.Service{
+				Name: v.Keys[0],
+				Keys: v.Keys,
+				Start: v.Start,
+				End: v.End,
+				Metrics: Transform(v.Metrics, func(m types2.Metrics) types2.Metrics {
+					return types2.Metrics{
+						Name:          m.Name,
+						Amount:        m.Amount,
+						Unit:          m.Unit,
+						NumericAmount: m.NumericAmount,
+					}
+				}),
+			}
+		}),
 	}
-
-	var services []types2.Service
-	for _, v := range s {
-		var metrics []types2.Metrics
-		for _, m := range v.Metrics {
-			metrics = append(metrics, types2.Metrics{
-				Name:          m.Name,
-				Amount:        m.Amount,
-				Unit:          m.Unit,
-				NumericAmount: m.NumericAmount,
-			})
-		}
-		services = append(services, types2.Service{
-			Name:    v.Keys[0],
-			Keys:    v.Keys,
-			Start:   v.Start,
-			End:     v.End,
-			Metrics: metrics,
-		})
-	}
-	outputType.Services = services
-
 	return outputType
 }
 
-func ConvertToChartInputType(r types2.CostAndUsageOutputType,
-	s []types2.Service) types2.InputType {
-
-	input := types2.InputType{
+// ConvertToChartInputType - Generic version using new transformation utilities
+func ConvertToChartInputType(r types2.CostAndUsageOutputType, s []types2.Service) types2.InputType {
+	return types2.InputType{
 		Granularity: r.Granularity,
 		Start:       r.Start,
 		End:         r.End,
 		Dimensions:  r.Dimensions,
 		Tags:        r.Tags,
+		Services: Transform(s, func(service types2.Service) types2.Service {
+			return types2.Service{
+				Name:    service.Name,
+				Keys:    service.Keys,
+				Start:   service.Start,
+				End:     service.End,
+				Metrics: Transform(service.Metrics, func(metric types2.Metrics) types2.Metrics {
+					return types2.Metrics{
+						Name:          metric.Name,
+						Amount:        metric.Amount,
+						Unit:          metric.Unit,
+						UsageQuantity: metric.UsageQuantity,
+						NumericAmount: metric.NumericAmount,
+					}
+				}),
+			}
+		}),
 	}
-
-	var services []types2.Service
-	for _, service := range s {
-		var metrics []types2.Metrics
-		for _, metric := range service.Metrics {
-			metrics = append(metrics, types2.Metrics{
-				Name:          metric.Name,
-				Amount:        metric.Amount,
-				Unit:          metric.Unit,
-				UsageQuantity: metric.UsageQuantity,
-				NumericAmount: metric.NumericAmount,
-			})
-		}
-
-		services = append(services, types2.Service{
-			Name:    service.Name,
-			Keys:    service.Keys,
-			Start:   service.Start,
-			End:     service.End,
-			Metrics: metrics,
-		})
-	}
-
-	input.Services = services
-
-	return input
-
 }
 
-func ConvertToForecastStdoutType(r types2.ForecastPrintData,
-	filteredBy string) types2.ForecastStdoutType {
-	var forecast []types2.ForecastResults
-	for _, v := range r.Forecast.ForecastResultsByTime {
-		forecast = append(forecast, types2.ForecastResults{
-			TimePeriod: types2.DateInterval{
-				Start: *v.TimePeriod.Start,
-				End:   *v.TimePeriod.End,
-			},
-			MeanValue:                    *v.MeanValue,
-			PredictionIntervalLowerBound: *v.PredictionIntervalLowerBound,
-			PredictionIntervalUpperBound: *v.PredictionIntervalUpperBound,
-		})
-	}
-
+// ConvertToForecastStdoutType - Generic version using new transformation utilities
+func ConvertToForecastStdoutType(r types2.ForecastPrintData, filteredBy string) types2.ForecastStdoutType {
 	return types2.ForecastStdoutType{
-		Forecast: forecast,
+		Forecast: Transform(r.Forecast.ForecastResultsByTime, func(v types.ForecastResult) types2.ForecastResults {
+			return types2.ForecastResults{
+				TimePeriod: types2.DateInterval{
+					Start: *v.TimePeriod.Start,
+					End:   *v.TimePeriod.End,
+				},
+				MeanValue:                    *v.MeanValue,
+				PredictionIntervalLowerBound: *v.PredictionIntervalLowerBound,
+				PredictionIntervalUpperBound: *v.PredictionIntervalUpperBound,
+			}
+		}),
 		Total: types2.Total{
 			Amount: *r.Forecast.Total.Amount,
 			Unit:   *r.Forecast.Total.Unit,
 		},
 		FilteredBy: filteredBy,
 	}
-
 }
 
 func EncodeString(s string) string {
@@ -378,10 +323,10 @@ func EncodeString(s string) string {
 	return hashedString
 }
 
+// Generic version of ConvertToPineconeStruct
 func ConvertToPineconeStruct(items []*types2.VectorStoreItem) []pinecone.PineconeStruct {
-	var pineconeStruct []pinecone.PineconeStruct
-	for _, v := range items {
-		pineconeStruct = append(pineconeStruct, pinecone.PineconeStruct{
+	return ConvertSlice(items, func(v *types2.VectorStoreItem) pinecone.PineconeStruct {
+		return pinecone.PineconeStruct{
 			ID:     v.ID,
 			Values: v.EmbeddingVector,
 			Metadata: pinecone.Metadata{
@@ -392,7 +337,6 @@ func ConvertToPineconeStruct(items []*types2.VectorStoreItem) []pinecone.Pinecon
 				End:         v.Metadata.EndDate,
 				Cost:        v.Metadata.Cost,
 			},
-		})
-	}
-	return pineconeStruct
+		}
+	})
 }

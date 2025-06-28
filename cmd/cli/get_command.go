@@ -3,7 +3,7 @@ package cli
 import (
 	"context"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
-	"github.com/cduggn/ccexplorer/cmd/cli/flags"
+	"github.com/cduggn/ccexplorer/internal/flags"
 	awsservice "github.com/cduggn/ccexplorer/internal/awsservice"
 	"github.com/cduggn/ccexplorer/internal/ports"
 	"github.com/cduggn/ccexplorer/internal/types"
@@ -20,7 +20,7 @@ var (
 		Short: "Cost and usage summary for AWS services",
 		Long:  paintHeader(),
 	}
-	costUsageGroupBy                flags.DimensionAndTagFlag
+	costUsageGroupBy                *flags.GroupByFlag
 	costUsageGranularity            string
 	costUsageStartDate              string
 	costUsageEndDate                string
@@ -100,13 +100,14 @@ you can set the environment variables AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY a
 }
 
 func (c *CostCommandType) DefineFlags() {
-	c.Cmd.Flags().VarP(&costUsageGroupBy, "groupBy", "g",
+	costUsageGroupBy = flags.NewGroupByFlag()
+	c.Cmd.Flags().VarP(costUsageGroupBy, "groupBy", "g",
 		"Group by DIMENSION and/or TAG ")
 	// add required flag for groupBy
 	_ = c.Cmd.MarkFlagRequired("groupBy")
 
-	costUsageFilterBy := flags.NewFilterBy()
-	c.Cmd.Flags().VarP(&costUsageFilterBy, "filterBy", "f",
+	costUsageFilterBy := flags.NewFilterByFlag()
+	c.Cmd.Flags().VarP(costUsageFilterBy, "filterBy", "f",
 		"Filter by DIMENSION and/or TAG")
 
 	// Optional flag to dictate the granularity of the data returned
@@ -142,8 +143,8 @@ func (c *CostCommandType) DefineFlags() {
 
 func (f *ForecastCommandType) DefineFlags() {
 
-	forecastFilterBy := flags.NewForecastFilterBy()
-	f.Cmd.Flags().VarP(&forecastFilterBy, "filterBy", "f",
+	forecastFilterBy := flags.NewDimensionFilterFlag()
+	f.Cmd.Flags().VarP(forecastFilterBy, "filterBy", "f",
 		"Filter by DIMENSION  (default: none)")
 
 	f.Cmd.Flags().StringVarP(&forecastStartDate, "start", "s",
@@ -301,8 +302,9 @@ func (f *ForecastCommandType) InputHandler() types.ForecastCommandLineInput {
 	predictionIntervalLevel, _ := f.Cmd.Flags().GetInt32(
 		"predictionIntervalLevel")
 
-	filterFlag := filterByValues.(*flags.DimensionFilterByFlag)
-	dimensions := awsservice.ExtractForecastFilters(filterFlag.Dimensions)
+	filterFlag := filterByValues.(*flags.DimensionFilterFlag)
+	filterData := filterFlag.Value()
+	dimensions := awsservice.ExtractForecastFilters(filterData)
 
 	return types.ForecastCommandLineInput{
 		FilterByValues:          dimensions,

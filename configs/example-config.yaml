@@ -1,0 +1,19 @@
+# Example configuration for ccexplorer
+# Copy this file and modify as needed
+
+# AWS Configuration
+aws_profile: "default"
+
+# Pinecone Configuration (optional)
+pinecone:
+  api_key: "your-pinecone-api-key"
+  index_url: "https://your-index-url.pinecone.io"
+
+# OpenAI Configuration (optional, for embeddings)
+openai:
+  api_key: "your-openai-api-key"
+
+# Output Configuration
+output:
+  format: "table"  # Options: table, csv, chart, pinecone
+  file_path: ""    # Optional: save output to file
