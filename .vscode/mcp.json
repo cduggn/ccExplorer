@@ -1,0 +1,34 @@
+{
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "aws-access-key",
+      "description": "AWS Access Key ID (leave empty to use default AWS credential chain)",
+      "password": false
+    },
+    {
+      "type": "promptString", 
+      "id": "aws-secret-key",
+      "description": "AWS Secret Access Key (leave empty to use default AWS credential chain)",
+      "password": true
+    },
+    {
+      "type": "promptString",
+      "id": "aws-region",
+      "description": "AWS Region (e.g., us-east-1, us-west-2)",
+      "password": false
+    }
+  ],
+  "servers": {
+    "ccExplorer": {
+      "type": "stdio",
+      "command": "./bin/ccexplorer",
+      "args": ["mcp", "serve"],
+      "env": {
+        "AWS_ACCESS_KEY_ID": "${input:aws-access-key}",
+        "AWS_SECRET_ACCESS_KEY": "${input:aws-secret-key}",
+        "AWS_REGION": "${input:aws-region}"
+      }
+    }
+  }
+}
