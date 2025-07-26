@@ -1,0 +1,22 @@
+# GCP Dependencies to add to go.mod
+# Run: go get -u <package>@<version>
+
+# Core GCP SDK dependencies
+cloud.google.com/go/billing v1.18.0
+cloud.google.com/go/asset v1.19.0
+google.golang.org/api v0.155.0
+
+# Additional GCP dependencies
+cloud.google.com/go v0.112.0
+google.golang.org/grpc v1.60.1
+golang.org/x/oauth2 v0.15.0
+golang.org/x/time v0.5.0
+
+# Required for rate limiting and testing
+github.com/stretchr/testify v1.9.0
+
+# Commands to run:
+# go get cloud.google.com/go/billing@v1.18.0
+# go get cloud.google.com/go/asset@v1.19.0  
+# go get google.golang.org/api@v0.155.0
+# go get golang.org/x/time@v0.5.0
