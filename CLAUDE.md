@@ -53,3 +53,6 @@ ccExplorer is a CLI tool for AWS cost analysis that follows clean architecture p
 ## Testing Notes
 
 Tests are located alongside source files. The codebase includes unit tests for flag parsing (`cmd/cli/flags/*_test.go`), utility functions (`internal/utils/commons_test.go`), and service integrations (`internal/awsservice/filter_test.go`, `internal/pinecone/pinecone_test.go`).
+
+# Additional Instructions
+gemini.md
