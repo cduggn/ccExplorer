@@ -1,30 +1,26 @@
+// Package writer provides output formatting for AWS cost data.
+//
+// The package uses a strategy pattern with composable transformers and renderers.
+// The main components are:
+//   - Transformers: convert domain data to output-specific formats
+//   - Renderers: write formatted data to destinations (stdout, files, vector DB)
+//   - CompositeWriter: combines a transformer and renderer
+//
+// For new code, use the factory functions in writers.go directly.
+// The PrinterAdapter type provides backward compatibility with legacy code.
 package writer
 
 import (
-	"context"
-	"fmt"
-	"github.com/cduggn/ccexplorer/internal/http"
 	"github.com/cduggn/ccexplorer/internal/types"
-	"github.com/cduggn/ccexplorer/internal/utils"
-	"log/slog"
 	"os"
-	"strings"
 )
 
 var (
-	csvFileName = "ccexplorer.csv"
-	csvHeader   = []string{"Dimension/Tag", "Dimension/Tag", "Metric",
-		"Granularity",
-		"Start",
-		"End", "USD Amount", "Unit"}
 	OutputDir = "./writer"
 )
 
 type Builder struct {
 }
-
-// Legacy printer types - kept for interface compatibility
-// Actual implementations are now in writers.go using generics
 
 func init() {
 	if _, err := os.Stat(OutputDir); os.IsNotExist(err) {
@@ -35,123 +31,71 @@ func init() {
 	}
 }
 
+// PrinterAdapter adapts the new CompositeWriter to the legacy Printer interface
+type PrinterAdapter struct {
+	printType types.PrintWriterType
+	variant   string
+}
+
 func NewPrintWriter(printType types.PrintWriterType, variant string) Printer {
-	switch printType {
+	return &PrinterAdapter{
+		printType: printType,
+		variant:   variant,
+	}
+}
+
+// Write implements the Printer interface by delegating to appropriate CompositeWriter
+func (p *PrinterAdapter) Write(f interface{}, c interface{}) error {
+	switch p.printType {
 	case types.Stdout:
-		return NewGenericStdoutPrinter(variant)
+		return p.writeStdout(f, c)
 	case types.CSV:
-		return NewGenericCsvPrinter(variant)
+		return p.writeCSV(f, c)
 	case types.Chart:
-		return NewGenericChartPrinter(variant)
+		return p.writeChart(f, c)
 	case types.Pinecone:
-		return NewGenericPineconePrinter(variant)
+		return p.writeVector(f, c)
 	default:
 		panic("Invalid print type")
 	}
 }
 
-// Legacy mapper functions - kept for backward compatibility but will be removed
-// These are now handled by the generic transformers and renderers
-
-func CostAndUsageToVectorMapper(r types.CostAndUsageOutputType) error {
-
-	client := NewVectorStoreClient(http.NewRequestBuilder(),
-		r.OpenAIAPIKey, r.PineconeIndex, r.PineconeAPIKey)
-	items, err := client.CreateVectorStoreInput(r)
-	if err != nil {
-		return types.Error{
-			Msg: "Error writing to vector store: " + err.Error()}
+func (p *PrinterAdapter) writeStdout(f interface{}, c interface{}) error {
+	switch p.variant {
+	case "forecast":
+		writer := NewForecastTableWriter()
+		return writer.Write(f.(types.ForecastPrintData))
+	case "costAndUsage":
+		sortBy := f.(string)
+		writer := NewCostUsageTableWriter(sortBy)
+		return writer.Write(c.(types.CostAndUsageOutputType))
+	default:
+		panic("Invalid stdout variant: " + p.variant)
 	}
-
-	vectors, err := client.CreateEmbeddings(items)
-	if err != nil {
-		return types.Error{
-			Msg: "Error writing to vector store: " + err.Error()}
-	}
-
-	for index, m := range vectors {
-		items[index].EmbeddingVector = m.Embedding
-		items[index].ID = utils.EncodeString(items[index].EmbeddingText)
-	}
-
-	input := utils.ConvertToPineconeStruct(items)
-
-	resp, err := client.Upsert(context.Background(), input)
-	if err != nil {
-		return types.Error{
-			Msg: "Error writing to vector store: " + err.Error()}
-	}
-
-	slog.Info(fmt.Sprintf("Upserted %d items to vector store", resp.UpsertedCount))
-	return nil
 }
 
-func CostAndUsageToStdoutMapper(sortFn func(r map[int]types.Service) []types.Service,
-	r types.CostAndUsageOutputType) error {
-
-	sortedServices := sortFn(r.Services)
-	output := utils.ConvertToStdoutType(sortedServices, r.Granularity)
-
-	w, err := NewStdoutWriter("costAndUsage")
-	if err != nil {
-		return types.Error{
-			Msg: "Error writing to stdout : " + err.Error()}
+func (p *PrinterAdapter) writeCSV(f interface{}, c interface{}) error {
+	if p.variant != "costAndUsage" {
+		panic("Invalid CSV variant: " + p.variant)
 	}
-	w.Writer(output)
-	return nil
+	sortBy := f.(string)
+	writer := NewCostUsageCSVWriter(sortBy)
+	return writer.Write(c.(types.CostAndUsageOutputType))
 }
 
-func CostAndUsageToCSVMapper(sortFn func(r map[int]types.Service) []types.Service,
-	r types.CostAndUsageOutputType) error {
-
-	f, err := NewCSVFile(OutputDir, csvFileName)
-	if err != nil {
-		return types.Error{
-			Msg: "Error creating CSV file: " + err.Error()}
+func (p *PrinterAdapter) writeChart(f interface{}, c interface{}) error {
+	if p.variant != "costAndUsage" {
+		panic("Invalid chart variant: " + p.variant)
 	}
-	defer func(f *os.File) {
-		err := f.Close()
-		if err != nil {
-			panic(err)
-		}
-	}(f)
-
-	rows := utils.ConvertServiceMapToArray(r.Services, r.Granularity)
-	err = WriteToCSV(f, csvHeader, rows)
-	if err != nil {
-		return types.Error{
-			Msg: "Error writing to CSV file: " + err.Error()}
-	}
-	return nil
+	sortBy := f.(string)
+	writer := NewCostUsageChartWriter(sortBy)
+	return writer.Write(c.(types.CostAndUsageOutputType))
 }
 
-func CostAndUsageToChartMapper(sortFn func(r map[int]types.Service) []types.Service,
-	r types.CostAndUsageOutputType) error {
-
-	builder := Builder{}
-	s := sortFn(r.Services)
-	input := utils.ConvertToChartInputType(r, s)
-
-	charts, err := builder.NewCharts(input)
-	if err != nil {
-		return err
+func (p *PrinterAdapter) writeVector(f interface{}, c interface{}) error {
+	if p.variant != "costAndUsage" {
+		panic("Invalid vector variant: " + p.variant)
 	}
-
-	err = WriteToChart(charts)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func ForecastToStdoutMapper(r types.ForecastPrintData,
-	dimensions []string) {
-
-	filteredBy := strings.Join(dimensions, " | ")
-	output := utils.ConvertToForecastStdoutType(r, filteredBy)
-	w, err := NewStdoutWriter("forecast")
-	if err != nil {
-		return
-	}
-	w.Writer(output)
+	writer := NewCostUsageVectorWriter()
+	return writer.Write(c.(types.CostAndUsageOutputType))
 }
