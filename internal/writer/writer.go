@@ -23,25 +23,8 @@ var (
 type Builder struct {
 }
 
-type StdoutPrinter struct {
-	Variant string
-}
-
-type CsvPrinter struct {
-	Variant string
-}
-
-type OpenAIPrinter struct {
-	Variant string
-}
-
-type ChartPrinter struct {
-	Variant string
-}
-
-type PineconePrinter struct {
-	Variant string
-}
+// Legacy printer types - kept for interface compatibility
+// Actual implementations are now in writers.go using generics
 
 func init() {
 	if _, err := os.Stat(OutputDir); os.IsNotExist(err) {
@@ -55,71 +38,20 @@ func init() {
 func NewPrintWriter(printType types.PrintWriterType, variant string) Printer {
 	switch printType {
 	case types.Stdout:
-		return &StdoutPrinter{variant}
+		return NewGenericStdoutPrinter(variant)
 	case types.CSV:
-		return &CsvPrinter{variant}
+		return NewGenericCsvPrinter(variant)
 	case types.Chart:
-		return &ChartPrinter{variant}
+		return NewGenericChartPrinter(variant)
 	case types.Pinecone:
-		return &PineconePrinter{variant}
+		return NewGenericPineconePrinter(variant)
 	default:
 		panic("Invalid print type")
 	}
 }
 
-func (p *PineconePrinter) Write(f interface{}, c interface{}) error {
-	switch p.Variant {
-	case "costAndUsage":
-		err := CostAndUsageToVectorMapper(c.(types.CostAndUsageOutputType))
-		if err != nil {
-			return err
-		}
-		/// working with CostAndUsageOutputType
-	}
-	return nil
-}
-
-func (p *StdoutPrinter) Write(f interface{}, c interface{}) error {
-	switch p.Variant {
-	case "forecast":
-		ForecastToStdoutMapper(f.(types.ForecastPrintData),
-			c.([]string))
-	case "costAndUsage":
-		fn := utils.SortFunction(f.(string))
-		err := CostAndUsageToStdoutMapper(fn,
-			c.(types.CostAndUsageOutputType))
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (p *CsvPrinter) Write(f interface{}, c interface{}) error {
-	switch p.Variant {
-	case "costAndUsage":
-		fn := utils.SortFunction(f.(string))
-		err := CostAndUsageToCSVMapper(fn,
-			c.(types.CostAndUsageOutputType))
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (p *ChartPrinter) Write(f interface{}, c interface{}) error {
-	switch p.Variant {
-	case "costAndUsage":
-		fn := utils.SortFunction(f.(string))
-		err := CostAndUsageToChartMapper(fn,
-			c.(types.CostAndUsageOutputType))
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
+// Legacy mapper functions - kept for backward compatibility but will be removed
+// These are now handled by the generic transformers and renderers
 
 func CostAndUsageToVectorMapper(r types.CostAndUsageOutputType) error {
 

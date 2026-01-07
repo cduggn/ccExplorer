@@ -1,0 +1,37 @@
+{
+  "// Enable MCP support in VSCode": "",
+  "chat.mcp.enabled": true,
+  
+  "// Global MCP server configuration for ccExplorer": "",
+  "// Replace /path/to/your/ccexplorer with the actual path to your binary": "",
+  "chat.mcp.servers": {
+    "ccExplorer": {
+      "type": "stdio",
+      "command": "/path/to/your/ccexplorer",
+      "args": ["mcp", "serve"],
+      "env": {
+        "AWS_REGION": "us-east-1"
+      }
+    }
+  },
+  
+  "// Optional: Enable auto-discovery of MCP servers from other tools like Claude Desktop": "",
+  "chat.mcp.discovery.enabled": true,
+  
+  "// Optional: Automatically confirm tool executions (use with caution)": "",
+  "// chat.agent.autoConfirm": true,
+  
+  "// Example with explicit AWS credentials (not recommended for production)": "",
+  "// \"chat.mcp.servers\": {": "",
+  "//   \"ccExplorer\": {": "",
+  "//     \"type\": \"stdio\",": "",
+  "//     \"command\": \"/path/to/your/ccexplorer\",": "",
+  "//     \"args\": [\"mcp\", \"serve\", \"--stdio\"],": "",
+  "//     \"env\": {": "",
+  "//       \"AWS_ACCESS_KEY_ID\": \"your-access-key\",": "",
+  "//       \"AWS_SECRET_ACCESS_KEY\": \"your-secret-key\",": "",
+  "//       \"AWS_REGION\": \"us-east-1\"": "",
+  "//     }": "",
+  "//   }": "",
+  "// }": ""
+}

@@ -32,11 +32,11 @@ lint-exp: $(GOLANGCI_LINT)
 
 .PHONY: test-race
 test-race:
-	go run test -race ./...
+	go test -race ./...
 
 .PHONY: test-cover
 test-cover:
-	go run test -cover ./...
+	go test -cover ./...
 
 .PHONY: run-pkgsite
 run-pkgsite:
@@ -48,11 +48,12 @@ goimports: $(GOIMPORTS)
 .PHONY: run
 run:
 	go env -w CGO_ENABLED=1
-	go run ./cmd/cloudcost/cloudcost.go
+	go run ./cmd/ccexplorer
 
 .PHONY: build
 build:
-	go build -o bin/ ./...
+	go env -w CGO_ENABLED=1
+	go build -o bin/ ./cmd/ccexplorer
 
 .PHONY: release
 release: $(GORELEASER)
