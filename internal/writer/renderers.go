@@ -7,7 +7,6 @@ import (
 	"io"
 	"os"
 
-	"github.com/cduggn/ccexplorer/internal/http"
 	"github.com/cduggn/ccexplorer/internal/types"
 	"github.com/cduggn/ccexplorer/internal/utils"
 	"github.com/jedib0t/go-pretty/v6/table"
@@ -112,16 +111,18 @@ func (r *ForecastTableRenderer) Render(data *ForecastTableOutput) error {
 }
 
 // CSVRenderer renders CSV data to files
-type CSVRenderer struct{}
+type CSVRenderer struct {
+	config *Config
+}
 
 // NewCSVRenderer creates a new CSV renderer
-func NewCSVRenderer() *CSVRenderer {
-	return &CSVRenderer{}
+func NewCSVRenderer(config *Config) *CSVRenderer {
+	return &CSVRenderer{config: config}
 }
 
 // Render implements the Renderer interface for CSV files
 func (r *CSVRenderer) Render(data *CSVOutput) error {
-	filePath := utils.BuildOutputFilePath(OutputDir, data.Filename)
+	filePath := utils.BuildOutputFilePath(r.config.OutputDir, data.Filename)
 	file, err := os.Create(filePath)
 	if err != nil {
 		return types.Error{Msg: "Error creating CSV file: " + err.Error()}
@@ -145,16 +146,18 @@ func (r *CSVRenderer) Render(data *CSVOutput) error {
 }
 
 // ChartRenderer renders chart data to HTML files
-type ChartRenderer struct{}
+type ChartRenderer struct {
+	config *Config
+}
 
 // NewChartRenderer creates a new chart renderer
-func NewChartRenderer() *ChartRenderer {
-	return &ChartRenderer{}
+func NewChartRenderer(config *Config) *ChartRenderer {
+	return &ChartRenderer{config: config}
 }
 
 // Render implements the Renderer interface for charts
 func (r *ChartRenderer) Render(data *ChartOutput) error {
-	filePath := utils.BuildOutputFilePath(OutputDir, data.Filename)
+	filePath := utils.BuildOutputFilePath(r.config.OutputDir, data.Filename)
 	file, err := os.Create(filePath)
 	if err != nil {
 		return types.Error{Msg: "Failed creating chart HTML file: " + err.Error()}
@@ -165,25 +168,29 @@ func (r *ChartRenderer) Render(data *ChartOutput) error {
 }
 
 // VectorRenderer renders vector data to vector databases
-type VectorRenderer struct{}
+type VectorRenderer struct {
+	config *Config
+	client VectorStore
+}
 
 // NewVectorRenderer creates a new vector renderer
-func NewVectorRenderer() *VectorRenderer {
-	return &VectorRenderer{}
+func NewVectorRenderer(config *Config) *VectorRenderer {
+	client := NewVectorStoreClient(
+		config.HTTPClient,
+		config.OpenAIAPIKey,
+		config.PineconeIndex,
+		config.PineconeAPIKey,
+	)
+	return &VectorRenderer{
+		config: config,
+		client: client,
+	}
 }
 
 // Render implements the Renderer interface for vector databases
 func (r *VectorRenderer) Render(data *VectorOutput) error {
-	// Create the vector store client - this would need to be passed in or configured
-	client := NewVectorStoreClient(
-		http.NewRequestBuilder(),
-		data.IndexName,
-		"", // API keys would need to be provided
-		"",
-	)
-
 	// Create embeddings for the vector items
-	vectors, err := client.CreateEmbeddings(data.Items)
+	vectors, err := r.client.CreateEmbeddings(data.Items)
 	if err != nil {
 		return types.Error{Msg: "Error creating embeddings: " + err.Error()}
 	}
@@ -198,7 +205,7 @@ func (r *VectorRenderer) Render(data *VectorOutput) error {
 
 	// Convert to Pinecone format and upsert
 	pineconeData := utils.ConvertToPineconeStruct(data.Items)
-	resp, err := client.Upsert(context.Background(), pineconeData)
+	resp, err := r.client.Upsert(context.Background(), pineconeData)
 	if err != nil {
 		return types.Error{Msg: "Error upserting to vector store: " + err.Error()}
 	}

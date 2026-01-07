@@ -67,7 +67,7 @@ func (p *PrinterAdapter) writeStdout(f interface{}, c interface{}) error {
 		return writer.Write(f.(types.ForecastPrintData))
 	case "costAndUsage":
 		sortBy := f.(string)
-		writer := NewCostUsageTableWriter(sortBy)
+		writer := NewCostUsageTableWriter(WithSortBy(sortBy))
 		return writer.Write(c.(types.CostAndUsageOutputType))
 	default:
 		panic("Invalid stdout variant: " + p.variant)
@@ -79,7 +79,7 @@ func (p *PrinterAdapter) writeCSV(f interface{}, c interface{}) error {
 		panic("Invalid CSV variant: " + p.variant)
 	}
 	sortBy := f.(string)
-	writer := NewCostUsageCSVWriter(sortBy)
+	writer := NewCostUsageCSVWriter(WithSortBy(sortBy))
 	return writer.Write(c.(types.CostAndUsageOutputType))
 }
 
@@ -88,7 +88,7 @@ func (p *PrinterAdapter) writeChart(f interface{}, c interface{}) error {
 		panic("Invalid chart variant: " + p.variant)
 	}
 	sortBy := f.(string)
-	writer := NewCostUsageChartWriter(sortBy)
+	writer := NewCostUsageChartWriter(WithSortBy(sortBy))
 	return writer.Write(c.(types.CostAndUsageOutputType))
 }
 
@@ -96,6 +96,9 @@ func (p *PrinterAdapter) writeVector(f interface{}, c interface{}) error {
 	if p.variant != "costAndUsage" {
 		panic("Invalid vector variant: " + p.variant)
 	}
-	writer := NewCostUsageVectorWriter()
-	return writer.Write(c.(types.CostAndUsageOutputType))
+	data := c.(types.CostAndUsageOutputType)
+	writer := NewCostUsageVectorWriter(
+		WithVectorDBConfig(data.OpenAIAPIKey, data.PineconeAPIKey, data.PineconeIndex),
+	)
+	return writer.Write(data)
 }
