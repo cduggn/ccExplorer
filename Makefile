@@ -47,13 +47,11 @@ goimports: $(GOIMPORTS)
 
 .PHONY: run
 run:
-	go env -w CGO_ENABLED=1
-	go run ./cmd/ccexplorer
+	CGO_ENABLED=0 go run ./cmd/ccexplorer
 
 .PHONY: build
 build:
-	go env -w CGO_ENABLED=1
-	go build -o bin/ ./cmd/ccexplorer
+	CGO_ENABLED=0 go build -o bin/ ./cmd/ccexplorer
 
 .PHONY: release
 release: $(GORELEASER)
