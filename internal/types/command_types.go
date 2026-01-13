@@ -14,6 +14,15 @@ type Command interface {
 	DefineFlags()
 }
 
+// Generic command interface for type-safe command implementations
+type GenericCommand[TInput, TOutput any] interface {
+	Run(cmd *cobra.Command, args []string) error
+	SynthesizeRequest(input TInput) (TOutput, error)
+	InputHandler(cmd *cobra.Command) TInput
+	Execute(req TOutput) error
+	DefineFlags()
+}
+
 type CostDataReader interface {
 	ExtractGroupBySelections() ([]string, []string)
 	ExtractFilterBySelection() (FilterBySelections, error)
@@ -217,4 +226,73 @@ type PresetError struct {
 
 func (e PresetError) Error() string {
 	return e.Msg
+}
+
+// Generic collection types for improved type safety
+
+// GenericFilter provides type-safe filtering capabilities
+type GenericFilter[T any] struct {
+	Predicate func(T) bool
+}
+
+func (f GenericFilter[T]) Apply(items []T) []T {
+	var result []T
+	for _, item := range items {
+		if f.Predicate(item) {
+			result = append(result, item)
+		}
+	}
+	return result
+}
+
+// GenericCollection provides common collection operations
+type GenericCollection[T any] struct {
+	Items []T
+}
+
+func NewGenericCollection[T any](items []T) *GenericCollection[T] {
+	return &GenericCollection[T]{Items: items}
+}
+
+func (c *GenericCollection[T]) Filter(predicate func(T) bool) *GenericCollection[T] {
+	var filtered []T
+	for _, item := range c.Items {
+		if predicate(item) {
+			filtered = append(filtered, item)
+		}
+	}
+	return &GenericCollection[T]{Items: filtered}
+}
+
+func (c *GenericCollection[T]) Map(mapper func(T) T) *GenericCollection[T] {
+	mapped := make([]T, len(c.Items))
+	for i, item := range c.Items {
+		mapped[i] = mapper(item)
+	}
+	return &GenericCollection[T]{Items: mapped}
+}
+
+func (c *GenericCollection[T]) ToSlice() []T {
+	return c.Items
+}
+
+// GenericServiceMap provides type-safe service operations
+type GenericServiceMap[K comparable, V any] map[K]V
+
+func (m GenericServiceMap[K, V]) Filter(predicate func(K, V) bool) GenericServiceMap[K, V] {
+	result := make(GenericServiceMap[K, V])
+	for k, v := range m {
+		if predicate(k, v) {
+			result[k] = v
+		}
+	}
+	return result
+}
+
+func (m GenericServiceMap[K, V]) Transform(transformer func(V) V) GenericServiceMap[K, V] {
+	result := make(GenericServiceMap[K, V])
+	for k, v := range m {
+		result[k] = transformer(v)
+	}
+	return result
 }

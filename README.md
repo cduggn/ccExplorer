@@ -69,7 +69,7 @@ $ go run .\cmd\ccexplorer.go get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -f
 
 ```console
 # download
-$ docker pull ghcr.io/cduggn/ccexplorer:v0.7.5
+$ docker pull ghcr.io/cduggn/ccexplorer:v0.8.4
 
 # Container requires AWS Access key, secret, and region
 $ docker run -it \
@@ -77,7 +77,7 @@ $ docker run -it \
   -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
   -e AWS_REGION=<AWS-REGION> \
   --mount type=bind,source="$(pwd)"/output/,target=/app/output \
-  ghcr.io/cduggn/ccexplorer:v0.7.5 get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE -l
+  ghcr.io/cduggn/ccexplorer:v0.8.4 get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE -l
   
 ```
 
@@ -286,6 +286,32 @@ flags
   providing an ISO 8601 formatted date and time for example `-s 
   2022-10-10T00:00:00Z -e 2022-10-10T23:59:59Z`. 
   
+
+## MCP Server Integration
+
+`ccExplorer` includes a built-in MCP (Model Context Protocol) server that enables AI-powered cost analysis through VSCode and GitHub Copilot Chat integration.
+
+### Quick Setup
+
+1. **Enable MCP in VSCode**: Add `"chat.mcp.enabled": true` to your VSCode settings
+2. **Build ccExplorer**: Run `make build` to ensure the binary is available
+3. **Use with Copilot**: Open VSCode Copilot Chat in Agent Mode and start querying your AWS costs
+
+The repository includes a pre-configured `.vscode/mcp.json` file for automatic setup.
+
+### Example Queries
+
+```
+@agent What were my AWS costs for the last 30 days grouped by service?
+@agent Show my EC2 costs for the last quarter, excluding discounts
+@agent Compare my AWS costs between last month and this month
+```
+
+### Available Commands
+
+- `ccexplorer mcp serve` - Start MCP server with stdio transport (for VSCode integration)
+
+For detailed setup instructions, see [VSCode MCP Integration Guide](./docs/vscode-mcp-integration.md).
 
 ## Additional Information
 <hr>

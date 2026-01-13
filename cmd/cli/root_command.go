@@ -24,6 +24,7 @@ func RootCommand() *cobra.Command {
 
 func init() {
 	rootCmd.AddCommand(CostAndForecast())
+	rootCmd.AddCommand(mcpCommand())
 	_ = viper.BindPFlag("openai_api_key", rootCmd.PersistentFlags().Lookup(
 		"OPENAI_API_KEY"))
 	_ = viper.BindPFlag("aws_profile", rootCmd.PersistentFlags().Lookup(
