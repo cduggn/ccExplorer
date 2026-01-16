@@ -44,26 +44,6 @@ type ForecastTableOutput struct {
 	Total      types.Total
 }
 
-// FormatType represents the target output format
-type FormatType int
-
-const (
-	FormatTable FormatType = iota
-	FormatCSV
-	FormatChart  
-	FormatVector
-)
-
-// OutputData is a union type that can hold any output format
-type OutputData struct {
-	Type     FormatType
-	Table    *TableOutput
-	CSV      *CSVOutput
-	Chart    *ChartOutput
-	Vector   *VectorOutput
-	Forecast *ForecastTableOutput
-}
-
 // NewTableOutput creates a new TableOutput instance
 func NewTableOutput(headers []string, rows [][]string, total string) *TableOutput {
 	return &TableOutput{

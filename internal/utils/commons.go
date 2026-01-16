@@ -30,21 +30,6 @@ func ReturnIfPresent(s []string) string {
 	}
 }
 
-func ToPrintWriterType(s string) types2.PrintWriterType {
-	switch s {
-	case "csv":
-		return types2.CSV
-	case "stdout":
-		return types2.Stdout
-	case "chart":
-		return types2.Chart
-	case "pinecone":
-		return types2.Pinecone
-	default:
-		return types2.Stdout
-	}
-}
-
 func NewFile(dir string, file string) (*os.File, error) {
 	filePath := BuildOutputFilePath(dir, file)
 	return os.Create(filePath)

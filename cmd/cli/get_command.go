@@ -259,11 +259,8 @@ func (c *CostCommandType) Execute(req types.CostAndUsageRequestType) error {
 
 	report := utils.ToCostAndUsageOutputType(costAndUsageResponse, req)
 
-	w := writer.NewPrintWriter(utils.ToPrintWriterType(req.PrintFormat),
-		"costAndUsage")
-
-	err = w.Write(utils.SortByFn(req.SortByDate), report)
-	if err != nil {
+	w := writer.NewCostUsageWriter(req.PrintFormat, utils.SortByFn(req.SortByDate))
+	if err := w.Write(report); err != nil {
 		return err
 	}
 	return nil
@@ -283,16 +280,12 @@ func (f *ForecastCommandType) RunE(cmd *cobra.Command, args []string) error {
 	}
 
 	printData := prepareResponseForRendering(res)
-	filters := filterList(req)
-	printData.Filters = filters
+	printData.Filters = filterList(req)
 
-	p := writer.NewPrintWriter(utils.ToPrintWriterType("stdout"),
-		"forecast")
-	err = p.Write(printData, filters)
-	if err != nil {
+	w := writer.NewForecastWriter()
+	if err := w.Write(printData); err != nil {
 		return err
 	}
-
 	return nil
 }
 

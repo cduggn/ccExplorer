@@ -15,26 +15,15 @@ import (
 )
 
 // StdoutTableRenderer renders table data to stdout
-type StdoutTableRenderer struct {
-	variant string
-}
+type StdoutTableRenderer struct{}
 
 // NewStdoutTableRenderer creates a new stdout table renderer
-func NewStdoutTableRenderer(variant string) *StdoutTableRenderer {
-	return &StdoutTableRenderer{variant: variant}
+func NewStdoutTableRenderer() *StdoutTableRenderer {
+	return &StdoutTableRenderer{}
 }
 
 // Render implements the Renderer interface for stdout tables
 func (r *StdoutTableRenderer) Render(data *TableOutput) error {
-	switch r.variant {
-	case "costAndUsage":
-		return r.renderCostUsageTable(data)
-	default:
-		return fmt.Errorf("unknown table variant: %s", r.variant)
-	}
-}
-
-func (r *StdoutTableRenderer) renderCostUsageTable(data *TableOutput) error {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.SetColumnConfigs([]table.ColumnConfig{
@@ -161,7 +150,12 @@ func (r *ChartRenderer) Render(data *ChartOutput) error {
 	}
 	defer file.Close()
 
-	return data.Page.Render(io.MultiWriter(file))
+	if err := data.Page.Render(io.MultiWriter(file)); err != nil {
+		return err
+	}
+
+	fmt.Printf("Chart written to: %s\n", filePath)
+	return nil
 }
 
 // VectorRenderer renders vector data to vector databases
