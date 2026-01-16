@@ -7,11 +7,18 @@ import (
 
 // TableOutput represents data formatted for table display
 type TableOutput struct {
-	Headers []string
-	Rows    [][]string
-	Footer  []string
-	Title   string
-	Total   string
+	Headers      []string
+	Rows         [][]string
+	Footer       []string
+	Title        string
+	Total        string
+	Granularity  string
+	DateRange    string
+	RowCount     int
+	Metric       string
+	Unit         string
+	SortedBy     string
+	HasTagColumn bool // Whether the Tag/Dimension column has any values
 }
 
 // CSVOutput represents data formatted for CSV export
@@ -45,11 +52,18 @@ type ForecastTableOutput struct {
 }
 
 // NewTableOutput creates a new TableOutput instance
-func NewTableOutput(headers []string, rows [][]string, total string) *TableOutput {
+func NewTableOutput(headers []string, rows [][]string, total string, granularity string, dateRange string, metric string, unit string, sortedBy string, hasTagColumn bool) *TableOutput {
 	return &TableOutput{
-		Headers: headers,
-		Rows:    rows,
-		Total:   total,
+		Headers:      headers,
+		Rows:         rows,
+		Total:        total,
+		Granularity:  granularity,
+		DateRange:    dateRange,
+		RowCount:     len(rows),
+		Metric:       metric,
+		Unit:         unit,
+		SortedBy:     sortedBy,
+		HasTagColumn: hasTagColumn,
 	}
 }
 

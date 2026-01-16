@@ -24,47 +24,83 @@ func NewCostUsageToTableTransformer(sortBy string) *CostUsageToTableTransformer 
 // Transform implements the Transformer interface for cost and usage data
 func (t *CostUsageToTableTransformer) Transform(input types.CostAndUsageOutputType) (*TableOutput, error) {
 	sortedServices := t.sortFunc(input.Services)
-	
-	headers := []string{
-		"Rank", "Dimension/Tag", "Dimension/Tag",
-		"Metric Name", "Amount", "Rounded",
-		"Unit", "Granularity", "Start", "End",
-	}
-	
-	var rows [][]string
+
+	// First pass: calculate total for percentage calculation
 	var total float64
-	
-	// Use generic transformation for creating rows
-	for index, service := range sortedServices {
-		serviceRows := utils.Transform(service.Metrics, func(metric types.Metrics) []string {
+	var metricName, unit string
+	var hasTagColumn bool
+
+	for _, service := range sortedServices {
+		for _, metric := range service.Metrics {
 			if metric.Unit == "USD" {
 				total += metric.NumericAmount
 			}
-			
+			if metricName == "" {
+				metricName = metric.Name
+				unit = metric.Unit
+			}
+		}
+		// Check if tag/dimension column has values
+		if !hasTagColumn && len(service.Keys) > 1 && service.Keys[1] != "" {
+			hasTagColumn = true
+		}
+	}
+
+	// Build headers based on whether tag column has data
+	var headers []string
+	if hasTagColumn {
+		headers = []string{"#", "Service", "Tag/Dimension", "Cost", "%", "Start", "End"}
+	} else {
+		headers = []string{"#", "Service", "Cost", "%", "Start", "End"}
+	}
+
+	var rows [][]string
+	var startDate, endDate string
+
+	// Second pass: create rows with percentage
+	for index, service := range sortedServices {
+		// Track date range
+		if index == 0 {
+			startDate = service.Start
+		}
+		endDate = service.End
+
+		serviceRows := utils.Transform(service.Metrics, func(metric types.Metrics) []string {
+			// Calculate percentage of total
+			var pct float64
+			if total > 0 {
+				pct = (metric.NumericAmount / total) * 100
+			}
+
+			if hasTagColumn {
+				return []string{
+					fmt.Sprintf("%d", index+1),
+					service.Keys[0],
+					utils.ReturnIfPresent(service.Keys),
+					fmt.Sprintf("%.2f", metric.NumericAmount),
+					fmt.Sprintf("%.1f%%", pct),
+					service.Start,
+					service.End,
+				}
+			}
 			return []string{
 				fmt.Sprintf("%d", index+1),
 				service.Keys[0],
-				utils.ReturnIfPresent(service.Keys),
-				metric.Name,
-				metric.Amount,
 				fmt.Sprintf("%.2f", metric.NumericAmount),
-				metric.Unit,
-				input.Granularity,
+				fmt.Sprintf("%.1f%%", pct),
 				service.Start,
 				service.End,
 			}
 		})
-		
-		// Add periodic divider rows
-		if index%10 == 0 && len(rows) > 0 {
-			rows = append(rows, make([]string, len(headers)))
-		}
+
 		rows = append(rows, serviceRows...)
 	}
-	
+
 	totalFormatted := fmt.Sprintf("$%.2f", total)
-	
-	return NewTableOutput(headers, rows, totalFormatted), nil
+	dateRange := fmt.Sprintf("%s to %s", startDate, endDate)
+	sortedBy := "Cost"
+
+	return NewTableOutput(headers, rows, totalFormatted, input.Granularity, dateRange, metricName, unit, sortedBy, hasTagColumn), nil
 }
 
 // CostUsageToCSVTransformer transforms cost and usage data to CSV format

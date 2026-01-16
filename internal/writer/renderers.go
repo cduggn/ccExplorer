@@ -5,13 +5,15 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
+	"log/slog"
 	"os"
+	"strconv"
 
 	"github.com/cduggn/ccexplorer/internal/http"
 	"github.com/cduggn/ccexplorer/internal/types"
 	"github.com/cduggn/ccexplorer/internal/utils"
 	"github.com/jedib0t/go-pretty/v6/table"
-	"log/slog"
+	"github.com/jedib0t/go-pretty/v6/text"
 )
 
 // StdoutTableRenderer renders table data to stdout
@@ -24,13 +26,61 @@ func NewStdoutTableRenderer() *StdoutTableRenderer {
 
 // Render implements the Renderer interface for stdout tables
 func (r *StdoutTableRenderer) Render(data *TableOutput) error {
+	// Print summary header with consolidated metadata
+	fmt.Println()
+	fmt.Printf("  %s\n", text.FgHiCyan.Sprint("AWS Cost Explorer Report"))
+	fmt.Printf("  %s %s  |  %s %s  |  %s %d services\n",
+		text.FgHiWhite.Sprint("Period:"), data.DateRange,
+		text.FgHiWhite.Sprint("Granularity:"), data.Granularity,
+		text.FgHiWhite.Sprint("Results:"), data.RowCount)
+	fmt.Printf("  %s %s  |  %s %s  |  %s %s %s\n",
+		text.FgHiWhite.Sprint("Metric:"), data.Metric,
+		text.FgHiWhite.Sprint("Unit:"), data.Unit,
+		text.FgHiWhite.Sprint("Sorted by:"), data.SortedBy, text.FgHiWhite.Sprint("▼"))
+	fmt.Println()
+	// Color legend
+	fmt.Printf("  %s  %s >= $5  %s >= $1  %s >= $0.01  %s < $0.01\n",
+		text.FgHiWhite.Sprint("Cost:"),
+		text.FgHiRed.Sprint("■"),
+		text.FgHiYellow.Sprint("■"),
+		text.FgHiGreen.Sprint("■"),
+		text.FgHiBlack.Sprint("■"))
+	fmt.Println()
+
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
-	t.SetColumnConfigs([]table.ColumnConfig{
-		{Number: 6, WidthMax: 8},
-	})
-	t.SetStyle(table.StyleColoredGreenWhiteOnBlack)
-	t.SuppressEmptyColumns()
+
+	// Column configurations based on whether tag column exists
+	if data.HasTagColumn {
+		// 7 columns: #, Service, Tag/Dimension, Cost, %, Start, End
+		t.SetColumnConfigs([]table.ColumnConfig{
+			{Number: 1, Align: text.AlignRight, AlignHeader: text.AlignCenter},                              // #
+			{Number: 2, WidthMax: 38, AlignHeader: text.AlignCenter},                                        // Service
+			{Number: 3, WidthMax: 20, AlignHeader: text.AlignCenter},                                        // Tag/Dimension
+			{Number: 4, Align: text.AlignRight, AlignHeader: text.AlignCenter, AlignFooter: text.AlignRight}, // Cost
+			{Number: 5, Align: text.AlignRight, AlignHeader: text.AlignCenter},                              // %
+			{Number: 6, Align: text.AlignCenter, AlignHeader: text.AlignCenter},                             // Start
+			{Number: 7, Align: text.AlignCenter, AlignHeader: text.AlignCenter},                             // End
+		})
+	} else {
+		// 6 columns: #, Service, Cost, %, Start, End
+		t.SetColumnConfigs([]table.ColumnConfig{
+			{Number: 1, Align: text.AlignRight, AlignHeader: text.AlignCenter},                              // #
+			{Number: 2, WidthMax: 42, AlignHeader: text.AlignCenter},                                        // Service
+			{Number: 3, Align: text.AlignRight, AlignHeader: text.AlignCenter, AlignFooter: text.AlignRight}, // Cost
+			{Number: 4, Align: text.AlignRight, AlignHeader: text.AlignCenter},                              // %
+			{Number: 5, Align: text.AlignCenter, AlignHeader: text.AlignCenter},                             // Start
+			{Number: 6, Align: text.AlignCenter, AlignHeader: text.AlignCenter},                             // End
+		})
+	}
+
+	// Use a cleaner style with rounded borders
+	t.SetStyle(table.StyleRounded)
+	t.Style().Color.Header = text.Colors{text.FgHiWhite, text.Bold}
+	t.Style().Color.Row = text.Colors{text.FgWhite}
+	t.Style().Color.RowAlternate = text.Colors{text.FgHiBlack}
+	t.Style().Color.Footer = text.Colors{text.FgHiGreen, text.Bold}
+	t.Style().Options.SeparateRows = false
 
 	// Convert headers to table.Row
 	headerRow := make(table.Row, len(data.Headers))
@@ -39,24 +89,59 @@ func (r *StdoutTableRenderer) Render(data *TableOutput) error {
 	}
 	t.AppendHeader(headerRow)
 
-	// Convert data rows to table.Row
-	for _, row := range data.Rows {
+	// Determine cost column index based on layout
+	costColIdx := 2 // Without tag column: #(0), Service(1), Cost(2)
+	if data.HasTagColumn {
+		costColIdx = 3 // With tag column: #(0), Service(1), Tag(2), Cost(3)
+	}
+
+	// Convert data rows to table.Row with conditional coloring and separators
+	for rowIdx, row := range data.Rows {
+		// Add separator every 10 rows for readability
+		if rowIdx > 0 && rowIdx%10 == 0 {
+			t.AppendSeparator()
+		}
+
 		tableRow := make(table.Row, len(row))
 		for i, cell := range row {
-			tableRow[i] = cell
+			tableRow[i] = r.formatCell(cell, i, row, costColIdx)
 		}
 		t.AppendRow(tableRow)
 	}
 
-	// Add divider and footer
-	divider := make(table.Row, len(data.Headers))
-	t.AppendRow(divider)
-	
-	footer := table.Row{"", "", "", "", "Cost", data.Total, "", "", "", ""}
+	// Footer with total
+	var footer table.Row
+	if data.HasTagColumn {
+		footer = table.Row{"", "", "", data.Total, "100%", "", ""}
+	} else {
+		footer = table.Row{"", "", data.Total, "100%", "", ""}
+	}
 	t.AppendFooter(footer)
-	
+
 	t.Render()
+	fmt.Println()
 	return nil
+}
+
+// formatCell applies conditional formatting to cells based on value and position
+func (r *StdoutTableRenderer) formatCell(cell string, colIndex int, row []string, costColIdx int) interface{} {
+	// Apply color coding based on cost amount
+	if colIndex == costColIdx && len(row) > costColIdx {
+		amount, err := strconv.ParseFloat(row[costColIdx], 64)
+		if err == nil {
+			switch {
+			case amount >= 5.0:
+				return text.FgHiRed.Sprint(cell) // High cost - red
+			case amount >= 1.0:
+				return text.FgHiYellow.Sprint(cell) // Medium cost - yellow
+			case amount >= 0.01:
+				return text.FgHiGreen.Sprint(cell) // Low cost - green
+			default:
+				return text.FgHiBlack.Sprint(cell) // Negligible - dim
+			}
+		}
+	}
+	return cell
 }
 
 // ForecastTableRenderer renders forecast table data to stdout  
