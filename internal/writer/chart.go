@@ -2,30 +2,15 @@ package writer
 
 import (
 	"fmt"
+
 	cc "github.com/cduggn/ccexplorer/internal/types"
-	"github.com/cduggn/ccexplorer/internal/utils"
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/components"
 	"github.com/go-echarts/go-echarts/v2/opts"
-
-	"io"
 )
 
-var (
-	chartFileName = "ccexplorer_chart.html"
-)
-
-func WriteToChart(p *components.Page) error {
-
-	f, err := utils.NewFile(OutputDir, chartFileName)
-	if err != nil {
-		return cc.Error{
-			Msg: "Failed creating chart HTML file: " + err.Error(),
-		}
-	}
-	defer f.Close()
-	return p.Render(io.MultiWriter(f))
-}
+// Builder provides methods for building chart components
+type Builder struct{}
 
 func (Builder) NewCharts(r cc.InputType) (*components.Page,
 	error) {

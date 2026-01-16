@@ -2,7 +2,6 @@ package types
 
 import (
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
-	"github.com/jedib0t/go-pretty/v6/table"
 )
 
 type Error struct {
@@ -12,18 +11,6 @@ type Error struct {
 func (e Error) Error() string {
 	return e.Msg
 }
-
-type PrintWriterType int
-
-type SortBy int
-
-const (
-	Stdout PrintWriterType = iota
-	CSV
-	Chart
-	OpenAPI
-	Pinecone
-)
 
 type InputType struct {
 	Services     []Service
@@ -50,19 +37,6 @@ type Metrics struct {
 	NumericAmount float64
 	Unit          string
 	UsageQuantity float64
-}
-
-type Table interface {
-	Writer(interface{})
-	Header()
-	Footer(row table.Row)
-	AddRows(rows []table.Row)
-	Style()
-}
-
-type CostAndUsage struct {
-	Rows  []table.Row
-	Total string
 }
 
 type CostAndUsageStdoutType struct {

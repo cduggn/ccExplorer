@@ -41,6 +41,7 @@ brews:
 dockers:
   - image_templates:
       - 'ghcr.io/cduggn/ccexplorer:{{ .Tag }}'
+      - 'ghcr.io/cduggn/ccexplorer:latest'
     dockerfile: Dockerfile-releaser
     goos: linux
     goarch: amd64
