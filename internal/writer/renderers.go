@@ -130,6 +130,7 @@ func (r *CSVRenderer) Render(data *CSVOutput) error {
 		return types.Error{Msg: "Error writing CSV data: " + err.Error()}
 	}
 
+	fmt.Printf("CSV written to: %s\n", filePath)
 	return nil
 }
 
