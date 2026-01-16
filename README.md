@@ -4,8 +4,12 @@
 
 <hr>
 <div align="center">
-<a href="https://github.com/cduggn/ccExplorer/actions" 
-alt="goreleaser status">
+<a href="https://github.com/cduggn/ccExplorer/actions/workflows/ci.yml"
+alt="CI status">
+<img src="https://github.com/cduggn/ccExplorer/actions/workflows/ci.yml/badge.svg">
+</a>
+<a href="https://github.com/cduggn/ccExplorer/actions/workflows/release.yml"
+alt="Release status">
 <img src="https://github.com/cduggn/ccExplorer/actions/workflows/release.yml/badge.svg">
 </a>
 <a href="https://goreportcard.com/report/github.com/cduggn/ccexplorer">
@@ -68,8 +72,8 @@ $ go run .\cmd\ccexplorer.go get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -f
 #### From`docker`:
 
 ```console
-# download
-$ docker pull ghcr.io/cduggn/ccexplorer:v0.8.4
+# download (use 'latest' or a specific version tag like 'v0.8.4')
+$ docker pull ghcr.io/cduggn/ccexplorer:latest
 
 # Container requires AWS Access key, secret, and region
 $ docker run -it \
@@ -77,7 +81,7 @@ $ docker run -it \
   -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
   -e AWS_REGION=<AWS-REGION> \
   --mount type=bind,source="$(pwd)"/output/,target=/app/output \
-  ghcr.io/cduggn/ccexplorer:v0.8.4 get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE -l
+  ghcr.io/cduggn/ccexplorer:latest get aws -g DIMENSION=OPERATION,DIMENSION=SERVICE -l
   
 ```
 
@@ -322,6 +326,42 @@ For detailed setup instructions, see [VSCode MCP Integration Guide](./docs/vscod
 - Credits and refunds are automatically applied to Cost Explorer results.
 - Cost Explorer API calls can be tracked using CloudTrail. 
 - Requests are issued against the `us-east-1` region.
+
+## Development
+<hr>
+
+### Build Commands
+
+```console
+$ make build      # Build application to bin/ directory
+$ make test       # Run all tests
+$ make test-race  # Run tests with race detection
+$ make lint       # Run golangci-lint
+```
+
+### CI/CD Pipeline
+
+All pull requests are automatically validated with build, test, and lint checks before merge.
+
+### Conventional Commits
+
+This project uses [Conventional Commits](https://www.conventionalcommits.org/) for automated versioning. Commit messages determine version bumps:
+
+| Prefix | Version Bump | Example |
+|--------|--------------|---------|
+| `fix:` | Patch (0.0.X) | `fix: resolve nil pointer in table renderer` |
+| `feat:` | Minor (0.X.0) | `feat: add percentage column to table output` |
+| `feat!:` | Major (X.0.0) | `feat!: change CLI flag format` |
+| `docs:`, `chore:`, `test:` | No release | `docs: update README` |
+
+### Release Process
+
+Releases are fully automated using [release-please](https://github.com/googleapis/release-please):
+
+1. Merge PRs with conventional commit messages to `main`
+2. Release-please creates a Release PR with changelog
+3. Merge the Release PR to trigger the release
+4. GoReleaser builds binaries, Docker image, and Homebrew formula
 
 ## Contributing
 ccexplorer is an open source project and built on the top of other open-source projects, hence we are always very happy to have contributions, whether for typo fix, bug fix or big new features. Please do not ever hesitate to ask a question or send a pull request.
