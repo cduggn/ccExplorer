@@ -16,12 +16,8 @@ ccExplorer/
 │   ├── utils/          # Utilities and transformations
 │   ├── ports/          # Interface definitions
 │   └── ...
-├── configs/            # Configuration examples
-├── scripts/            # Build and utility scripts
 ├── docs/               # Documentation
-├── api/                # API definitions
-├── examples/           # Usage examples
-└── tools/              # Supporting tools
+└── examples/           # Usage examples
 ```
 
 ## Data Flow
