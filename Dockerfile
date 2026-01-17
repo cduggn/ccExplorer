@@ -1,5 +1,5 @@
 # Build stage
-FROM  golang:1.22.0-alpine3.19 as build-stage
+FROM  golang:1.25-alpine as build-stage
 
 # Add Maintainer Info
 LABEL maintainer="Colin Duggan <duggan.colin@gmail.com>"
