@@ -133,7 +133,7 @@ func (p *ClientAPI) sendRequest(req *http.Request, v any) error {
 		return fmt.Errorf("failed to send request: %w", err)
 	}
 
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 	if res.StatusCode < http.StatusOK || res.StatusCode >= http.
 		StatusBadRequest {
 		return fmt.Errorf("unexpected status code %d", res.StatusCode)

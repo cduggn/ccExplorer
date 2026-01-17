@@ -200,7 +200,7 @@ func (r *CSVRenderer) Render(data *CSVOutput) error {
 	if err != nil {
 		return types.Error{Msg: "Error creating CSV file: " + err.Error()}
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
@@ -234,7 +234,7 @@ func (r *ChartRenderer) Render(data *ChartOutput) error {
 	if err != nil {
 		return types.Error{Msg: "Failed creating chart HTML file: " + err.Error()}
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	if err := data.Page.Render(io.MultiWriter(file)); err != nil {
 		return err
