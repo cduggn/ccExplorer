@@ -12,7 +12,7 @@ $(GORELEASER):
 	go install github.com/goreleaser/goreleaser@latest
 
 $(GOLANGCI_LINT):
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+	go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.8.0
 
 .PHONY: setup
 setup:
@@ -24,7 +24,7 @@ test:
 
 .PHONY: lint
 lint: $(GOLANGCI_LINT)
-	$(GOLANGCI_LINT) run --color=always --sort-results ./...
+	$(GOLANGCI_LINT) run --color=always ./...
 
 .PHONY: lint-exp
 lint-exp: $(GOLANGCI_LINT)
