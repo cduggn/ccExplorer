@@ -8,20 +8,17 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestParseGetCostAndUsageParams(t *testing.T) {
-	server := &Server{}
-
+func TestInputToParams(t *testing.T) {
 	tests := []struct {
 		name     string
-		args     map[string]interface{}
+		input    types.GetCostAndUsageInput
 		expected types.MCPToolParameters
-		wantErr  bool
 	}{
 		{
-			name: "valid basic parameters",
-			args: map[string]interface{}{
-				"start_date": "2024-01-01",
-				"end_date":   "2024-01-31",
+			name: "basic parameters with defaults",
+			input: types.GetCostAndUsageInput{
+				StartDate: "2024-01-01",
+				EndDate:   "2024-01-31",
 			},
 			expected: types.MCPToolParameters{
 				StartDate:   "2024-01-01",
@@ -29,64 +26,50 @@ func TestParseGetCostAndUsageParams(t *testing.T) {
 				Granularity: "MONTHLY",
 				Metrics:     []string{"UnblendedCost"},
 			},
-			wantErr: false,
 		},
 		{
-			name: "valid parameters with all options",
-			args: map[string]interface{}{
-				"start_date":         "2024-01-01",
-				"end_date":           "2024-01-31",
-				"granularity":        "DAILY",
-				"metrics":            []interface{}{"AmortizedCost", "BlendedCost"},
-				"group_by":           []interface{}{"SERVICE", "TAG:Project"},
-				"filter_by_service":  "Amazon Simple Storage Service",
-				"exclude_discounts":  true,
+			name: "all options specified",
+			input: types.GetCostAndUsageInput{
+				StartDate:        "2024-01-01",
+				EndDate:          "2024-01-31",
+				Granularity:      "DAILY",
+				Metrics:          "AmortizedCost, BlendedCost",
+				GroupBy:          "SERVICE, TAG:Project",
+				FilterByService:  "Amazon Simple Storage Service",
+				ExcludeDiscounts: true,
 			},
 			expected: types.MCPToolParameters{
-				StartDate:         "2024-01-01",
-				EndDate:           "2024-01-31",
-				Granularity:       "DAILY",
-				Metrics:           []string{"AmortizedCost", "BlendedCost"},
-				GroupBy:           []string{"SERVICE", "TAG:Project"},
-				FilterByService:   "Amazon Simple Storage Service",
-				ExcludeDiscounts:  true,
+				StartDate:        "2024-01-01",
+				EndDate:          "2024-01-31",
+				Granularity:      "DAILY",
+				Metrics:          []string{"AmortizedCost", "BlendedCost"},
+				GroupBy:          []string{"SERVICE", "TAG:Project"},
+				FilterByService:  "Amazon Simple Storage Service",
+				ExcludeDiscounts: true,
 			},
-			wantErr: false,
 		},
 		{
-			name: "missing start_date",
-			args: map[string]interface{}{
-				"end_date": "2024-01-31",
+			name: "single metric and group_by",
+			input: types.GetCostAndUsageInput{
+				StartDate:   "2024-01-01",
+				EndDate:     "2024-01-31",
+				Granularity: "MONTHLY",
+				Metrics:     "UnblendedCost",
+				GroupBy:     "SERVICE",
 			},
-			wantErr: true,
-		},
-		{
-			name: "missing end_date",
-			args: map[string]interface{}{
-				"start_date": "2024-01-01",
+			expected: types.MCPToolParameters{
+				StartDate:   "2024-01-01",
+				EndDate:     "2024-01-31",
+				Granularity: "MONTHLY",
+				Metrics:     []string{"UnblendedCost"},
+				GroupBy:     []string{"SERVICE"},
 			},
-			wantErr: true,
-		},
-		{
-			name: "invalid start_date type",
-			args: map[string]interface{}{
-				"start_date": 123,
-				"end_date":   "2024-01-31",
-			},
-			wantErr: true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := server.parseGetCostAndUsageParams(tt.args)
-
-			if tt.wantErr {
-				assert.Error(t, err)
-				return
-			}
-
-			require.NoError(t, err)
+			result := inputToParams(tt.input)
 			assert.Equal(t, tt.expected.StartDate, result.StartDate)
 			assert.Equal(t, tt.expected.EndDate, result.EndDate)
 			assert.Equal(t, tt.expected.Granularity, result.Granularity)

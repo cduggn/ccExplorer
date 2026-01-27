@@ -1,11 +1,11 @@
 package cli
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 
 	"github.com/cduggn/ccexplorer/internal/mcp"
-	"github.com/mark3labs/mcp-go/server"
 	"github.com/spf13/cobra"
 )
 
@@ -61,8 +61,8 @@ func runMCPServe(cmd *cobra.Command, args []string) error {
 
 	slog.Info("MCP tools registered successfully, starting stdio server")
 
-	// Start MCP server with stdio transport (recommended for MCP clients)
-	if err := server.ServeStdio(mcpServer.MCPServer()); err != nil {
+	// Start MCP server with stdio transport
+	if err := mcpServer.Run(context.Background()); err != nil {
 		return fmt.Errorf("MCP stdio server error: %w", err)
 	}
 

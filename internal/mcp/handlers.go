@@ -9,35 +9,26 @@ import (
 
 	"github.com/cduggn/ccexplorer/internal/types"
 	"github.com/cduggn/ccexplorer/internal/utils"
-	"github.com/mark3labs/mcp-go/mcp"
+	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
 // handleGetCostAndUsage handles the get_cost_and_usage MCP tool call
-func (s *Server) handleGetCostAndUsage(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	slog.Info("Handling get_cost_and_usage request", "arguments", request.Params.Arguments)
+func (s *Server) handleGetCostAndUsage(ctx context.Context, req *mcp.CallToolRequest, input types.GetCostAndUsageInput) (*mcp.CallToolResult, any, error) {
+	slog.Info("Handling get_cost_and_usage request", "input", input)
 
-	// Type assert the arguments
-	args, ok := request.Params.Arguments.(map[string]interface{})
-	if !ok {
-		return nil, fmt.Errorf("invalid arguments type")
-	}
-
-	// Parse and validate arguments
-	mcpParams, err := s.parseGetCostAndUsageParams(args)
-	if err != nil {
-		return nil, fmt.Errorf("invalid parameters: %w", err)
-	}
+	// Convert typed input to internal MCPToolParameters
+	mcpParams := inputToParams(input)
 
 	// Translate MCP parameters to internal request type
 	internalRequest, err := s.translateMCPToInternalRequest(mcpParams)
 	if err != nil {
-		return nil, fmt.Errorf("failed to translate parameters: %w", err)
+		return nil, nil, fmt.Errorf("failed to translate parameters: %w", err)
 	}
 
 	// Call AWS Cost Explorer service
 	result, err := s.awsService.GetCostAndUsage(ctx, internalRequest)
 	if err != nil {
-		return nil, fmt.Errorf("AWS service error: %w", err)
+		return nil, nil, fmt.Errorf("AWS service error: %w", err)
 	}
 
 	// Transform the response to a format suitable for MCP
@@ -46,59 +37,35 @@ func (s *Server) handleGetCostAndUsage(ctx context.Context, request mcp.CallTool
 	// Convert to JSON for MCP response
 	responseJSON, err := json.MarshalIndent(response, "", "  ")
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal response: %w", err)
+		return nil, nil, fmt.Errorf("failed to marshal response: %w", err)
 	}
 
 	// Return MCP tool result
-	return mcp.NewToolResultText(string(responseJSON)), nil
+	return &mcp.CallToolResult{
+		Content: []mcp.Content{&mcp.TextContent{Text: string(responseJSON)}},
+	}, nil, nil
 }
 
-// parseGetCostAndUsageParams parses the MCP tool arguments into MCPToolParameters
-func (s *Server) parseGetCostAndUsageParams(args map[string]interface{}) (types.MCPToolParameters, error) {
-	var params types.MCPToolParameters
-
-	// Required parameters
-	if startDate, ok := args["start_date"].(string); ok {
-		params.StartDate = startDate
-	} else {
-		return params, fmt.Errorf("start_date is required and must be a string")
+// inputToParams converts the typed SDK input to internal MCPToolParameters
+func inputToParams(input types.GetCostAndUsageInput) types.MCPToolParameters {
+	params := types.MCPToolParameters{
+		StartDate:        input.StartDate,
+		EndDate:          input.EndDate,
+		Granularity:      input.Granularity,
+		FilterByService:  input.FilterByService,
+		ExcludeDiscounts: input.ExcludeDiscounts,
 	}
 
-	if endDate, ok := args["end_date"].(string); ok {
-		params.EndDate = endDate
-	} else {
-		return params, fmt.Errorf("end_date is required and must be a string")
-	}
-
-	// Optional parameters with defaults
-	if granularity, ok := args["granularity"].(string); ok {
-		params.Granularity = granularity
-	} else {
+	if params.Granularity == "" {
 		params.Granularity = "MONTHLY"
 	}
 
-	// Parse metrics - can be array or comma-separated string
-	if metricsInterface, ok := args["metrics"]; ok {
-		if metricsArray, ok := metricsInterface.([]interface{}); ok {
-			// Handle array format (typically from HTTP JSON-RPC)
-			for _, metric := range metricsArray {
-				if metricStr, ok := metric.(string); ok {
-					params.Metrics = append(params.Metrics, metricStr)
-				}
-			}
-		} else if metricsStr, ok := metricsInterface.(string); ok && metricsStr != "" {
-			// Handle string format (typically from stdio)
-			if strings.Contains(metricsStr, ",") {
-				// Comma-separated values
-				for _, metric := range strings.Split(metricsStr, ",") {
-					metric = strings.TrimSpace(metric)
-					if metric != "" {
-						params.Metrics = append(params.Metrics, metric)
-					}
-				}
-			} else {
-				// Single metric
-				params.Metrics = append(params.Metrics, metricsStr)
+	// Parse comma-separated metrics
+	if input.Metrics != "" {
+		for _, m := range strings.Split(input.Metrics, ",") {
+			m = strings.TrimSpace(m)
+			if m != "" {
+				params.Metrics = append(params.Metrics, m)
 			}
 		}
 	}
@@ -106,41 +73,15 @@ func (s *Server) parseGetCostAndUsageParams(args map[string]interface{}) (types.
 		params.Metrics = []string{"UnblendedCost"}
 	}
 
-	// Parse group_by - can be array or comma-separated string
-	if groupByInterface, ok := args["group_by"]; ok {
-		if groupByArray, ok := groupByInterface.([]interface{}); ok {
-			// Handle array format (typically from HTTP JSON-RPC)
-			for _, groupBy := range groupByArray {
-				if groupByStr, ok := groupBy.(string); ok {
-					params.GroupBy = append(params.GroupBy, groupByStr)
-				}
-			}
-		} else if groupByStr, ok := groupByInterface.(string); ok && groupByStr != "" {
-			// Handle string format (typically from stdio)
-			if strings.Contains(groupByStr, ",") {
-				// Comma-separated values
-				for _, groupBy := range strings.Split(groupByStr, ",") {
-					groupBy = strings.TrimSpace(groupBy)
-					if groupBy != "" {
-						params.GroupBy = append(params.GroupBy, groupBy)
-					}
-				}
-			} else {
-				// Single group_by
-				params.GroupBy = append(params.GroupBy, groupByStr)
+	// Parse comma-separated group_by
+	if input.GroupBy != "" {
+		for _, g := range strings.Split(input.GroupBy, ",") {
+			g = strings.TrimSpace(g)
+			if g != "" {
+				params.GroupBy = append(params.GroupBy, g)
 			}
 		}
 	}
 
-	// Optional filter parameters
-	if filterService, ok := args["filter_by_service"].(string); ok && filterService != "" {
-		params.FilterByService = filterService
-	}
-
-	if excludeDiscounts, ok := args["exclude_discounts"].(bool); ok {
-		params.ExcludeDiscounts = excludeDiscounts
-	}
-
-	return params, nil
+	return params
 }
-
