@@ -254,12 +254,12 @@ func NewVectorRenderer() *VectorRenderer {
 
 // Render implements the Renderer interface for vector databases
 func (r *VectorRenderer) Render(data *VectorOutput) error {
-	// Create the vector store client - this would need to be passed in or configured
+	// NewVectorStoreClient(builder, openAIAPIKey, indexURL, pineconeAPIKey)
 	client := NewVectorStoreClient(
 		http.NewRequestBuilder(),
-		data.IndexName,
-		"", // API keys would need to be provided
-		"",
+		data.OpenAIAPIKey,
+		data.IndexURL,
+		data.PineconeAPIKey,
 	)
 
 	// Create embeddings for the vector items

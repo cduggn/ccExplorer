@@ -30,14 +30,20 @@ func ValidateInput(input types.CommandLineInput) error {
 		}
 	}
 
-	if input.PrintFormat == "pinecone" && input.OpenAIAPIKey == "" {
-		return ValidationError{
-			Message: "OpenAI API key not set. " +
-				"Please set the OPENAI_API_KEY in the config file or environment variable",
+	if input.PrintFormat == "pinecone" {
+		for _, missing := range []struct{ value, env string }{
+			{input.OpenAIAPIKey, "OPENAI_API_KEY"},
+			{input.PineconeAPIKey, "PINECONE_API_KEY"},
+			{input.PineconeIndex, "PINECONE_INDEX"},
+		} {
+			if missing.value == "" {
+				return ValidationError{
+					Message: missing.env + " is not set. It is required for " +
+						"-p pinecone; export it before running the query",
+				}
+			}
 		}
-	}
 
-	if input.PrintFormat == "pinecone" && input.OpenAIAPIKey != "" {
 		if HasAccountInformation(input.GroupByDimension) {
 			return ValidationError{
 				Message: "Cannot use Pinecone with account information. " +

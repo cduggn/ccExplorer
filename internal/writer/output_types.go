@@ -35,11 +35,15 @@ type ChartOutput struct {
 	Filename  string
 }
 
-// VectorOutput represents data formatted for vector database storage
+// VectorOutput represents data formatted for vector database storage.
+// It carries the vector store credentials because the renderer, not the
+// transformer, is what actually talks to Pinecone and OpenAI.
 type VectorOutput struct {
-	Items       []*types.VectorStoreItem
-	IndexName   string
-	BatchSize   int
+	Items          []*types.VectorStoreItem
+	IndexURL       string
+	PineconeAPIKey string
+	OpenAIAPIKey   string
+	BatchSize      int
 }
 
 // ForecastTableOutput represents forecast data for table display
@@ -86,11 +90,14 @@ func NewChartOutput(page *components.Page, title, filename string) *ChartOutput 
 }
 
 // NewVectorOutput creates a new VectorOutput instance
-func NewVectorOutput(items []*types.VectorStoreItem, indexName string) *VectorOutput {
+func NewVectorOutput(items []*types.VectorStoreItem, indexURL,
+	pineconeAPIKey, openAIAPIKey string) *VectorOutput {
 	return &VectorOutput{
-		Items:     items,
-		IndexName: indexName,
-		BatchSize: 25, // default batch size
+		Items:          items,
+		IndexURL:       indexURL,
+		PineconeAPIKey: pineconeAPIKey,
+		OpenAIAPIKey:   openAIAPIKey,
+		BatchSize:      25, // default batch size
 	}
 }
 

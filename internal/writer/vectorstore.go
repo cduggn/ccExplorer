@@ -15,11 +15,6 @@ type VectorStore interface {
 }
 
 type VectorStoreClient struct {
-	apikey         string
-	indexUrl       string
-	openAIAPIKey   string
-	requestbuilder http.Builder
-
 	client *pinecone2.ClientAPI
 }
 
@@ -27,10 +22,6 @@ func NewVectorStoreClient(builder http.Builder, openAIAPIKey,
 	indexUrl,
 	pineconeAPIKey string) VectorStore {
 	return &VectorStoreClient{
-		apikey:         openAIAPIKey,
-		indexUrl:       indexUrl,
-		openAIAPIKey:   pineconeAPIKey,
-		requestbuilder: builder,
 		client: pinecone2.NewVectorStoreClient(builder, indexUrl,
 			pineconeAPIKey, openAIAPIKey),
 	}

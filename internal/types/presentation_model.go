@@ -74,9 +74,12 @@ type CostAndUsageOutputType struct {
 	Dimensions     []string
 	Tags           []string
 	SortBy         string
-	OpenAIAPIKey   string
-	PineconeAPIKey string
-	PineconeIndex  string
+	// Credentials are plumbed through this type to reach the writer. They
+	// must never be serialised: this struct is marshalled verbatim into MCP
+	// tool results, which are handed to a model.
+	OpenAIAPIKey   string `json:"-"`
+	PineconeAPIKey string `json:"-"`
+	PineconeIndex  string `json:"-"`
 }
 
 type ForecastPrintData struct {
