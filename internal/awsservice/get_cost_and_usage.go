@@ -2,6 +2,7 @@ package awsservice
 
 import (
 	"context"
+	"fmt"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
@@ -41,7 +42,7 @@ var (
 			Not: &types.Expression{
 				Dimensions: &types.DimensionValues{
 					Key:    "RECORD_TYPE", // Note: RECORD_TYPE is the equivalent of CHARGE_TYPE - https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/manage-cost-categories.html#cost-categories-terms
-					Values: []string{"Refund", "Credit", "DiscountedUsage", "Discount", "BundledDiscount ", "SavingsPlanCoveredUsage", "SavingsPlanNegation"},
+					Values: []string{"Refund", "Credit", "DiscountedUsage", "Discount", "BundledDiscount", "SavingsPlanCoveredUsage", "SavingsPlanNegation"},
 				},
 			},
 		}
@@ -67,28 +68,64 @@ var (
 	}
 )
 
+// maxPages bounds pagination. Cost Explorer bills per request, so a runaway
+// token loop is expensive as well as slow.
+const maxPages = 100
+
 func (srv *Service) GetCostAndUsage(ctx context.Context,
 	req types2.CostAndUsageRequestType) (
 	*costexplorer.GetCostAndUsageOutput,
 	error) {
 
-	result, err := srv.Client.GetCostAndUsage(context.TODO(),
-		&costexplorer.GetCostAndUsageInput{
-			Granularity: types.Granularity(req.Granularity), //todo: add option to pass HOURLY granularity as well
-			Metrics:     req.Metrics,
-			TimePeriod: &types.DateInterval{
-				Start: aws.String(req.Time.Start),
-				End:   aws.String(req.Time.End),
-			},
-			GroupBy: CostAndUsageGroupByGenerator(req),
-			Filter:  CostAndUsageFilterGenerator(req),
-		})
-
-	if err != nil {
-		return nil, types2.APIError{
-			Msg: err.Error(),
-		}
+	input := &costexplorer.GetCostAndUsageInput{
+		Granularity: types.Granularity(req.Granularity),
+		Metrics:     req.Metrics,
+		TimePeriod: &types.DateInterval{
+			Start: aws.String(req.Time.Start),
+			End:   aws.String(req.Time.End),
+		},
+		GroupBy: CostAndUsageGroupByGenerator(req),
+		Filter:  CostAndUsageFilterGenerator(req),
 	}
+
+	var result *costexplorer.GetCostAndUsageOutput
+
+	for page := 1; ; page++ {
+		out, err := srv.Client.GetCostAndUsage(ctx, input)
+		if err != nil {
+			return nil, types2.APIError{
+				Msg: err.Error(),
+			}
+		}
+
+		if result == nil {
+			result = out
+		} else {
+			result.ResultsByTime = append(result.ResultsByTime,
+				out.ResultsByTime...)
+			result.DimensionValueAttributes = append(
+				result.DimensionValueAttributes,
+				out.DimensionValueAttributes...)
+		}
+
+		if out.NextPageToken == nil || *out.NextPageToken == "" {
+			break
+		}
+
+		if page >= maxPages {
+			return nil, types2.APIError{
+				Msg: fmt.Sprintf(
+					"result set exceeded %d pages; narrow the date range, "+
+						"granularity or grouping", maxPages),
+			}
+		}
+
+		input.NextPageToken = out.NextPageToken
+	}
+
+	// The token describes the last page fetched, not the aggregate we return.
+	result.NextPageToken = nil
+
 	return result, nil
 }
 

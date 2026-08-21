@@ -8,8 +8,18 @@ import (
 	"github.com/cduggn/ccexplorer/internal/types"
 )
 
+// CostExplorerAPI is the subset of the Cost Explorer client used by this
+// package. It exists so the pagination and filter logic can be exercised
+// without a live AWS account.
+type CostExplorerAPI interface {
+	GetCostAndUsage(ctx context.Context, params *costexplorer.GetCostAndUsageInput,
+		optFns ...func(*costexplorer.Options)) (*costexplorer.GetCostAndUsageOutput, error)
+	GetCostForecast(ctx context.Context, params *costexplorer.GetCostForecastInput,
+		optFns ...func(*costexplorer.Options)) (*costexplorer.GetCostForecastOutput, error)
+}
+
 type Service struct {
-	*costexplorer.Client
+	Client CostExplorerAPI
 }
 
 func New() (*Service, error) {
