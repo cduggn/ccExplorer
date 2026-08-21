@@ -1,5 +1,5 @@
 # Build stage
-FROM  golang:1.25-alpine as build-stage
+FROM golang:1.25-alpine AS build-stage
 
 # Add Maintainer Info
 LABEL maintainer="Colin Duggan <duggan.colin@gmail.com>"
@@ -18,10 +18,10 @@ COPY . .
 
 # Build the Go app
 RUN CGO_ENABLED=0 GOOS=linux go build -a -o ccexplorer \
-    ./cmd
+    ./cmd/ccexplorer
 
 # Run stage
-FROM alpine:3 as run-stage
+FROM alpine:3 AS run-stage
 
 # Copy the binary from build-stage
 COPY --from=build-stage /app/ccexplorer .
