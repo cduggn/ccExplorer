@@ -52,6 +52,17 @@ func ValidateInput(input types.CommandLineInput) error {
 		}
 	}
 
+	if err := validateGranularityAgainstDates(input.Interval, input.Start,
+		input.End); err != nil {
+		return err
+	}
+
+	if len(input.Metrics) == 0 {
+		return ValidationError{
+			Message: "A cost metric must be specified",
+		}
+	}
+
 	IsValid := IsValidMetric(input.Metrics[0])
 	if !IsValid {
 		return ValidationError{
@@ -63,6 +74,29 @@ func ValidateInput(input types.CommandLineInput) error {
 	return nil
 }
 
+const (
+	dateLayout      = "2006-01-02"
+	timestampLayout = time.RFC3339
+)
+
+// ParseDate accepts either a plain calendar date or an ISO 8601 timestamp,
+// which is what Cost Explorer requires for HOURLY granularity. The second
+// return value reports whether the value carried a time component.
+func ParseDate(value string) (time.Time, bool, error) {
+	if t, err := time.Parse(timestampLayout, value); err == nil {
+		return t, true, nil
+	}
+	t, err := time.Parse(dateLayout, value)
+	if err != nil {
+		return time.Time{}, false, ValidationError{
+			Message: "Invalid date " + value +
+				". Use YYYY-MM-DD, or an ISO 8601 timestamp such as " +
+				"2006-01-02T15:04:05Z for HOURLY granularity",
+		}
+	}
+	return t, false, nil
+}
+
 func ValidateStartDate(startDate string) error {
 	if startDate == "" {
 		return ValidationError{
@@ -70,9 +104,12 @@ func ValidateStartDate(startDate string) error {
 		}
 	}
 
-	start, _ := time.Parse("2006-01-02", startDate)
-	today := time.Now()
-	if start.After(today) {
+	start, _, err := ParseDate(startDate)
+	if err != nil {
+		return err
+	}
+
+	if start.After(time.Now()) {
 		return ValidationError{
 			Message: "Start date must be before today's date",
 		}
@@ -88,18 +125,51 @@ func ValidateEndDate(endDate, startDate string) error {
 		}
 	}
 
-	end, _ := time.Parse("2006-01-02", endDate)
-	today := time.Now()
-	if end.After(today) {
+	end, _, err := ParseDate(endDate)
+	if err != nil {
+		return err
+	}
+
+	if end.After(time.Now()) {
 		return ValidationError{
 			Message: "End date must be before today's date",
 		}
 	}
 
-	start, _ := time.Parse("2006-01-02", startDate)
+	start, _, err := ParseDate(startDate)
+	if err != nil {
+		return err
+	}
+
 	if end.Before(start) {
 		return ValidationError{
 			Message: "End date must not be before start date",
+		}
+	}
+
+	return nil
+}
+
+// validateGranularityAgainstDates rejects the combination Cost Explorer
+// itself rejects: HOURLY granularity requires both bounds to carry a time
+// component, and the flag defaults are plain calendar dates, so `-m HOURLY`
+// with default dates could only ever fail at the API.
+func validateGranularityAgainstDates(interval, start, end string) error {
+	if interval != "HOURLY" {
+		return nil
+	}
+
+	for label, value := range map[string]string{"start": start, "end": end} {
+		_, hasTime, err := ParseDate(value)
+		if err != nil {
+			return err
+		}
+		if !hasTime {
+			return ValidationError{
+				Message: "HOURLY granularity requires an ISO 8601 " +
+					label + " date with a time component, for example " +
+					"2006-01-02T15:04:05Z (got " + value + ")",
+			}
 		}
 	}
 
