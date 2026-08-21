@@ -47,12 +47,13 @@ func runMCPServe(cmd *cobra.Command, args []string) error {
 	slog.Info("Starting ccExplorer MCP server with stdio transport")
 
 	// Configure AWS service (reuse existing service initialization)
-	if srv == nil {
-		Initialize()
+	aws, err := awsService()
+	if err != nil {
+		return fmt.Errorf("failed to configure AWS service: %w", err)
 	}
 
 	// Create MCP server
-	mcpServer := mcp.NewServer(srv.aws)
+	mcpServer := mcp.NewServer(aws)
 
 	// Register tools
 	if err := mcpServer.RegisterTools(); err != nil {

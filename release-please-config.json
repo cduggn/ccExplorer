@@ -3,18 +3,12 @@
     ".": {
       "release-type": "go",
       "package-name": "ccexplorer",
+      "include-component-in-tag": false,
       "changelog-path": "CHANGELOG.md",
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": true,
       "draft": false,
-      "prerelease": false,
-      "extra-files": [
-        {
-          "type": "generic",
-          "path": "README.md",
-          "glob": false
-        }
-      ]
+      "prerelease": false
     }
   },
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json"

@@ -57,7 +57,7 @@ build:
 
 .PHONY: release
 release: $(GORELEASER)
-	$(GORELEASER) release --rm-dist
+	$(GORELEASER) release --clean
 
 .PHONY: clean
 clean: clean-lint-cache

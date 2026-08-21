@@ -4,35 +4,29 @@ import (
 	"github.com/cduggn/ccexplorer/internal/config"
 	"github.com/common-nighthawk/go-figure"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var (
 	rootCmd = &cobra.Command{
-		Use:     "ccexplorer",
-		Version: "0.7.5",
-		Short:   "A CLI tool to explore cloud costs and usage",
-		Long:    paintRootHeader(),
+		Use:   "ccexplorer",
+		Short: "A CLI tool to explore cloud costs and usage",
+		Long:  paintRootHeader(),
 	}
 )
 
-func RootCommand() *cobra.Command {
+// RootCommand returns the root command annotated with the build version.
+// AWS clients are not constructed here: they are resolved lazily by the
+// subcommands that need them so that --help and --version work without
+// credentials.
+func RootCommand(version string) *cobra.Command {
 	config.LoadConfigFunc(".")()
-	Initialize()
+	rootCmd.Version = version
 	return rootCmd
 }
 
 func init() {
 	rootCmd.AddCommand(CostAndForecast())
 	rootCmd.AddCommand(mcpCommand())
-	_ = viper.BindPFlag("openai_api_key", rootCmd.PersistentFlags().Lookup(
-		"OPENAI_API_KEY"))
-	_ = viper.BindPFlag("aws_profile", rootCmd.PersistentFlags().Lookup(
-		"AWS_PROFILE"))
-	_ = viper.BindPFlag("PINECONE_INDEX", rootCmd.PersistentFlags().Lookup(
-		"PINECONE_INDEX"))
-	_ = viper.BindPFlag("PINECONE_API_KEY", rootCmd.PersistentFlags().Lookup(
-		"PINECONE_API_KEY"))
 }
 
 func paintRootHeader() string {

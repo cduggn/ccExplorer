@@ -16,6 +16,8 @@ builds:
       - windows
       - darwin
     gobinary: "go"
+    ldflags:
+      - -s -w -X main.version={{ .Version }}
     goarch:
       - amd64
       - arm64
