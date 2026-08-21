@@ -12,17 +12,11 @@ jobs:
   goreleaser:
     name: GoReleaser
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.get_version.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Get version from tag
-        id: get_version
-        run: echo "version=${{ github.ref_name }}" >> $GITHUB_OUTPUT
 
       - name: Docker Login
         uses: docker/login-action@v3
@@ -37,6 +31,9 @@ jobs:
           go-version-file: 'go.mod'
           cache: true
 
+      - name: Test
+        run: go test -race ./...
+
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
@@ -45,34 +42,3 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.PUBLISHER_TOKEN }}
-
-  update-readme:
-    name: Update README Version
-    runs-on: ubuntu-latest
-    needs: goreleaser
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: main
-          token: ${{ secrets.PUBLISHER_TOKEN }}
-
-      - name: Update Docker version in README
-        env:
-          VERSION: ${{ needs.goreleaser.outputs.version }}
-        run: |
-          sed -i "s|ghcr.io/cduggn/ccexplorer:v[0-9]*\.[0-9]*\.[0-9]*|ghcr.io/cduggn/ccexplorer:${VERSION}|g" README.md
-
-      - name: Commit and push README update
-        env:
-          VERSION: ${{ needs.goreleaser.outputs.version }}
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet README.md; then
-            echo "No changes to commit"
-            exit 0
-          fi
-          git add README.md
-          git commit -m "docs: update Docker image version to ${VERSION} [skip ci]"
-          git push origin main

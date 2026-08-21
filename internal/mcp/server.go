@@ -17,7 +17,7 @@ type Server struct {
 // NewServer creates a new MCP server instance for stdio transport
 func NewServer(awsService ports.AWSService) *Server {
 	slog.Info("Creating new ccExplorer MCP server")
-	
+
 	mcpServer := server.NewMCPServer(
 		"ccExplorer MCP Server",
 		"1.0.0",
@@ -33,7 +33,7 @@ func NewServer(awsService ports.AWSService) *Server {
 // RegisterTools registers all available MCP tools with the server
 func (s *Server) RegisterTools() error {
 	slog.Info("Registering MCP tools")
-	
+
 	// Register the get_cost_and_usage tool
 	getCostTool := mcp.NewTool("get_cost_and_usage",
 		mcp.WithDescription("Query AWS Cost Explorer for cost and usage data"),
@@ -49,7 +49,7 @@ func (s *Server) RegisterTools() error {
 	// Add tool to the MCP server with our handler
 	s.mcpServer.AddTool(getCostTool, s.handleGetCostAndUsage)
 	slog.Info("Successfully registered get_cost_and_usage tool")
-	
+
 	return nil
 }
 

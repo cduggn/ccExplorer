@@ -15,6 +15,10 @@
 bin/
 dist/
 output/
+# the compiled binary, if built into the repo root
+/ccexplorer
+# generated CSV/chart output (see writer.OutputDir)
+/writer/
 
 # Archive files
 *.zip

@@ -26,9 +26,9 @@ test:
 lint: $(GOLANGCI_LINT)
 	$(GOLANGCI_LINT) run --color=always ./...
 
-.PHONY: lint-exp
-lint-exp: $(GOLANGCI_LINT)
-	$(GOLANGCI_LINT) run --fix --config .golangci-exp.yaml ./...
+.PHONY: fmt
+fmt: $(GOLANGCI_LINT)
+	$(GOLANGCI_LINT) fmt ./...
 
 .PHONY: test-race
 test-race:

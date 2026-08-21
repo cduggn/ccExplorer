@@ -11,7 +11,7 @@ func (c *CostCommandType) ExtractGroupBySelections() ([]string, []string) {
 	// groupBY dimensions and tags
 	groupByValues := c.Cmd.Flags().Lookup("groupBy").Value
 	groupBy, _ := groupByValues.(*flags.GroupByFlag)
-	
+
 	groupByData := groupBy.Value()
 
 	// groupBy TAGs
@@ -35,7 +35,7 @@ func (c *CostCommandType) ExtractFilterBySelection() (types.FilterBySelections, 
 
 	filterByValues := c.Cmd.Flags().Lookup("filterBy").Value
 	filterBy, _ := filterByValues.(*flags.FilterByFlag)
-	
+
 	filterByData := filterBy.Value()
 
 	if len(filterByData.Tags) > 1 {

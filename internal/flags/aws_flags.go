@@ -2,7 +2,7 @@ package flags
 
 // Type aliases for cleaner usage
 type GroupByFlag = Flag[GroupByType, DimensionValidator]
-type FilterByFlag = Flag[FilterByType, FilterValidator] 
+type FilterByFlag = Flag[FilterByType, FilterValidator]
 type DimensionFilterFlag = Flag[map[string]string, DimensionOnlyValidator]
 
 // Factory functions for creating AWS-specific flags
@@ -30,7 +30,7 @@ func (f *DimensionAndTagFlag) Value() GroupByType {
 	return f.GroupByFlag.Value()
 }
 
-// DimensionAndTagFilterFlag provides backward compatibility  
+// DimensionAndTagFilterFlag provides backward compatibility
 type DimensionAndTagFilterFlag struct {
 	*FilterByFlag
 }

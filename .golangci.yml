@@ -1,0 +1,11 @@
+# golangci-lint v2. `linters` is deliberately left unset so the standard
+# linter set applies, exactly as it did when this repo had no config at all.
+# The only new enforcement here is formatting.
+version: "2"
+
+formatters:
+  enable:
+    - gofmt
+  settings:
+    gofmt:
+      simplify: true

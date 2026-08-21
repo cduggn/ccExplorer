@@ -13,7 +13,7 @@ func (srv *Service) GetCostForecast(ctx context.Context,
 	*costexplorer.
 		GetCostForecastOutput, error) {
 
-	result, err := srv.Client.GetCostForecast(context.TODO(),
+	result, err := srv.Client.GetCostForecast(ctx,
 		&costexplorer.GetCostForecastInput{
 			Granularity: types.Granularity(req.Granularity),
 			Metric:      types.Metric(req.Metric),

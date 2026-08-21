@@ -6,8 +6,12 @@ import (
 	"os"
 )
 
+// version is the build version. It is overwritten at release time by
+// goreleaser via -X main.version and stays "dev" for local builds.
+var version = "dev"
+
 func main() {
-	root := cli.RootCommand()
+	root := cli.RootCommand(version)
 
 	if err := root.Execute(); err != nil {
 		slog.Error("error", ErrAttr(err))

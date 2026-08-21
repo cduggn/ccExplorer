@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	costexplorertypes "github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
+	"github.com/cduggn/ccexplorer/internal/http"
 	"github.com/cduggn/ccexplorer/internal/types"
 	"github.com/cduggn/ccexplorer/internal/utils"
 )
@@ -121,9 +122,9 @@ func (t *CostUsageToCSVTransformer) Transform(input types.CostAndUsageOutputType
 		"Dimension/Tag", "Dimension/Tag", "Metric",
 		"Granularity", "Start", "End", "USD Amount", "Unit",
 	}
-	
+
 	rows := utils.ConvertServiceMapToArray(input.Services, input.Granularity)
-	
+
 	return NewCSVOutput(headers, rows, "ccexplorer.csv"), nil
 }
 
@@ -145,12 +146,12 @@ func NewCostUsageToChartTransformer(sortBy string) *CostUsageToChartTransformer 
 func (t *CostUsageToChartTransformer) Transform(input types.CostAndUsageOutputType) (*ChartOutput, error) {
 	sortedServices := t.sortFunc(input.Services)
 	chartInput := utils.ConvertToChartInputType(input, sortedServices)
-	
+
 	page, err := t.builder.NewCharts(chartInput)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return NewChartOutput(page, "Cost and Usage Report", "ccexplorer_chart.html"), nil
 }
 
@@ -164,13 +165,16 @@ func NewCostUsageToVectorTransformer() *CostUsageToVectorTransformer {
 
 // Transform implements the Transformer interface for vector output
 func (t *CostUsageToVectorTransformer) Transform(input types.CostAndUsageOutputType) (*VectorOutput, error) {
-	client := NewVectorStoreClient(nil, input.PineconeIndex, input.PineconeAPIKey, input.OpenAIAPIKey)
+	// NewVectorStoreClient(builder, openAIAPIKey, indexURL, pineconeAPIKey)
+	client := NewVectorStoreClient(http.NewRequestBuilder(),
+		input.OpenAIAPIKey, input.PineconeIndex, input.PineconeAPIKey)
 	items, err := client.CreateVectorStoreInput(input)
 	if err != nil {
 		return nil, err
 	}
-	
-	return NewVectorOutput(items, input.PineconeIndex), nil
+
+	return NewVectorOutput(items, input.PineconeIndex,
+		input.PineconeAPIKey, input.OpenAIAPIKey), nil
 }
 
 // ForecastToTableTransformer transforms forecast data to table format
@@ -188,7 +192,7 @@ func (t *ForecastToTableTransformer) Transform(input types.ForecastPrintData) (*
 		"Prediction Interval LowerBound",
 		"Prediction Interval UpperBound", "Unit", "Total",
 	}
-	
+
 	// Use generic transformation for creating rows
 	rows := utils.Transform(input.Forecast.ForecastResultsByTime, func(forecast costexplorertypes.ForecastResult) []string {
 		return []string{
@@ -199,13 +203,13 @@ func (t *ForecastToTableTransformer) Transform(input types.ForecastPrintData) (*
 			*forecast.PredictionIntervalUpperBound,
 		}
 	})
-	
+
 	total := types.Total{
 		Amount: *input.Forecast.Total.Amount,
 		Unit:   *input.Forecast.Total.Unit,
 	}
-	
+
 	filterInfo := strings.Join(input.Filters, " | ")
-	
+
 	return NewForecastTableOutput(headers, rows, filterInfo, total), nil
 }

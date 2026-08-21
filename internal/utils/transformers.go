@@ -23,14 +23,14 @@ func TransformServiceMapToRows(serviceMap map[int]types.Service, granularity str
 	for _, service := range serviceMap {
 		services = append(services, service)
 	}
-	
+
 	// Then transform each service to its row representation
 	var allRows [][]string
 	for _, service := range services {
 		rows := ConvertServiceToSlice(service, granularity)
 		allRows = append(allRows, rows...)
 	}
-	
+
 	return allRows
 }
 
@@ -47,7 +47,7 @@ func TransformServicesWithMetrics(services []types.Service) []types.Service {
 				UsageQuantity: metric.UsageQuantity,
 			}
 		})
-		
+
 		return types.Service{
 			Name:    service.Name,
 			Keys:    service.Keys,
@@ -106,18 +106,18 @@ func CalculateTotalCost(services []types.Service) float64 {
 // ExtractUniqueKeys extracts all unique keys from services
 func ExtractUniqueKeys(services []types.Service) []string {
 	keySet := make(map[string]bool)
-	
+
 	for _, service := range services {
 		for _, key := range service.Keys {
 			keySet[key] = true
 		}
 	}
-	
+
 	keys := make([]string, 0, len(keySet))
 	for key := range keySet {
 		keys = append(keys, key)
 	}
-	
+
 	return keys
 }
 

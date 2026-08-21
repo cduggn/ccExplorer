@@ -127,13 +127,13 @@ func TestConvertSlice(t *testing.T) {
 
 func TestMaxLen(t *testing.T) {
 	items := []string{"a", "b", "c", "d", "e"}
-	
+
 	// Test when slice is longer than max
 	max := MaxLen(items, 3)
 	if max != 3 {
 		t.Errorf("MaxLen failed. Expected 3, got %d", max)
 	}
-	
+
 	// Test when slice is shorter than max
 	max = MaxLen(items, 10)
 	if max != 5 {

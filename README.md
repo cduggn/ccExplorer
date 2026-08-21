@@ -24,7 +24,8 @@ ccexplorer get aws -g DIMENSION=SERVICE
 ```
 
 > [!TIP]
-> Use the `-l` flag to exclude credits and refunds for accurate cost analysis.
+> Credits, refunds and discounts are **included** by default. Pass `-l` to
+> exclude them for accurate net cost analysis.
 
 ## Features
 
@@ -196,11 +197,11 @@ See [VSCode MCP Integration Guide](./docs/vscode-mcp-integration.md) for details
 
 | Setting | Default |
 |---------|---------|
-| Date range | Current calendar month |
+| Date range | First day of the previous month to today |
 | Cost metric | UnblendedCost |
 | Output | stdout (table) |
 | Sort order | Cost descending |
-| Excluded charges | Credits, refunds, discounts (use `-l` to include) |
+| Excluded charges | None; pass `-l` to exclude credits, refunds and discounts |
 
 </details>
 

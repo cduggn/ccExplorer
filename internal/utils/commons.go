@@ -8,7 +8,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
 	"github.com/cduggn/ccexplorer/internal/pinecone"
 	types2 "github.com/cduggn/ccexplorer/internal/types"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -28,15 +27,6 @@ func ReturnIfPresent(s []string) string {
 	} else {
 		return s[1]
 	}
-}
-
-func NewFile(dir string, file string) (*os.File, error) {
-	filePath := BuildOutputFilePath(dir, file)
-	return os.Create(filePath)
-}
-
-func BuildOutputFilePath(dir string, fileName string) string {
-	return dir + "/" + fileName
 }
 
 func DefaultEndDate(f func(date time.Time) string) string {
@@ -174,13 +164,13 @@ func MetricsToService(m map[string]types.MetricValue) []types2.Metrics {
 func ConvertServiceToSlice(s types2.Service, granularity string) [][]string {
 	return Transform(s.Metrics, func(v types2.Metrics) []string {
 		return []string{
-			s.Keys[0], 
-			ReturnIfPresent(s.Keys), 
+			s.Keys[0],
+			ReturnIfPresent(s.Keys),
 			v.Name,
-			granularity, 
-			s.Start, 
+			granularity,
+			s.Start,
 			s.End,
-			v.Amount, 
+			v.Amount,
 			v.Unit,
 		}
 	})
@@ -232,10 +222,10 @@ func ConvertToStdoutType(s []types2.Service, granularity string) types2.CostAndU
 		Granularity: granularity,
 		Services: Transform(s, func(v types2.Service) types2.Service {
 			return types2.Service{
-				Name: v.Keys[0],
-				Keys: v.Keys,
+				Name:  v.Keys[0],
+				Keys:  v.Keys,
 				Start: v.Start,
-				End: v.End,
+				End:   v.End,
 				Metrics: Transform(v.Metrics, func(m types2.Metrics) types2.Metrics {
 					return types2.Metrics{
 						Name:          m.Name,
@@ -260,10 +250,10 @@ func ConvertToChartInputType(r types2.CostAndUsageOutputType, s []types2.Service
 		Tags:        r.Tags,
 		Services: Transform(s, func(service types2.Service) types2.Service {
 			return types2.Service{
-				Name:    service.Name,
-				Keys:    service.Keys,
-				Start:   service.Start,
-				End:     service.End,
+				Name:  service.Name,
+				Keys:  service.Keys,
+				Start: service.Start,
+				End:   service.End,
 				Metrics: Transform(service.Metrics, func(metric types2.Metrics) types2.Metrics {
 					return types2.Metrics{
 						Name:          metric.Name,

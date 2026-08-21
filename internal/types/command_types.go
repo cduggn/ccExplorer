@@ -1,8 +1,6 @@
 package types
 
 import (
-	"context"
-	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/spf13/cobra"
 )
 
@@ -91,23 +89,12 @@ type PresetParams struct {
 	Metric            []string
 }
 
-type GetCostForecastAPI interface {
-	GetCostForecast(ctx context.Context, params *costexplorer.GetCostForecastInput, optFns ...func(*costexplorer.Options)) (*costexplorer.GetCostForecastOutput, error)
-}
-
 type GetCostForecastRequest struct {
 	Time                    Time
 	Granularity             string
 	Metric                  string
 	Filter                  Filter
 	PredictionIntervalLevel int32
-}
-
-type GetCostForecastReport struct{}
-
-type GetCostAndUsageAPI interface {
-	GetCostAndUsage(ctx context.Context,
-		optFns ...func(*costexplorer.Options)) (*costexplorer.GetCostAndUsageOutput, error)
 }
 
 type Time struct {

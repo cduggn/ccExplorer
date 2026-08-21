@@ -3,14 +3,15 @@ package cli
 import (
 	"context"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
-	"github.com/cduggn/ccexplorer/internal/flags"
 	awsservice "github.com/cduggn/ccexplorer/internal/awsservice"
+	"github.com/cduggn/ccexplorer/internal/flags"
 	"github.com/cduggn/ccexplorer/internal/ports"
 	"github.com/cduggn/ccexplorer/internal/types"
 	"github.com/cduggn/ccexplorer/internal/utils"
 	"github.com/cduggn/ccexplorer/internal/writer"
 	"github.com/common-nighthawk/go-figure"
 	"github.com/spf13/cobra"
+	"sync"
 	"time"
 )
 
@@ -32,7 +33,10 @@ var (
 	forecastEndDate                 string
 	forecastGranularity             string
 	forecastPredictionIntervalLevel int32
-	srv                             *service
+
+	srv     *service
+	srvOnce sync.Once
+	srvErr  error
 )
 
 type service struct {
@@ -47,18 +51,23 @@ type ForecastCommandType struct {
 	Cmd *cobra.Command
 }
 
-func Initialize() {
-	var err error
-	srv, err = configureServices()
-	if err != nil {
-		panic(err.Error())
+// awsService lazily constructs the AWS Cost Explorer client on first use and
+// caches it. Resolving it here rather than in RootCommand keeps credential
+// errors out of --help/--version and surfaces them as errors, not panics.
+func awsService() (ports.AWSService, error) {
+	srvOnce.Do(func() {
+		srv, srvErr = configureServices()
+	})
+	if srvErr != nil {
+		return nil, srvErr
 	}
+	return srv.aws, nil
 }
 
 func configureServices() (*service, error) {
 	awsService, err := awsservice.New()
 	if err != nil {
-		return &service{}, err
+		return nil, err
 	}
 	awsClient := &service{
 		aws: awsService,
@@ -251,7 +260,12 @@ func (c *CostCommandType) SynthesizeRequest(input types.CommandLineInput) types.
 
 func (c *CostCommandType) Execute(req types.CostAndUsageRequestType) error {
 
-	costAndUsageResponse, err := srv.aws.GetCostAndUsage(
+	aws, err := awsService()
+	if err != nil {
+		return err
+	}
+
+	costAndUsageResponse, err := aws.GetCostAndUsage(
 		context.Background(), req)
 	if err != nil {
 		return err
@@ -325,7 +339,12 @@ func (f *ForecastCommandType) SynthesizeRequest(input types.ForecastCommandLineI
 func (f *ForecastCommandType) Execute(r types.GetCostForecastRequest) (
 	*costexplorer.GetCostForecastOutput, error) {
 
-	res, err := srv.aws.GetCostForecast(context.TODO(), r)
+	aws, err := awsService()
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := aws.GetCostForecast(context.TODO(), r)
 	if err != nil {
 		return nil, err
 	}

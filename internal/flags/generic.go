@@ -59,15 +59,15 @@ func (f *Flag[T, V]) IsSet() bool {
 
 // ValidationError represents a validation error with context
 type ValidationError struct {
-	Field    string
-	Value    string
-	Allowed  []string
-	Message  string
+	Field   string
+	Value   string
+	Allowed []string
+	Message string
 }
 
 func (e ValidationError) Error() string {
 	if len(e.Allowed) > 0 {
-		return fmt.Sprintf("invalid %s: %s. Must be one of: %s", 
+		return fmt.Sprintf("invalid %s: %s. Must be one of: %s",
 			e.Field, e.Value, strings.Join(e.Allowed, ", "))
 	}
 	return fmt.Sprintf("invalid %s: %s. %s", e.Field, e.Value, e.Message)

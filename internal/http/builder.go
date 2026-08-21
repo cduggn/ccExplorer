@@ -28,10 +28,6 @@ func (b *HttpRequestBuilder) Build(ctx context.Context, method, url string,
 		return http.NewRequestWithContext(ctx, method, url, nil)
 	}
 
-	return http.NewRequest(
-		method,
-		url,
-		payload,
-	)
+	return http.NewRequestWithContext(ctx, method, url, payload)
 
 }
