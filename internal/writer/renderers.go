@@ -195,7 +195,11 @@ func NewCSVRenderer() *CSVRenderer {
 
 // Render implements the Renderer interface for CSV files
 func (r *CSVRenderer) Render(data *CSVOutput) error {
-	filePath := utils.BuildOutputFilePath(OutputDir, data.Filename)
+	if err := ensureOutputDir(); err != nil {
+		return types.Error{Msg: "Error creating output directory: " + err.Error()}
+	}
+
+	filePath := outputPath(data.Filename)
 	file, err := os.Create(filePath)
 	if err != nil {
 		return types.Error{Msg: "Error creating CSV file: " + err.Error()}
@@ -229,7 +233,11 @@ func NewChartRenderer() *ChartRenderer {
 
 // Render implements the Renderer interface for charts
 func (r *ChartRenderer) Render(data *ChartOutput) error {
-	filePath := utils.BuildOutputFilePath(OutputDir, data.Filename)
+	if err := ensureOutputDir(); err != nil {
+		return types.Error{Msg: "Error creating output directory: " + err.Error()}
+	}
+
+	filePath := outputPath(data.Filename)
 	file, err := os.Create(filePath)
 	if err != nil {
 		return types.Error{Msg: "Failed creating chart HTML file: " + err.Error()}

@@ -8,7 +8,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
 	"github.com/cduggn/ccexplorer/internal/pinecone"
 	types2 "github.com/cduggn/ccexplorer/internal/types"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -28,15 +27,6 @@ func ReturnIfPresent(s []string) string {
 	} else {
 		return s[1]
 	}
-}
-
-func NewFile(dir string, file string) (*os.File, error) {
-	filePath := BuildOutputFilePath(dir, file)
-	return os.Create(filePath)
-}
-
-func BuildOutputFilePath(dir string, fileName string) string {
-	return dir + "/" + fileName
 }
 
 func DefaultEndDate(f func(date time.Time) string) string {
