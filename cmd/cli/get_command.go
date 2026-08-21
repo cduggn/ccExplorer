@@ -3,8 +3,8 @@ package cli
 import (
 	"context"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
-	"github.com/cduggn/ccexplorer/internal/flags"
 	awsservice "github.com/cduggn/ccexplorer/internal/awsservice"
+	"github.com/cduggn/ccexplorer/internal/flags"
 	"github.com/cduggn/ccexplorer/internal/ports"
 	"github.com/cduggn/ccexplorer/internal/types"
 	"github.com/cduggn/ccexplorer/internal/utils"

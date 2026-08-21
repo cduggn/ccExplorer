@@ -28,7 +28,7 @@ func TestTransformServicesToRows(t *testing.T) {
 	}
 
 	rows := TransformServicesToRows(services, "DAILY")
-	
+
 	// Should have 2 rows (one per service)
 	if len(rows) != 2 {
 		t.Errorf("TransformServicesToRows failed. Expected 2 rows, got %d", len(rows))
@@ -62,7 +62,7 @@ func TestTransformServiceMapToRows(t *testing.T) {
 	}
 
 	rows := TransformServiceMapToRows(serviceMap, "DAILY")
-	
+
 	// Should have 2 rows
 	if len(rows) != 2 {
 		t.Errorf("TransformServiceMapToRows failed. Expected 2 rows, got %d", len(rows))
@@ -90,7 +90,7 @@ func TestFilterServicesByMetricType(t *testing.T) {
 	}
 
 	filtered := FilterServicesByMetricType(services, "BlendedCost")
-	
+
 	// Should have 2 services with BlendedCost metric
 	if len(filtered) != 2 {
 		t.Errorf("FilterServicesByMetricType failed. Expected 2 services, got %d", len(filtered))
@@ -119,7 +119,7 @@ func TestFilterServicesByDateRange(t *testing.T) {
 	}
 
 	filtered := FilterServicesByDateRange(services, "2023-01-01", "2023-01-04")
-	
+
 	// Should have 2 services within the date range
 	if len(filtered) != 2 {
 		t.Errorf("FilterServicesByDateRange failed. Expected 2 services, got %d", len(filtered))
@@ -134,7 +134,7 @@ func TestGroupServicesByKey(t *testing.T) {
 	}
 
 	grouped := GroupServicesByKey(services, 0) // Group by first key
-	
+
 	// Should have 2 groups: service1 and service2
 	if len(grouped) != 2 {
 		t.Errorf("GroupServicesByKey failed. Expected 2 groups, got %d", len(grouped))
@@ -167,7 +167,7 @@ func TestCalculateTotalCost(t *testing.T) {
 	}
 
 	total := CalculateTotalCost(services)
-	
+
 	// Should be 150.0 (100.0 + 50.0, UsageQuantity ignored)
 	expected := 150.0
 	if total != expected {
@@ -183,7 +183,7 @@ func TestExtractUniqueKeys(t *testing.T) {
 	}
 
 	keys := ExtractUniqueKeys(services)
-	
+
 	// Should have 4 unique keys: service1, service2, tag1, tag2
 	if len(keys) != 4 {
 		t.Errorf("ExtractUniqueKeys failed. Expected 4 unique keys, got %d", len(keys))

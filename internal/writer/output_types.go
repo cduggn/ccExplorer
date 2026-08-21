@@ -23,16 +23,16 @@ type TableOutput struct {
 
 // CSVOutput represents data formatted for CSV export
 type CSVOutput struct {
-	Headers []string
-	Rows    [][]string
+	Headers  []string
+	Rows     [][]string
 	Filename string
 }
 
 // ChartOutput represents data formatted for chart visualization
 type ChartOutput struct {
-	Page      *components.Page
-	Title     string
-	Filename  string
+	Page     *components.Page
+	Title    string
+	Filename string
 }
 
 // VectorOutput represents data formatted for vector database storage.

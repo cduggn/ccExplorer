@@ -6,7 +6,7 @@ import (
 
 func TestDimensionValidator_Validate(t *testing.T) {
 	validator := DimensionValidator{}
-	
+
 	tests := []struct {
 		name    string
 		input   string
@@ -58,7 +58,7 @@ func TestDimensionValidator_Validate(t *testing.T) {
 
 func TestFilterValidator_Validate(t *testing.T) {
 	validator := FilterValidator{}
-	
+
 	tests := []struct {
 		name    string
 		input   string
@@ -105,21 +105,21 @@ func TestFilterValidator_Validate(t *testing.T) {
 
 func TestGenericFlag_SetAndValue(t *testing.T) {
 	flag := NewGroupByFlag()
-	
+
 	err := flag.Set("DIMENSION=SERVICE,TAG=Environment")
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
 	}
-	
+
 	if !flag.IsSet() {
 		t.Error("Expected flag to be marked as set")
 	}
-	
+
 	value := flag.Value()
 	if len(value.Dimensions) != 1 || value.Dimensions[0] != "SERVICE" {
 		t.Errorf("Expected dimension SERVICE, got %v", value.Dimensions)
 	}
-	
+
 	if len(value.Tags) != 1 || value.Tags[0] != "Environment" {
 		t.Errorf("Expected tag Environment, got %v", value.Tags)
 	}

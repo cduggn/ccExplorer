@@ -26,9 +26,9 @@ test:
 lint: $(GOLANGCI_LINT)
 	$(GOLANGCI_LINT) run --color=always ./...
 
-.PHONY: lint-exp
-lint-exp: $(GOLANGCI_LINT)
-	$(GOLANGCI_LINT) run --fix --config .golangci-exp.yaml ./...
+.PHONY: fmt
+fmt: $(GOLANGCI_LINT)
+	$(GOLANGCI_LINT) fmt ./...
 
 .PHONY: test-race
 test-race:
@@ -47,15 +47,17 @@ goimports: $(GOIMPORTS)
 
 .PHONY: run
 run:
+	go env -w CGO_ENABLED=1
 	go run ./cmd/ccexplorer
 
 .PHONY: build
 build:
+	go env -w CGO_ENABLED=1
 	go build -o bin/ ./cmd/ccexplorer
 
 .PHONY: release
 release: $(GORELEASER)
-	$(GORELEASER) release --clean
+	$(GORELEASER) release --rm-dist
 
 .PHONY: clean
 clean: clean-lint-cache

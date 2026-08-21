@@ -54,23 +54,23 @@ func (r *StdoutTableRenderer) Render(data *TableOutput) error {
 	if data.HasTagColumn {
 		// 7 columns: #, Service, Tag/Dimension, Cost, %, Start, End
 		t.SetColumnConfigs([]table.ColumnConfig{
-			{Number: 1, Align: text.AlignRight, AlignHeader: text.AlignCenter},                              // #
-			{Number: 2, WidthMax: 38, AlignHeader: text.AlignCenter},                                        // Service
-			{Number: 3, WidthMax: 20, AlignHeader: text.AlignCenter},                                        // Tag/Dimension
+			{Number: 1, Align: text.AlignRight, AlignHeader: text.AlignCenter},                               // #
+			{Number: 2, WidthMax: 38, AlignHeader: text.AlignCenter},                                         // Service
+			{Number: 3, WidthMax: 20, AlignHeader: text.AlignCenter},                                         // Tag/Dimension
 			{Number: 4, Align: text.AlignRight, AlignHeader: text.AlignCenter, AlignFooter: text.AlignRight}, // Cost
-			{Number: 5, Align: text.AlignRight, AlignHeader: text.AlignCenter},                              // %
-			{Number: 6, Align: text.AlignCenter, AlignHeader: text.AlignCenter},                             // Start
-			{Number: 7, Align: text.AlignCenter, AlignHeader: text.AlignCenter},                             // End
+			{Number: 5, Align: text.AlignRight, AlignHeader: text.AlignCenter},                               // %
+			{Number: 6, Align: text.AlignCenter, AlignHeader: text.AlignCenter},                              // Start
+			{Number: 7, Align: text.AlignCenter, AlignHeader: text.AlignCenter},                              // End
 		})
 	} else {
 		// 6 columns: #, Service, Cost, %, Start, End
 		t.SetColumnConfigs([]table.ColumnConfig{
-			{Number: 1, Align: text.AlignRight, AlignHeader: text.AlignCenter},                              // #
-			{Number: 2, WidthMax: 42, AlignHeader: text.AlignCenter},                                        // Service
+			{Number: 1, Align: text.AlignRight, AlignHeader: text.AlignCenter},                               // #
+			{Number: 2, WidthMax: 42, AlignHeader: text.AlignCenter},                                         // Service
 			{Number: 3, Align: text.AlignRight, AlignHeader: text.AlignCenter, AlignFooter: text.AlignRight}, // Cost
-			{Number: 4, Align: text.AlignRight, AlignHeader: text.AlignCenter},                              // %
-			{Number: 5, Align: text.AlignCenter, AlignHeader: text.AlignCenter},                             // Start
-			{Number: 6, Align: text.AlignCenter, AlignHeader: text.AlignCenter},                             // End
+			{Number: 4, Align: text.AlignRight, AlignHeader: text.AlignCenter},                               // %
+			{Number: 5, Align: text.AlignCenter, AlignHeader: text.AlignCenter},                              // Start
+			{Number: 6, Align: text.AlignCenter, AlignHeader: text.AlignCenter},                              // End
 		})
 	}
 
@@ -144,7 +144,7 @@ func (r *StdoutTableRenderer) formatCell(cell string, colIndex int, row []string
 	return cell
 }
 
-// ForecastTableRenderer renders forecast table data to stdout  
+// ForecastTableRenderer renders forecast table data to stdout
 type ForecastTableRenderer struct{}
 
 // NewForecastTableRenderer creates a new forecast table renderer
@@ -180,7 +180,7 @@ func (r *ForecastTableRenderer) Render(data *ForecastTableOutput) error {
 		data.Total.Unit, data.Total.Amount,
 	}
 	t.AppendFooter(footer)
-	
+
 	t.Render()
 	return nil
 }

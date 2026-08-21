@@ -30,7 +30,7 @@ var (
 	groupByTagAndDimension = func(tag []string, dimensions []string) []types.GroupDefinition {
 		dimensionGroups := groupByDimension(dimensions)
 		tagGroups := groupByTag(tag)
-		
+
 		// Combine the two slices using generic utilities
 		combined := make([]types.GroupDefinition, 0, len(dimensionGroups)+len(tagGroups))
 		combined = append(combined, dimensionGroups...)

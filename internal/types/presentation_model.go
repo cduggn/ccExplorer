@@ -67,13 +67,13 @@ type DateInterval struct {
 	Start string
 }
 type CostAndUsageOutputType struct {
-	Services       map[int]Service
-	Granularity    string
-	Start          string
-	End            string
-	Dimensions     []string
-	Tags           []string
-	SortBy         string
+	Services    map[int]Service
+	Granularity string
+	Start       string
+	End         string
+	Dimensions  []string
+	Tags        []string
+	SortBy      string
 	// Credentials are plumbed through this type to reach the writer. They
 	// must never be serialised: this struct is marshalled verbatim into MCP
 	// tool results, which are handed to a model.

@@ -143,4 +143,3 @@ func (s *Server) parseGetCostAndUsageParams(args map[string]interface{}) (types.
 
 	return params, nil
 }
-
