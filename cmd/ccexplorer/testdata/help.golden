@@ -1,0 +1,21 @@
+
+          ,---.         |
+,---.,---.|--- .  ,,---.|    ,---.,---.,---.,---.
+|    |    |     >< |   ||    |   ||    |---'|
+`---'`---'`---''  `|---'`---'`---'`    `---'`
+                   |
+
+Usage:
+  ccexplorer [command]
+
+Available Commands:
+  completion  Generate the autocompletion script for the specified shell
+  get         Cost and usage summary for AWS services
+  help        Help about any command
+  mcp         Model Context Protocol server for ccExplorer
+
+Flags:
+  -h, --help      help for ccexplorer
+  -v, --version   version for ccexplorer
+
+Use "ccexplorer [command] --help" for more information about a command.
