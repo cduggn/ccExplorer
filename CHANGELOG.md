@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.9.0](https://github.com/cduggn/ccExplorer/compare/v0.8.6...v0.9.0) (2026-08-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove Pinecone/OpenAI vector store support ([#413](https://github.com/cduggn/ccExplorer/issues/413))
+
+### Features
+
+* remove Pinecone/OpenAI vector store support ([#413](https://github.com/cduggn/ccExplorer/issues/413)) ([67125a0](https://github.com/cduggn/ccExplorer/commit/67125a0a0956ee891631500955b868f74d70ebc0))
+
 ## [0.8.6](https://github.com/cduggn/ccExplorer/compare/v0.8.5...v0.8.6) (2026-08-22)
 
 
