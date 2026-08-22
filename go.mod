@@ -10,7 +10,6 @@ require (
 	github.com/go-echarts/go-echarts/v2 v2.4.6
 	github.com/jedib0t/go-pretty/v6 v6.8.3
 	github.com/mark3labs/mcp-go v0.43.2
-	github.com/sashabaranov/go-openai v1.42.0
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.10.0

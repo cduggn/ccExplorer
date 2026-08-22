@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	costexplorertypes "github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
-	"github.com/cduggn/ccexplorer/internal/http"
 	"github.com/cduggn/ccexplorer/internal/types"
 	"github.com/cduggn/ccexplorer/internal/utils"
 )
@@ -153,28 +152,6 @@ func (t *CostUsageToChartTransformer) Transform(input types.CostAndUsageOutputTy
 	}
 
 	return NewChartOutput(page, "Cost and Usage Report", "ccexplorer_chart.html"), nil
-}
-
-// CostUsageToVectorTransformer transforms cost and usage data to vector format
-type CostUsageToVectorTransformer struct{}
-
-// NewCostUsageToVectorTransformer creates a new transformer for vector output
-func NewCostUsageToVectorTransformer() *CostUsageToVectorTransformer {
-	return &CostUsageToVectorTransformer{}
-}
-
-// Transform implements the Transformer interface for vector output
-func (t *CostUsageToVectorTransformer) Transform(input types.CostAndUsageOutputType) (*VectorOutput, error) {
-	// NewVectorStoreClient(builder, openAIAPIKey, indexURL, pineconeAPIKey)
-	client := NewVectorStoreClient(http.NewRequestBuilder(),
-		input.OpenAIAPIKey, input.PineconeIndex, input.PineconeAPIKey)
-	items, err := client.CreateVectorStoreInput(input)
-	if err != nil {
-		return nil, err
-	}
-
-	return NewVectorOutput(items, input.PineconeIndex,
-		input.PineconeAPIKey, input.OpenAIAPIKey), nil
 }
 
 // ForecastToTableTransformer transforms forecast data to table format

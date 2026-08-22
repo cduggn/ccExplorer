@@ -3,7 +3,6 @@ package cli
 import (
 	"github.com/cduggn/ccexplorer/internal/flags"
 	"github.com/cduggn/ccexplorer/internal/types"
-	"github.com/spf13/viper"
 	"strings"
 )
 
@@ -86,15 +85,6 @@ func (c *CostCommandType) ExtractPrintPreferences() types.PrintOptions {
 
 	sortByDate, _ := c.Cmd.Flags().GetBool("sortByDate")
 	printOptions.IsSortByDate = sortByDate
-
-	openAIKey := viper.GetString("openai_api_key")
-	printOptions.OpenAIKey = openAIKey
-
-	pineconeAPIKey := viper.GetString("PINECONE_API_KEY")
-	printOptions.PineconeAPIKey = pineconeAPIKey
-
-	pineconeIndex := viper.GetString("PINECONE_INDEX")
-	printOptions.PineconeIndex = pineconeIndex
 
 	excludeDiscounts, _ := c.Cmd.Flags().GetBool("excludeDiscounts")
 	printOptions.ExcludeDiscounts = excludeDiscounts

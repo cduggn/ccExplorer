@@ -17,4 +17,3 @@ See the `/configs` directory for example configuration files.
 - `table` - Console table output
 - `csv` - CSV file output  
 - `chart` - Chart visualization
-- `pinecone` - Store in Pinecone vector database

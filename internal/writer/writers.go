@@ -18,7 +18,6 @@ type ForecastWriter interface {
 type costUsageTableWriter = CompositeWriter[types.CostAndUsageOutputType, *TableOutput]
 type costUsageCSVWriter = CompositeWriter[types.CostAndUsageOutputType, *CSVOutput]
 type costUsageChartWriter = CompositeWriter[types.CostAndUsageOutputType, *ChartOutput]
-type costUsageVectorWriter = CompositeWriter[types.CostAndUsageOutputType, *VectorOutput]
 type forecastTableWriter = CompositeWriter[types.ForecastPrintData, *ForecastTableOutput]
 
 // NewCostUsageWriter creates a writer for cost and usage data based on print format
@@ -28,8 +27,6 @@ func NewCostUsageWriter(printFormat string, sortBy string) CostUsageWriter {
 		return newCostUsageCSVWriter(sortBy)
 	case "chart":
 		return newCostUsageChartWriter(sortBy)
-	case "pinecone":
-		return newCostUsageVectorWriter()
 	default: // stdout
 		return newCostUsageTableWriter(sortBy)
 	}
@@ -58,12 +55,6 @@ func newCostUsageChartWriter(sortBy string) *costUsageChartWriter {
 	transformer := NewCostUsageToChartTransformer(sortBy)
 	renderer := NewChartRenderer()
 	return NewCompositeWriter[types.CostAndUsageOutputType, *ChartOutput](transformer, renderer)
-}
-
-func newCostUsageVectorWriter() *costUsageVectorWriter {
-	transformer := NewCostUsageToVectorTransformer()
-	renderer := NewVectorRenderer()
-	return NewCompositeWriter[types.CostAndUsageOutputType, *VectorOutput](transformer, renderer)
 }
 
 func newForecastTableWriter() *forecastTableWriter {

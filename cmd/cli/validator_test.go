@@ -148,11 +148,9 @@ func TestValidateInput(t *testing.T) {
 		})
 	})
 
-	t.Run("rejects LINKED_ACCOUNT for pinecone", func(t *testing.T) {
+	t.Run("rejects pinecone as a print format", func(t *testing.T) {
 		in := baseInput()
 		in.PrintFormat = "pinecone"
-		in.OpenAIAPIKey = "k"
-		in.GroupByDimension = []string{"LINKED_ACCOUNT"}
-		assert.Error(t, ValidateInput(in))
+		assert.ErrorContains(t, ValidateInput(in), "Invalid print format")
 	})
 }

@@ -1,17 +1,13 @@
 package writer
 
 import (
-	"context"
 	"encoding/csv"
 	"fmt"
 	"io"
-	"log/slog"
 	"os"
 	"strconv"
 
-	"github.com/cduggn/ccexplorer/internal/http"
 	"github.com/cduggn/ccexplorer/internal/types"
-	"github.com/cduggn/ccexplorer/internal/utils"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
 )
@@ -249,48 +245,5 @@ func (r *ChartRenderer) Render(data *ChartOutput) error {
 	}
 
 	fmt.Printf("Chart written to: %s\n", filePath)
-	return nil
-}
-
-// VectorRenderer renders vector data to vector databases
-type VectorRenderer struct{}
-
-// NewVectorRenderer creates a new vector renderer
-func NewVectorRenderer() *VectorRenderer {
-	return &VectorRenderer{}
-}
-
-// Render implements the Renderer interface for vector databases
-func (r *VectorRenderer) Render(data *VectorOutput) error {
-	// NewVectorStoreClient(builder, openAIAPIKey, indexURL, pineconeAPIKey)
-	client := NewVectorStoreClient(
-		http.NewRequestBuilder(),
-		data.OpenAIAPIKey,
-		data.IndexURL,
-		data.PineconeAPIKey,
-	)
-
-	// Create embeddings for the vector items
-	vectors, err := client.CreateEmbeddings(data.Items)
-	if err != nil {
-		return types.Error{Msg: "Error creating embeddings: " + err.Error()}
-	}
-
-	// Update items with embedding vectors
-	for index, vector := range vectors {
-		if index < len(data.Items) {
-			data.Items[index].EmbeddingVector = vector.Embedding
-			data.Items[index].ID = utils.EncodeString(data.Items[index].EmbeddingText)
-		}
-	}
-
-	// Convert to Pinecone format and upsert
-	pineconeData := utils.ConvertToPineconeStruct(data.Items)
-	resp, err := client.Upsert(context.Background(), pineconeData)
-	if err != nil {
-		return types.Error{Msg: "Error upserting to vector store: " + err.Error()}
-	}
-
-	slog.Info(fmt.Sprintf("Upserted %d items to vector store", resp.UpsertedCount))
 	return nil
 }

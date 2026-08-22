@@ -1,12 +1,9 @@
 package utils
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
-	"github.com/cduggn/ccexplorer/internal/pinecone"
 	types2 "github.com/cduggn/ccexplorer/internal/types"
 	"strconv"
 	"strings"
@@ -112,15 +109,12 @@ func CurateCostAndUsageReport(
 	d *costexplorer.GetCostAndUsageOutput, query types2.CostAndUsageRequestType) types2.CostAndUsageOutputType {
 
 	c := types2.CostAndUsageOutputType{
-		Services:       make(map[int]types2.Service),
-		Granularity:    query.Granularity,
-		Dimensions:     query.GroupBy,
-		Tags:           query.GroupByTag,
-		Start:          query.Time.Start,
-		End:            query.Time.End,
-		OpenAIAPIKey:   query.OpenAIAPIKey,
-		PineconeAPIKey: query.PineconeAPIKey,
-		PineconeIndex:  query.PineconeIndex,
+		Services:    make(map[int]types2.Service),
+		Granularity: query.Granularity,
+		Dimensions:  query.GroupBy,
+		Tags:        query.GroupByTag,
+		Start:       query.Time.Start,
+		End:         query.Time.End,
 	}
 
 	c.Services = ResultsToServicesMap(d.ResultsByTime)
@@ -288,30 +282,4 @@ func ConvertToForecastStdoutType(r types2.ForecastPrintData, filteredBy string) 
 		},
 		FilteredBy: filteredBy,
 	}
-}
-
-func EncodeString(s string) string {
-	h := sha256.New()
-	h.Write([]byte(s))
-	hashed := h.Sum(nil)
-	hashedString := hex.EncodeToString(hashed)
-	return hashedString
-}
-
-// Generic version of ConvertToPineconeStruct
-func ConvertToPineconeStruct(items []*types2.VectorStoreItem) []pinecone.PineconeStruct {
-	return ConvertSlice(items, func(v *types2.VectorStoreItem) pinecone.PineconeStruct {
-		return pinecone.PineconeStruct{
-			ID:     v.ID,
-			Values: v.EmbeddingVector,
-			Metadata: pinecone.Metadata{
-				PageContent: v.EmbeddingText,
-				Source:      "aws cost explorer",
-				Dimensions:  v.Metadata.Dimensions,
-				Start:       v.Metadata.StartDate,
-				End:         v.Metadata.EndDate,
-				Cost:        v.Metadata.Cost,
-			},
-		}
-	})
 }
