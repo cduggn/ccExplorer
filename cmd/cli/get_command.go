@@ -142,7 +142,7 @@ func (c *CostCommandType) DefineFlags() {
 		"End date *(defaults to the present day)")
 
 	c.Cmd.Flags().StringVarP(&costAndUsagePrintFormat, "printFormat", "p", "stdout",
-		"Valid values: stdout, csv, chart, pinecone (default: stdout)")
+		"Valid values: stdout, csv, chart (default: stdout)")
 
 	c.Cmd.Flags().StringVarP(&costAndUsageMetric, "metric", "i", "UnblendedCost",
 		"Valid values: AmortizedCost, BlendedCost, NetAmortizedCost, "+
@@ -221,9 +221,6 @@ func (c *CostCommandType) InputHandler(validatorFn func(input types.CommandLineI
 		PrintFormat:         printOptions.Format,
 		Metrics:             []string{printOptions.Metric},
 		SortByDate:          printOptions.IsSortByDate,
-		OpenAIAPIKey:        printOptions.OpenAIKey,
-		PineconeAPIKey:      printOptions.PineconeAPIKey,
-		PineconeIndex:       printOptions.PineconeIndex,
 	}
 
 	err = validatorFn(input)
@@ -252,9 +249,6 @@ func (c *CostCommandType) SynthesizeRequest(input types.CommandLineInput) types.
 		PrintFormat:                input.PrintFormat,
 		Metrics:                    input.Metrics,
 		SortByDate:                 input.SortByDate,
-		OpenAIAPIKey:               input.OpenAIAPIKey,
-		PineconeAPIKey:             input.PineconeAPIKey,
-		PineconeIndex:              input.PineconeIndex,
 	}
 }
 

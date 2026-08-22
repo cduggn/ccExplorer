@@ -31,9 +31,8 @@ ccexplorer get aws -g DIMENSION=SERVICE
 
 - **Multi-dimensional grouping** - Group costs by service, operation, account, or tags
 - **Flexible filtering** - Filter by any AWS dimension or cost allocation tag
-- **Multiple outputs** - Table, CSV, charts, or vector database
+- **Multiple outputs** - Table, CSV, or charts
 - **Date ranges** - Daily, monthly, or hourly granularity
-- **AI-ready** - Export to Pinecone for semantic search with LangChain
 - **MCP integration** - Use with GitHub Copilot and VSCode
 
 ## Installation
@@ -134,9 +133,6 @@ ccexplorer get aws -g DIMENSION=SERVICE -p csv
 
 # Chart (generates HTML file)
 ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=OPERATION -p chart -l
-
-# Pinecone vector database
-ccexplorer get aws -g DIMENSION=SERVICE,DIMENSION=USAGE_TYPE -p pinecone -l
 ```
 
 </details>
@@ -156,19 +152,6 @@ export AWS_ACCESS_KEY_ID=your-key
 export AWS_SECRET_ACCESS_KEY=your-secret
 export AWS_REGION=us-east-1
 ```
-
-### Pinecone Integration
-
-For vector database output, set these additional variables:
-
-```bash
-export OPENAI_API_KEY=your-openai-key
-export PINECONE_API_KEY=your-pinecone-key
-export PINECONE_INDEX=https://your-index.svc.us-east-1-aws.pinecone.io
-```
-
-> [!NOTE]
-> The `-p pinecone` flag does not support `LINKED_ACCOUNT` dimension to prevent sending sensitive data.
 
 ## Advanced Features
 

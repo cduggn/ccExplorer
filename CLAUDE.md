@@ -24,7 +24,7 @@ ccExplorer is a CLI tool for AWS cost analysis that follows clean architecture p
 2. Commands synthesize requests to internal domain types (`internal/types/`)
 3. AWS service layer (`internal/awsservice/`) calls Cost Explorer API
 4. Utils (`internal/utils/`) transform AWS responses to internal types
-5. Writer layer (`internal/writer/`) formats output (stdout, CSV, charts, Pinecone vector DB)
+5. Writer layer (`internal/writer/`) formats output (stdout, CSV, charts)
 
 **Key Architectural Patterns:**
 - **Dependency Inversion**: Interfaces defined in `internal/ports/` 
@@ -35,21 +35,17 @@ ccExplorer is a CLI tool for AWS cost analysis that follows clean architecture p
 ## Package Responsibilities
 
 **`internal/awsservice/`** - AWS Cost Explorer client wrapper implementing `ports.AWSService`
-**`internal/writer/`** - Output formatting with multiple `Printer` implementations (stdout, CSV, charts, Pinecone)
+**`internal/writer/`** - Output formatting with multiple `Printer` implementations (stdout, CSV, charts)
 **`internal/types/`** - Domain models for requests, responses, and presentation
 **`internal/utils/`** - Data transformations, sorting, date handling
-**`internal/openai/`** - Embedding generation for vector database storage
-**`internal/pinecone/`** - Vector database client with batch processing
 **`internal/ports/`** - Interface definitions for testability and modularity
 
 ## Key Integration Points
 
 **AWS Integration:** Uses AWS SDK v2 with Cost Explorer API. Authentication handled through standard AWS credential chain.
 
-**AI/Vector DB Pipeline:** Cost data → OpenAI embeddings → Pinecone storage for semantic search capabilities.
-
 **CLI Structure:** Main commands are `ccexplorer get aws` (cost queries) and `ccexplorer get aws forecast` (forecasting). Supports complex filtering by AWS dimensions and cost allocation tags.
 
 ## Testing Notes
 
-Tests are located alongside source files. The codebase includes unit tests for flag parsing (`cmd/cli/flags/*_test.go`), utility functions (`internal/utils/commons_test.go`), and service integrations (`internal/awsservice/filter_test.go`, `internal/pinecone/pinecone_test.go`).
+Tests are located alongside source files. The codebase includes unit tests for flag parsing (`cmd/cli/flags/*_test.go`), utility functions (`internal/utils/commons_test.go`), and service integrations (`internal/awsservice/filter_test.go`).

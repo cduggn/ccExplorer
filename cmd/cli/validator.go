@@ -26,29 +26,7 @@ func ValidateInput(input types.CommandLineInput) error {
 	if !isValidPrintFormat {
 		return ValidationError{
 			Message: "Invalid print format. " +
-				"Please use one of the following: stdout, csv, chart, pinecone",
-		}
-	}
-
-	if input.PrintFormat == "pinecone" {
-		for _, missing := range []struct{ value, env string }{
-			{input.OpenAIAPIKey, "OPENAI_API_KEY"},
-			{input.PineconeAPIKey, "PINECONE_API_KEY"},
-			{input.PineconeIndex, "PINECONE_INDEX"},
-		} {
-			if missing.value == "" {
-				return ValidationError{
-					Message: missing.env + " is not set. It is required for " +
-						"-p pinecone; export it before running the query",
-				}
-			}
-		}
-
-		if HasAccountInformation(input.GroupByDimension) {
-			return ValidationError{
-				Message: "Cannot use Pinecone with account information. " +
-					"Please remove the account dimension",
-			}
+				"Please use one of the following: stdout, csv, chart",
 		}
 	}
 
@@ -177,7 +155,7 @@ func validateGranularityAgainstDates(interval, start, end string) error {
 }
 
 func IsValidPrintFormat(f string) bool {
-	return f == "stdout" || f == "csv" || f == "chart" || f == "pinecone"
+	return f == "stdout" || f == "csv" || f == "chart"
 }
 
 func IsValidGranularity(g string) bool {
@@ -188,14 +166,4 @@ func IsValidMetric(m string) bool {
 	return m == "AmortizedCost" || m == "BlendedCost" || m == "NetAmortizedCost" ||
 		m == "NetUnblendedCost" || m == "NormalizedUsageAmount" || m == "UnblendedCost" ||
 		m == "UsageQuantity"
-}
-
-func HasAccountInformation(groupBy []string) bool {
-	for _, v := range groupBy {
-		if v == "LINKED_ACCOUNT" {
-			return true
-		}
-	}
-	return false
-
 }
