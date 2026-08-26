@@ -58,7 +58,21 @@ const (
   
   # DynamoDB cost forecast for PutObject operations for the next 30 days
   ccexplorer get aws forecast -f SERVICE="Amazon DynamoDB",OPERATION="CommittedThroughput"  -p 95 -g MONTHLY
-  
+
+`
+	AnomaliesExamples = `
+  # Cost anomalies detected in the last 90 days (the default window)
+  ccexplorer get aws anomalies
+
+  # Cost anomalies detected in a narrower date range
+  ccexplorer get aws anomalies -s 2023-01-01 -e 2023-01-31
+
+  # Cost anomalies for a specific Cost Anomaly Monitor
+  ccexplorer get aws anomalies -a arn:aws:ce::123456789012:anomalymonitor/monitor-id
+
+  # Cost anomalies that haven't been triaged yet
+  ccexplorer get aws anomalies -k NO
+
 `
 )
 

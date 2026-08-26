@@ -154,6 +154,56 @@ func validateGranularityAgainstDates(interval, start, end string) error {
 	return nil
 }
 
+// anomalyDetectionWindow is the maximum span AWS Cost Anomaly Detection
+// retains anomalies for; see the GetAnomalies API doc comment.
+const anomalyDetectionWindow = 90 * 24 * time.Hour
+
+func ValidateAnomaliesInput(input types.AnomaliesCommandLineInput) error {
+	if err := ValidateAnomaliesDateRange(input.Start, input.End); err != nil {
+		return err
+	}
+
+	if !IsValidFeedbackType(input.Feedback) {
+		return ValidationError{
+			Message: "Invalid feedback value. " +
+				"Please use one of the following: YES, NO, PLANNED_ACTIVITY",
+		}
+	}
+
+	return nil
+}
+
+func ValidateAnomaliesDateRange(startDate, endDate string) error {
+	if err := ValidateStartDate(startDate); err != nil {
+		return err
+	}
+	if err := ValidateEndDate(endDate, startDate); err != nil {
+		return err
+	}
+
+	start, _, err := ParseDate(startDate)
+	if err != nil {
+		return err
+	}
+	end, _, err := ParseDate(endDate)
+	if err != nil {
+		return err
+	}
+
+	if end.Sub(start) > anomalyDetectionWindow {
+		return ValidationError{
+			Message: "Date range must not exceed 90 days; " +
+				"AWS Cost Anomaly Detection only retains anomalies for the past 90 days",
+		}
+	}
+
+	return nil
+}
+
+func IsValidFeedbackType(f string) bool {
+	return f == "" || f == "YES" || f == "NO" || f == "PLANNED_ACTIVITY"
+}
+
 func IsValidPrintFormat(f string) bool {
 	return f == "stdout" || f == "csv" || f == "chart"
 }

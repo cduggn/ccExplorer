@@ -15,4 +15,7 @@ type AWSService interface {
 		req types.GetCostForecastRequest) (
 		*costexplorer.
 			GetCostForecastOutput, error)
+	GetAnomalies(ctx context.Context,
+		req types.GetAnomaliesRequestType) (
+		*costexplorer.GetAnomaliesOutput, error)
 }

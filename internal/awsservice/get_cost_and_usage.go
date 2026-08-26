@@ -2,7 +2,6 @@ package awsservice
 
 import (
 	"context"
-	"fmt"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
@@ -68,10 +67,6 @@ var (
 	}
 )
 
-// maxPages bounds pagination. Cost Explorer bills per request, so a runaway
-// token loop is expensive as well as slow.
-const maxPages = 100
-
 func (srv *Service) GetCostAndUsage(ctx context.Context,
 	req types2.CostAndUsageRequestType) (
 	*costexplorer.GetCostAndUsageOutput,
@@ -88,39 +83,25 @@ func (srv *Service) GetCostAndUsage(ctx context.Context,
 		Filter:  CostAndUsageFilterGenerator(req),
 	}
 
-	var result *costexplorer.GetCostAndUsageOutput
-
-	for page := 1; ; page++ {
-		out, err := srv.Client.GetCostAndUsage(ctx, input)
-		if err != nil {
-			return nil, types2.APIError{
-				Msg: err.Error(),
-			}
-		}
-
-		if result == nil {
-			result = out
-		} else {
-			result.ResultsByTime = append(result.ResultsByTime,
-				out.ResultsByTime...)
-			result.DimensionValueAttributes = append(
-				result.DimensionValueAttributes,
-				out.DimensionValueAttributes...)
-		}
-
-		if out.NextPageToken == nil || *out.NextPageToken == "" {
-			break
-		}
-
-		if page >= maxPages {
-			return nil, types2.APIError{
-				Msg: fmt.Sprintf(
-					"result set exceeded %d pages; narrow the date range, "+
-						"granularity or grouping", maxPages),
-			}
-		}
-
-		input.NextPageToken = out.NextPageToken
+	result, err := paginate(
+		func(token *string) (*costexplorer.GetCostAndUsageOutput, error) {
+			input.NextPageToken = token
+			return srv.Client.GetCostAndUsage(ctx, input)
+		},
+		func(out *costexplorer.GetCostAndUsageOutput) *string {
+			return out.NextPageToken
+		},
+		func(acc, page *costexplorer.GetCostAndUsageOutput) *costexplorer.GetCostAndUsageOutput {
+			acc.ResultsByTime = append(acc.ResultsByTime,
+				page.ResultsByTime...)
+			acc.DimensionValueAttributes = append(
+				acc.DimensionValueAttributes,
+				page.DimensionValueAttributes...)
+			return acc
+		},
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	// The token describes the last page fetched, not the aggregate we return.

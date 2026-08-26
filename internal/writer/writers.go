@@ -14,11 +14,17 @@ type ForecastWriter interface {
 	Write(data types.ForecastPrintData) error
 }
 
+// AnomaliesWriter is the interface for writing cost anomaly data
+type AnomaliesWriter interface {
+	Write(data types.AnomaliesPrintData) error
+}
+
 // Type aliases for specific writer combinations
 type costUsageTableWriter = CompositeWriter[types.CostAndUsageOutputType, *TableOutput]
 type costUsageCSVWriter = CompositeWriter[types.CostAndUsageOutputType, *CSVOutput]
 type costUsageChartWriter = CompositeWriter[types.CostAndUsageOutputType, *ChartOutput]
 type forecastTableWriter = CompositeWriter[types.ForecastPrintData, *ForecastTableOutput]
+type anomaliesTableWriter = CompositeWriter[types.AnomaliesPrintData, *AnomaliesTableOutput]
 
 // NewCostUsageWriter creates a writer for cost and usage data based on print format
 func NewCostUsageWriter(printFormat string, sortBy string) CostUsageWriter {
@@ -35,6 +41,11 @@ func NewCostUsageWriter(printFormat string, sortBy string) CostUsageWriter {
 // NewForecastWriter creates a writer for forecast data
 func NewForecastWriter() ForecastWriter {
 	return newForecastTableWriter()
+}
+
+// NewAnomaliesWriter creates a writer for cost anomaly data
+func NewAnomaliesWriter() AnomaliesWriter {
+	return newAnomaliesTableWriter()
 }
 
 // Factory functions for creating specific writer types
@@ -61,4 +72,10 @@ func newForecastTableWriter() *forecastTableWriter {
 	transformer := NewForecastToTableTransformer()
 	renderer := NewForecastTableRenderer()
 	return NewCompositeWriter[types.ForecastPrintData, *ForecastTableOutput](transformer, renderer)
+}
+
+func newAnomaliesTableWriter() *anomaliesTableWriter {
+	transformer := NewAnomaliesToTableTransformer()
+	renderer := NewAnomaliesTableRenderer()
+	return NewCompositeWriter[types.AnomaliesPrintData, *AnomaliesTableOutput](transformer, renderer)
 }

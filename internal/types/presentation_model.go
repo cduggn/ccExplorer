@@ -80,6 +80,11 @@ type ForecastPrintData struct {
 	Filters  []string
 }
 
+type AnomaliesPrintData struct {
+	Anomalies *costexplorer.GetAnomaliesOutput
+	Filters   []string
+}
+
 // Generic output types for improved type safety and reduced interface{} usage
 
 // GenericOutputType provides a type-safe output container

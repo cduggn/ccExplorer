@@ -33,6 +33,11 @@ var (
 	forecastEndDate                 string
 	forecastGranularity             string
 	forecastPredictionIntervalLevel int32
+	anomaliesStartDate              string
+	anomaliesEndDate                string
+	anomaliesMonitorArn             string
+	anomaliesFeedback               string
+	anomaliesMaxResults             int32
 
 	srv     *service
 	srvOnce sync.Once
@@ -48,6 +53,10 @@ type CostCommandType struct {
 }
 
 type ForecastCommandType struct {
+	Cmd *cobra.Command
+}
+
+type AnomaliesCommandType struct {
 	Cmd *cobra.Command
 }
 
@@ -105,6 +114,18 @@ you can set the environment variables AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY a
 
 	forecastCommand.DefineFlags()
 	costCommand.Cmd.AddCommand(forecastCommand.Cmd)
+
+	anomaliesCommand := AnomaliesCommandType{
+		Cmd: &cobra.Command{
+			Use:     "anomalies",
+			Short:   "Return AWS Cost Anomaly Detection results for your account.",
+			Example: AnomaliesExamples,
+		},
+	}
+	anomaliesCommand.Cmd.RunE = anomaliesCommand.RunE
+
+	anomaliesCommand.DefineFlags()
+	costCommand.Cmd.AddCommand(anomaliesCommand.Cmd)
 	return getCmd
 }
 
@@ -169,6 +190,25 @@ func (f *ForecastCommandType) DefineFlags() {
 
 	f.Cmd.Flags().Int32VarP(&forecastPredictionIntervalLevel, "predictionIntervalLevel",
 		"p", 95, "Prediction interval level (default: 95)")
+}
+
+func (a *AnomaliesCommandType) DefineFlags() {
+
+	a.Cmd.Flags().StringVarP(&anomaliesStartDate, "start", "s",
+		utils.SubtractDays(time.Now(), 90),
+		"Start date (defaults to 90 days ago, the maximum Cost Anomaly Detection retention window)")
+
+	a.Cmd.Flags().StringVarP(&anomaliesEndDate, "end", "e",
+		utils.Format(time.Now()), "End date (defaults to today)")
+
+	a.Cmd.Flags().StringVarP(&anomaliesMonitorArn, "monitorArn", "a", "",
+		"Filter by a specific Cost Anomaly Monitor ARN (default: none)")
+
+	a.Cmd.Flags().StringVarP(&anomaliesFeedback, "feedback", "k", "",
+		"Filter by feedback status. Valid values: YES, NO, PLANNED_ACTIVITY (default: none)")
+
+	a.Cmd.Flags().Int32VarP(&anomaliesMaxResults, "maxResults", "r", 0,
+		"Maximum number of anomalies per page (default: AWS's own page size)")
 }
 
 func paintHeader() string {
@@ -358,4 +398,77 @@ func filterList(r types.GetCostForecastRequest) []string {
 		dimensions = append(dimensions, d.Key)
 	}
 	return dimensions
+}
+
+func (a *AnomaliesCommandType) RunE(cmd *cobra.Command, args []string) error {
+
+	userInput, err := a.InputHandler(ValidateAnomaliesInput)
+	if err != nil {
+		return err
+	}
+
+	req := a.SynthesizeRequest(userInput)
+	return a.Execute(req)
+}
+
+func (a *AnomaliesCommandType) InputHandler(validatorFn func(input types.AnomaliesCommandLineInput) error) (types.AnomaliesCommandLineInput, error) {
+
+	input := types.AnomaliesCommandLineInput{
+		Start:      anomaliesStartDate,
+		End:        anomaliesEndDate,
+		MonitorArn: anomaliesMonitorArn,
+		Feedback:   anomaliesFeedback,
+		MaxResults: anomaliesMaxResults,
+	}
+
+	if err := validatorFn(input); err != nil {
+		return types.AnomaliesCommandLineInput{}, err
+	}
+
+	return input, nil
+}
+
+func (a *AnomaliesCommandType) SynthesizeRequest(input types.AnomaliesCommandLineInput) types.GetAnomaliesRequestType {
+
+	return types.GetAnomaliesRequestType{
+		Time: types.Time{
+			Start: input.Start,
+			End:   input.End,
+		},
+		MonitorArn: input.MonitorArn,
+		Feedback:   input.Feedback,
+		MaxResults: input.MaxResults,
+	}
+}
+
+func (a *AnomaliesCommandType) Execute(req types.GetAnomaliesRequestType) error {
+
+	aws, err := awsService()
+	if err != nil {
+		return err
+	}
+
+	res, err := aws.GetAnomalies(context.Background(), req)
+	if err != nil {
+		return err
+	}
+
+	printData := types.AnomaliesPrintData{
+		Anomalies: res,
+		Filters:   anomaliesFilterList(req),
+	}
+
+	w := writer.NewAnomaliesWriter()
+	return w.Write(printData)
+}
+
+func anomaliesFilterList(r types.GetAnomaliesRequestType) []string {
+	var filters []string
+	if r.MonitorArn != "" {
+		filters = append(filters, "MonitorArn: "+r.MonitorArn)
+	}
+	if r.Feedback != "" {
+		filters = append(filters, "Feedback: "+r.Feedback)
+	}
+	return filters
 }

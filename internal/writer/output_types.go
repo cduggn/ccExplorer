@@ -78,6 +78,24 @@ func NewChartOutput(page *components.Page, title, filename string) *ChartOutput 
 	}
 }
 
+// AnomaliesTableOutput represents cost anomaly data for table display
+type AnomaliesTableOutput struct {
+	Headers    []string
+	Rows       [][]string
+	FilterInfo string
+	RowCount   int
+}
+
+// NewAnomaliesTableOutput creates a new AnomaliesTableOutput instance
+func NewAnomaliesTableOutput(headers []string, rows [][]string, filterInfo string) *AnomaliesTableOutput {
+	return &AnomaliesTableOutput{
+		Headers:    headers,
+		Rows:       rows,
+		FilterInfo: filterInfo,
+		RowCount:   len(rows),
+	}
+}
+
 // NewForecastTableOutput creates a new ForecastTableOutput instance
 func NewForecastTableOutput(headers []string, rows [][]string, filterInfo string, total types.Total) *ForecastTableOutput {
 	return &ForecastTableOutput{

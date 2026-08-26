@@ -190,3 +190,44 @@ func (t *ForecastToTableTransformer) Transform(input types.ForecastPrintData) (*
 
 	return NewForecastTableOutput(headers, rows, filterInfo, total), nil
 }
+
+// AnomaliesToTableTransformer transforms cost anomaly data to table format
+type AnomaliesToTableTransformer struct{}
+
+// NewAnomaliesToTableTransformer creates a new transformer for anomaly table output
+func NewAnomaliesToTableTransformer() *AnomaliesToTableTransformer {
+	return &AnomaliesToTableTransformer{}
+}
+
+// Transform implements the Transformer interface for cost anomaly data
+func (t *AnomaliesToTableTransformer) Transform(input types.AnomaliesPrintData) (*AnomaliesTableOutput, error) {
+	headers := []string{
+		"Anomaly ID", "Monitor ARN", "Dimension", "Start", "End",
+		"Score", "Total Impact", "Feedback",
+	}
+
+	rows := utils.Transform(input.Anomalies.Anomalies, func(a costexplorertypes.Anomaly) []string {
+		return []string{
+			*a.AnomalyId,
+			*a.MonitorArn,
+			derefOrEmpty(a.DimensionValue),
+			derefOrEmpty(a.AnomalyStartDate),
+			derefOrEmpty(a.AnomalyEndDate),
+			fmt.Sprintf("%.1f", a.AnomalyScore.CurrentScore),
+			fmt.Sprintf("$%.2f", a.Impact.MaxImpact),
+			string(a.Feedback),
+		}
+	})
+
+	filterInfo := strings.Join(input.Filters, " | ")
+
+	return NewAnomaliesTableOutput(headers, rows, filterInfo), nil
+}
+
+// derefOrEmpty reads an optional AWS SDK string pointer, returning "" when unset.
+func derefOrEmpty(s *string) string {
+	if s == nil {
+		return ""
+	}
+	return *s
+}
