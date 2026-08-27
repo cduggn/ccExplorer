@@ -16,6 +16,8 @@ type CostExplorerAPI interface {
 		optFns ...func(*costexplorer.Options)) (*costexplorer.GetCostAndUsageOutput, error)
 	GetCostForecast(ctx context.Context, params *costexplorer.GetCostForecastInput,
 		optFns ...func(*costexplorer.Options)) (*costexplorer.GetCostForecastOutput, error)
+	GetAnomalies(ctx context.Context, params *costexplorer.GetAnomaliesInput,
+		optFns ...func(*costexplorer.Options)) (*costexplorer.GetAnomaliesOutput, error)
 }
 
 type Service struct {

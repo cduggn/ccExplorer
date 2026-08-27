@@ -106,6 +106,75 @@ func TestValidateGranularityAgainstDates(t *testing.T) {
 	}
 }
 
+func TestValidateAnomaliesDateRange(t *testing.T) {
+	tests := []struct {
+		name       string
+		start, end string
+		wantErr    string
+	}{
+		{"valid 90 day range", "2024-01-01", "2024-03-30", ""},
+		{"valid short range", "2024-01-01", "2024-01-10", ""},
+		{"exceeds 90 days", "2024-01-01", "2024-04-15", "must not exceed 90 days"},
+		{"end before start", "2024-02-01", "2024-01-01", "not be before start"},
+		{"malformed start", "nonsense", "2024-01-10", "Invalid date"},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			err := ValidateAnomaliesDateRange(tc.start, tc.end)
+			if tc.wantErr == "" {
+				assert.NoError(t, err)
+				return
+			}
+			require.Error(t, err)
+			assert.Contains(t, err.Error(), tc.wantErr)
+		})
+	}
+}
+
+func TestIsValidFeedbackType(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  bool
+	}{
+		{"empty is valid (unset filter)", "", true},
+		{"YES", "YES", true},
+		{"NO", "NO", true},
+		{"PLANNED_ACTIVITY", "PLANNED_ACTIVITY", true},
+		{"unknown value", "MAYBE", false},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.want, IsValidFeedbackType(tc.input))
+		})
+	}
+}
+
+func TestValidateAnomaliesInput(t *testing.T) {
+	base := types.AnomaliesCommandLineInput{
+		Start: "2024-01-01",
+		End:   "2024-01-10",
+	}
+
+	t.Run("accepts a well formed request", func(t *testing.T) {
+		assert.NoError(t, ValidateAnomaliesInput(base))
+	})
+
+	t.Run("rejects an invalid feedback value", func(t *testing.T) {
+		in := base
+		in.Feedback = "MAYBE"
+		assert.ErrorContains(t, ValidateAnomaliesInput(in), "Invalid feedback value")
+	})
+
+	t.Run("rejects a range over 90 days", func(t *testing.T) {
+		in := base
+		in.End = "2024-06-01"
+		assert.ErrorContains(t, ValidateAnomaliesInput(in), "must not exceed 90 days")
+	})
+}
+
 func baseInput() types.CommandLineInput {
 	return types.CommandLineInput{
 		Interval:    "MONTHLY",

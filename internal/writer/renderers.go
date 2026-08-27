@@ -181,6 +181,47 @@ func (r *ForecastTableRenderer) Render(data *ForecastTableOutput) error {
 	return nil
 }
 
+// AnomaliesTableRenderer renders cost anomaly table data to stdout
+type AnomaliesTableRenderer struct{}
+
+// NewAnomaliesTableRenderer creates a new anomalies table renderer
+func NewAnomaliesTableRenderer() *AnomaliesTableRenderer {
+	return &AnomaliesTableRenderer{}
+}
+
+// Render implements the Renderer interface for anomaly tables
+func (r *AnomaliesTableRenderer) Render(data *AnomaliesTableOutput) error {
+	if data.RowCount == 0 {
+		fmt.Println("No cost anomalies found for the given criteria.")
+		return nil
+	}
+
+	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
+	t.SetStyle(table.StyleColoredGreenWhiteOnBlack)
+
+	headerRow := make(table.Row, len(data.Headers))
+	for i, h := range data.Headers {
+		headerRow[i] = h
+	}
+	t.AppendHeader(headerRow)
+
+	for _, row := range data.Rows {
+		tableRow := make(table.Row, len(row))
+		for i, cell := range row {
+			tableRow[i] = cell
+		}
+		t.AppendRow(tableRow)
+	}
+
+	if data.FilterInfo != "" {
+		t.AppendFooter(table.Row{"FilteredBy", data.FilterInfo})
+	}
+
+	t.Render()
+	return nil
+}
+
 // CSVRenderer renders CSV data to files
 type CSVRenderer struct{}
 

@@ -145,6 +145,21 @@ type GetDimensionValuesRequest struct {
 	Time      Time
 }
 
+type AnomaliesCommandLineInput struct {
+	Start      string
+	End        string
+	MonitorArn string
+	Feedback   string
+	MaxResults int32
+}
+
+type GetAnomaliesRequestType struct {
+	Time       Time
+	MonitorArn string
+	Feedback   string
+	MaxResults int32
+}
+
 func (t Time) Equals(other Time) bool {
 	return t.Start == other.Start && t.End == other.End
 }
