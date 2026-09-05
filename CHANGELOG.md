@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.1](https://github.com/cduggn/ccExplorer/compare/v0.9.0...v0.9.1) (2026-08-27)
+
+
+### Features
+
+* add ccexplorer get aws anomalies command ([#420](https://github.com/cduggn/ccExplorer/issues/420)) ([4a7659d](https://github.com/cduggn/ccExplorer/commit/4a7659d929cdb5a851d57a033fe262ed4d0de97b))
+
 ## [0.9.0](https://github.com/cduggn/ccExplorer/compare/v0.8.6...v0.9.0) (2026-08-22)
 
 
